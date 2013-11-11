@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "ROLE=master" > /etc/serf/role
+apt-get -y install git
+git clone https://github.com/darron/serf-docker-events.git /etc/serf/handlers
+/usr/sbin/service serf restart

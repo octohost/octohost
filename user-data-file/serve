@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "ROLE=serve" > /etc/serf/role
+apt-get -y install git
+git clone https://github.com/darron/serf-docker-events.git /etc/serf/handlers
+/usr/sbin/service serf restart
+# Strange failures if it didn't sleep before it joined.
+# sleep 5
+# serf join x.x.x.x

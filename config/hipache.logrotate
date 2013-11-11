@@ -1,0 +1,8 @@
+/var/log/hipache_access.log {
+  daily
+  rotate 7
+  delaycompress
+  compress
+  notifempty
+  missingok
+}

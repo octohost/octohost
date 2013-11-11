@@ -1,0 +1,2 @@
+EVENTS_DIR="/etc/serf/handlers"
+SUFFIX="sh"
