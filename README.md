@@ -21,7 +21,7 @@ To host any web code possible:
 2. PHP - [5.4.x w/nginx](https://github.com/octohost/php5-nginx), WordPress
 3. Node - [0.10.x](https://github.com/octohost/nodejs), [Harp](https://github.com/octohost/harp), Ghost
 4. Python - [3.3](https://github.com/octohost/python-3.3), Django
-5. Go - [1.2rc3](https://github.com/octohost/go-1.2rc3)
+5. Go - [1.2rc3](https://github.com/octohost/go-1.2rc3), [Web.go](https://github.com/octohost/web.go)
 
 The goal is to host anything.
 
