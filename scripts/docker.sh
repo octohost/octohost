@@ -11,6 +11,6 @@ sudo apt-get update
 sudo apt-get install -y --force-yes lxc-docker
 
 # Listen on TCP as well as local socket.
-cd /etc/init/; sudo wget https://raw.github.com/octohost/octohost/master/config/docker.conf
+cd /etc/init/; sudo rm docker.conf; sudo wget https://raw.github.com/octohost/octohost/master/config/docker.conf
 
-service docker restart
+sudo service docker restart
