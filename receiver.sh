@@ -24,6 +24,20 @@ PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
 /usr/bin/redis-cli rpush frontend:$BASE.handbill.io $BASE
 /usr/bin/redis-cli rpush frontend:$BASE.handbill.io http://127.0.0.1:$PORT
 
+# Support a CNAME file in repo src
+CNAME=/home/git/src/$1/CNAME
+if [ -f $CNAME ]
+then
+  # Add a new line at end if it does not exist to ensure the loop gets last line
+  sed -i -e '$a\' $CNAME
+  while read DOMAIN
+  do
+    /usr/bin/redis-cli ltrim frontend:$DOMAIN 200 200
+    /usr/bin/redis-cli rpush frontend:$DOMAIN $DOMAIN
+    /usr/bin/redis-cli rpush frontend:$DOMAIN http://127.0.0.1:$PORT
+  done < $CNAME
+fi
+
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
 then
