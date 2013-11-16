@@ -1,0 +1,10 @@
+---
+
+# Install the PPA
+- apt_repository: repo='ppa:chris-lea/redis-server'
+
+# Install Redis
+- apt: pkg=redis-server state=installed
+
+# Make sure it's running.
+- service: name=redis-server state=started

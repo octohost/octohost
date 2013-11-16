@@ -1,0 +1,22 @@
+---
+- apt: pkg=git-core state=installed
+
+# Gitreceive
+- get_url: url=https://raw.github.com/progrium/gitreceive/master/gitreceive dest=/usr/bin/gitreceive mode=0755
+
+# Do the gitreceive setup if the /home/git directory doesn't already exist.
+- name: Check if path exists
+  stat: path=/home/git
+  register: check_path
+
+- command: /usr/bin/gitreceive init
+  when: (check_path.stat.exists == false)
+
+# Add to sudoers group
+- action: template src=../templates/git dest=/etc/sudoers.d/80-git validate='visudo -cf %s'
+- file: path=/etc/sudoers.d/80-git owner=root group=root mode=0440
+
+- command: rm /home/git/receiver
+
+# Add octohost receiver
+- get_url: url=https://raw.github.com/octohost/octohost/master/receiver.sh dest=/home/git/receiver mode=0755

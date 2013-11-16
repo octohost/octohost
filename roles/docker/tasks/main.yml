@@ -1,0 +1,16 @@
+---
+
+# Add key
+- apt_key: url=https://get.docker.io/gpg state=present
+
+# Add repo
+- apt_repository: repo='deb http://get.docker.io/ubuntu docker main' state=present
+
+# Update the cache
+- apt: update_cache=yes
+
+# Install Docker
+- apt: pkg=lxc-docker state=installed
+
+# Make sure it's running.
+- service: name=docker state=started

@@ -1,0 +1,7 @@
+---
+
+# Install the PPA
+- apt_repository: repo='ppa:chris-lea/node.js'
+
+# Install the packages.
+- apt: pkg=nodejs state=installed

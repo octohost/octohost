@@ -1,0 +1,22 @@
+---
+
+# Install Hipache
+- command: npm install https://github.com/darron/hipache/archive/0.2.4.tar.gz -g
+
+# Create the directory
+- file: state=directory path=/etc/hipache/
+
+# Hipache configuration file.
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/hipache.json dest=/etc/hipache/hipache.json mode=0644
+
+# Hipache startup script.
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/hipache.conf dest=/etc/init/hipache.conf mode=0644
+
+# Hipache logrotate
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/hipache.logrotate dest=/etc/logrotate.d/hipache mode=0644
+
+# Example action to enable service hipache, and not touch the running state
+- service: name=hipache enabled=yes
+
+# Start it up
+- service: name=hipache state=started
