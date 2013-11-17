@@ -14,3 +14,12 @@
 
 # Make sure it's running.
 - service: name=docker state=started
+
+# Remove configuration file.
+- command: rm -f /etc/init/docker.conf
+
+# Install proper configuration file.
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/docker.conf dest=/etc/init/docker.conf mode=0644
+
+# Make sure it's running.
+- service: name=docker state=restarted
