@@ -1,0 +1,33 @@
+---
+- name: "Install unzip"
+  apt: pkg=unzip state=installed update-cache=yes
+
+#Download serf
+- name: Download serf.
+  command: wget -O serf.zip ${serf_url} chdir=/tmp
+
+#Unzip serf
+- name: Unzip serf.
+  command: unzip serf.zip chdir=/tmp
+
+#Moves serf to path
+- name: Moves serf to path.
+  command: mv serf /usr/local/bin/serf chdir=/tmp
+
+# Create the configuration directory
+- file: state=directory path=/etc/serf/
+
+# Serf startup script.
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/serf.conf dest=/etc/init/serf.conf mode=0644
+
+# Serf defaults
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/serf.default dest=/etc/default/serf mode=0644
+
+# Serf logrotate
+- get_url: url=https://raw.github.com/octohost/octohost/master/config/serf.logrotate dest=/etc/logrotate.d/serf mode=0644
+
+# Example action to enable service hipache, and not touch the running state
+- service: name=serf enabled=yes
+
+# Start it up
+- service: name=serf state=started

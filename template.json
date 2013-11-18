@@ -9,20 +9,16 @@
             "access_key": "{{user `aws_access_key`}}",
             "secret_key": "{{user `aws_secret_key` }}",
             "region": "us-west-2",
-            "source_ami": "ami-b87fe488",
+            "source_ami": "ami-806bf0b0",
             "instance_type": "m1.small",
             "ssh_username": "ubuntu",
             "ami_name": "octohost {{timestamp}}"
             }],
 
     "provisioners": [{
-            "type": "shell",
-            "scripts": [
-                "scripts/docker.sh",
-                "scripts/serf.sh",
-                "scripts/hipache.sh",
-                "scripts/gitreceive.sh"
-            ]
+        "type": "ansible-local",
+        "playbook_file": "site.yml",
+        "role_paths": [ "ansible/common", "ansible/docker", "ansible/redis", "ansible/nodejs", "ansible/hipache", "ansible/serf", "ansible/gitreceive" ]
     }],
 
     "post-processors": ["vagrant"]
