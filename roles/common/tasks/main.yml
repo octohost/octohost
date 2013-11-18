@@ -1,0 +1,14 @@
+---
+# The playbook for common tasks
+
+# Run the equivalent of "apt-get update" as a separate step
+- apt: update_cache=yes
+
+# Update all packages to the latest version
+- apt: upgrade=yes
+
+# Install python-software-properties
+- apt: pkg=python-software-properties state=installed
+
+# Fix locale
+- command: /usr/sbin/update-locale
