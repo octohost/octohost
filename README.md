@@ -34,5 +34,24 @@ To Build the VM's
 
 `packer build template.json`
 
-Instructions to Come
+To Install on Rackspace using Ansible:
+---------
+
+Create the instance.
+
+`ssh root@ip.address.goes.here`
+
+Add your public key to the root user - double check it works.
+
+Upgrade the kernel:
+
+`apt-get update; apt-get -y upgrade; apt-get -y install linux-image-generic-lts-raring linux-headers-generic-lts-raring`
+
+`reboot`
+
+Update your Ansible Inventory file - add a "rackspace" group - then:
+
+`ansible-playbook site.yml`
+
+Additional Instructions to Come
 ---------
