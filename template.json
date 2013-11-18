@@ -9,7 +9,7 @@
             "access_key": "{{user `aws_access_key`}}",
             "secret_key": "{{user `aws_secret_key` }}",
             "region": "us-west-2",
-            "source_ami": "ami-6aad335a",
+            "source_ami": "ami-1c7fe42c",
             "instance_type": "m1.small",
             "ssh_username": "ubuntu",
             "ami_name": "octohost {{timestamp}}"
@@ -18,7 +18,6 @@
     "provisioners": [{
             "type": "shell",
             "scripts": [
-                "scripts/setup.sh",
                 "scripts/docker.sh",
                 "scripts/serf.sh",
                 "scripts/hipache.sh",
