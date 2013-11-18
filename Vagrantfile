@@ -10,9 +10,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box_url = "https://dl.dropboxusercontent.com/u/695019/vagrant/precise64-3.8.box"
 
     # Proper kernel setup from setup.sh has already been done with that VM.
-    config.vm.provision "shell", path: "scripts/docker.sh"
-    config.vm.provision "shell", path: "scripts/serf.sh"
-    config.vm.provision "shell", path: "scripts/hipache.sh"
-    config.vm.provision "shell", path: "user-data-file/master"
+    config.vm.provision "shell", path: "shell/docker.sh"
+    config.vm.provision "shell", path: "shell/serf.sh"
+    config.vm.provision "shell", path: "shell/hipache.sh"
   end
 end
