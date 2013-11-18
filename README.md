@@ -3,7 +3,7 @@ Octohost
 
 A [Packer](http://www.packer.io/) template to build:
 
-  1. An AMI using Ubuntu 12.04 in AWS USW-2 (Oregon) region.
+  1. An AMI using Ubuntu 12.04 in AWS USW-2 (Oregon) region. It's built using [another AMI](https://github.com/octohost/ubuntu-12.0.4-3.8).
   2. A Virtualbox Vagrant box.
 
 Includes:
