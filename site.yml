@@ -1,5 +1,5 @@
-- hosts: all
-  user: vagrant
+- hosts: rackspace
+  user: root
   sudo: True
   gather_facts: False
   # vars_files:

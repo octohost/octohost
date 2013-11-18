@@ -3,6 +3,9 @@
 # Install the PPA
 - apt_repository: repo='ppa:chris-lea/redis-server'
 
+# Run the equivalent of "apt-get update" as a separate step
+- apt: update_cache=yes
+
 # Install Redis
 - apt: pkg=redis-server state=installed
 
