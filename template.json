@@ -17,7 +17,7 @@
 
     "provisioners": [{
         "type": "ansible-local",
-        "playbook_file": "site.yml",
+        "playbook_file": "ansible.yml",
         "role_paths": [ "ansible/common", "ansible/docker", "ansible/redis", "ansible/nodejs", "ansible/hipache", "ansible/serf", "ansible/gitreceive" ]
     }],
 

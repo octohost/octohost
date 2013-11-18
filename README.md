@@ -37,17 +37,13 @@ To Build the VM's
 To Install on Rackspace using Ansible:
 ---------
 
-Create the instance.
+Create the instance. Add your public key to the root user - use [ssh-copy-id](https://github.com/beautifulcode/ssh-copy-id-for-OSX):
 
-`ssh root@ip.address.goes.here`
+`ssh-copy-id -i ~/.ssh/id_dsa.pub root@ip.address.here`
 
-Add your public key to the root user - double check it works.
+Upgrade the kernel and reboot:
 
-Upgrade the kernel:
-
-`apt-get update; apt-get -y upgrade; apt-get -y install linux-image-generic-lts-raring linux-headers-generic-lts-raring`
-
-`reboot`
+`ssh root@ip.address.here "apt-get update && apt-get -y upgrade && apt-get -y install linux-image-generic-lts-raring linux-headers-generic-lts-raring && reboot"`
 
 Update your Ansible Inventory file - add a "rackspace" group - then:
 
