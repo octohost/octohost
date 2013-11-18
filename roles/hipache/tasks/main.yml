@@ -1,0 +1,22 @@
+---
+
+- name: Install Hipache from our fork.
+  command: npm install https://github.com/darron/hipache/archive/0.2.4.tar.gz -g
+
+- name: Create config directory.
+  file: state=directory path=/etc/hipache/
+
+- name: Install our configuration file.
+  get_url: url=https://raw.github.com/octohost/octohost/master/config/hipache.json dest=/etc/hipache/hipache.json mode=0644
+
+- name: Install Hipache Upstart script.
+  get_url: url=https://raw.github.com/octohost/octohost/master/config/hipache.conf dest=/etc/init/hipache.conf mode=0644
+
+- name: Install Hipache logrotate.
+  get_url: url=https://raw.github.com/octohost/octohost/master/config/hipache.logrotate dest=/etc/logrotate.d/hipache mode=0644
+
+- name: Enable Hipache startup.
+  service: name=hipache enabled=yes
+
+- name: Make sure it's running.
+  service: name=hipache state=started

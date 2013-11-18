@@ -1,0 +1,14 @@
+---
+
+- name: Update the apt cache.
+  apt: update_cache=yes
+
+
+- name: Upgrade all packages.
+  apt: upgrade=yes
+
+- name: Install python-software-properties
+  apt: pkg=python-software-properties state=installed
+
+- name: Fix locale.
+  command: /usr/sbin/update-locale

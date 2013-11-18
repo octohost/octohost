@@ -1,0 +1,13 @@
+---
+
+- name: Install Redis PPA
+  apt_repository: repo='ppa:chris-lea/redis-server'
+
+- name: Updated APT caches again.
+  apt: update_cache=yes
+
+- name: Install Redis.
+  apt: pkg=redis-server state=installed
+
+- name: Make sure it's running.
+  service: name=redis-server state=started
