@@ -7,7 +7,6 @@
   #   - vars/user.yml
 
   roles:
-    - common
     - docker
     - redis
     - nodejs
