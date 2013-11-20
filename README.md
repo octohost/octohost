@@ -33,11 +33,11 @@ The goal is to host anything - more are being worked on.
 Start Using Octohost
 ---------
 
-1. Build your AMI - clone this repo and build using [Packer](http://www.packer.io/):
+1\. Build your AMI - clone this repo and build using [Packer](http://www.packer.io/):
 
 `packer build template.json`
 
-2. Create an AWS security group with port 80 open to the world, port 22 open to you and all ports open to other members of that group.
+2\. Create an AWS security group with port 80 open to the world, port 22 open to you and all ports open to other members of that group.
 
 ```
 ec2-create-group -K your-key octohost -d "Octohost Group" --region us-west-2
@@ -58,19 +58,19 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3. Create a running instance using your AMI and security group:
+3\. Create a running instance using your AMI and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
 
-4. Once it's launched - visit that ip address with your web browser - it should say:
+4\. Once it's launched - visit that ip address with your web browser - it should say:
 
 "No Application Configured - This domain is not associated with an application."
 
-5. Add your private key to gitreceive:
+5\. Add your private key to gitreceive:
 
 `cat ~/.ssh/id_dsa.pub | ssh -i ~/your-key.pem ubuntu@ip.address.here "sudo gitreceive upload-key ubuntu"`
 
-6. Now you can push one of our example repos:
+6\. Now you can push one of our example repos:
 
 ```
 git clone git@github.com:octohost/harp.git
@@ -83,11 +83,11 @@ It will pull the base Docker container, build your repo and launch your site. Th
 
 `Your site is available at: http://harp.ip.address.here.xip.io`
 
-7. Visit that site:
+7\. Visit that site:
 
 http://harp.ip.address.here.xip.io
 
-8. Take a look around at all of the frameworks and languages available at [https://github.com/octohost](https://github.com/octohost).
+8\. Take a look around at all of the frameworks and languages available at [https://github.com/octohost](https://github.com/octohost).
 
 Send us a pull request - we'll look at adding whatever is needed.
 
