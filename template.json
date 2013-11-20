@@ -18,7 +18,7 @@
     "provisioners": [{
         "type": "ansible-local",
         "playbook_file": "ansible.yml",
-        "role_paths": [ "roles/common", "roles/docker", "roles/redis", "roles/nodejs", "roles/hipache", "roles/serf", "roles/gitreceive" ]
+        "role_paths": [ "roles/common", "roles/docker", "roles/redis", "roles/nodejs", "roles/hipache", "roles/serf", "roles/gitreceive", "roles/shipyard" ]
     }],
 
     "post-processors": ["vagrant"]
