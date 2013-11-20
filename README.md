@@ -30,7 +30,9 @@ To host any web code possible:
 
 The goal is to host anything - more are being worked on.
 
-Start Using Octohost
+PLEASE NOTE: There may be security holes, there are rough edges, it is not complete and eat your data - but *it works for us* at the moment. YMMV.
+
+To Start Using Octohost
 ---------
 
 1\. Build your AMI - clone this repo and build using [Packer](http://www.packer.io/):
@@ -100,16 +102,19 @@ http://octohost-test.ip.address.here.xip.io
 
 8\. Take a look around at all of the frameworks and languages available at [https://github.com/octohost](https://github.com/octohost).
 
-Send us a pull request - we'll look at adding whatever is needed.
+There's lots to do, this is nowhere near done - but it's working as the backend for a service of ours.
+
+Got a change? Send us a pull request - we'll look at adding whatever is needed.
 
 A few notes
 --------
 
 1. The key to octohost is the Dockerfile in the root of any repo. That's what determines how the site is built and runs.
-2. Currently there is only a single exposed port working.
-3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server.
+2. Currently there is only a single exposed port working per container.
+3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server. We're using external managed MySQL and Memcache at the moment.
 4. If you want to use your own domain name, just point a wildcard record to the server and edit the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) file.
 5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise.
+6. Port 8000 is blocked off on AWS, but will be wide open on Rackspace - login and change the password from the [default](https://github.com/shipyard/shipyard).
 
 To Build the VM's
 --------
@@ -133,4 +138,4 @@ Update your Ansible Inventory file - add a "rackspace" group - then:
 
 `ansible-playbook site.yml`
 
-Follow step 4 - 8 as above.
+Follow step 4 - 8 as above. PLEASE READ NOTE \#6.
