@@ -5,6 +5,9 @@ echo "Building Docker image."
 BASE=`basename $1 .git`
 echo "Base: $BASE"
 
+# Get Public IP address.
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
 OLD_PORT=$(sudo docker inspect $OLD_ID | grep "HostPort" | cut -d ':' -f 2 | cut -d '"' -f 2)
@@ -13,16 +16,16 @@ OLD_PORT=$(sudo docker inspect $OLD_ID | grep "HostPort" | cut -d ':' -f 2 | cut
 INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
 
 # Build and get the ID.
-sudo docker build -t nonfiction/$BASE /home/git/src/$1
-ID=$(sudo docker run -P -d nonfiction/$BASE)
+sudo docker build -t octohost/$BASE /home/git/src/$1
+ID=$(sudo docker run -P -d octohost/$BASE)
 # Get the $PORT from the container.
 PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
 
 # Zero out any existing items.
-/usr/bin/redis-cli ltrim frontend:$BASE.handbill.io 200 200
-# Connect $BASE.handbill.io to the $PORT
-/usr/bin/redis-cli rpush frontend:$BASE.handbill.io $BASE
-/usr/bin/redis-cli rpush frontend:$BASE.handbill.io http://127.0.0.1:$PORT
+/usr/bin/redis-cli ltrim frontend:$BASE.$PUBLIC_IP.xip.io 200 200
+# Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
+/usr/bin/redis-cli rpush frontend:$BASE.$PUBLIC_IP.xip.io $BASE
+/usr/bin/redis-cli rpush frontend:$BASE.$PUBLIC_IP.xip.io http://127.0.0.1:$PORT
 
 # Support a CNAME file in repo src
 CNAME=/home/git/src/$1/CNAME
@@ -46,3 +49,5 @@ then
 else
   echo "Not killing anything."
 fi
+
+echo "Your site is available at: http://$BASE.$PUBLIC_IP.xip.io"
