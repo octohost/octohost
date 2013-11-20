@@ -61,7 +61,7 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3\. Create a running instance using your AMI (or use ami-2a33a81a) and security group:
+3\. Create a running instance using your AMI (or use ami-d430abe4) and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
 
