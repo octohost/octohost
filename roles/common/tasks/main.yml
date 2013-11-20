@@ -3,12 +3,20 @@
 - name: Update the apt cache.
   apt: update_cache=yes
 
-
 - name: Upgrade all packages.
   apt: upgrade=yes
 
 - name: Install python-software-properties
   apt: pkg=python-software-properties state=installed
+  
+- name: Install ntp
+  apt: pkg=ntp state=installed
+
+- name: Enable ntp startup.
+  service: name=ntp enabled=yes
+
+- name: Make sure it's running.
+  service: name=ntp state=started
 
 - name: Fix locale.
   command: /usr/sbin/update-locale
