@@ -6,7 +6,7 @@ BASE=`basename $1 .git`
 echo "Base: $BASE"
 
 # Get Public IP address.
-PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+PUBLIC_IP=$(curl -s http://icanhazip.com)
 
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
