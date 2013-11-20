@@ -37,12 +37,15 @@ Start Using Octohost
 
 `packer build template.json`
 
+NOTE: The AMI in [template.json](https://github.com/octohost/octohost/blob/master/template.json) has all of the proper required kernel extensions for Docker as well as [Chef](http://www.opscode.com/chef/) \(currently unused\) and [Ansible](https://github.com/ansible/ansible) provisioners. If you supply your own AMI, make sure it's got those items. You can rebuild build your own from [this repo](https://github.com/octohost/ubuntu-12.0.4-3.8).
+
 2\. Create an AWS security group with port 80 open to the world, port 22 open to you and all ports open to other members of that group.
 
 ```
 ec2-create-group -K your-key octohost -d "Octohost Group" --region us-west-2
 ec2-authorize octohost -P tcp -p 80 -s 0.0.0.0/0 --region us-west-2
 ec2-authorize octohost -P tcp -p 22 -s 0.0.0.0/0 --region us-west-2
+# Not totally required - but helpful with Serf and Shipyard.
 ec2-authorize octohost -P tcp -p 0-65535 -o sg-groupid --region us-west-2
 ec2-authorize octohost -P udp -p 0-65535 -o sg-groupid --region us-west-2
 ```
@@ -58,7 +61,7 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3\. Create a running instance using your AMI and security group:
+3\. Create a running instance using your AMI (or use ami-2a33a81a) and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
 
@@ -87,10 +90,26 @@ It will pull the base Docker container, build your repo and launch your site. Th
 
 http://harp.ip.address.here.xip.io
 
+NOTE: Whatever you name your git repo is what the website URL is - for example:
+
+`git remote add octohost git@ip.address.here:octohost-test.git`
+
+would be located at:
+
+http://octohost-test.ip.address.here.xip.io
+
 8\. Take a look around at all of the frameworks and languages available at [https://github.com/octohost](https://github.com/octohost).
 
 Send us a pull request - we'll look at adding whatever is needed.
 
+A few notes
+--------
+
+1. The key to octohost is the Dockerfile in the root of any repo. That's what determines how the site is built and runs.
+2. Currently there is only a single exposed port working.
+3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server.
+4. If you want to use your own domain name, just point a wildcard record to the server and edit the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) file.
+5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise.
 
 To Build the VM's
 --------
