@@ -8,6 +8,9 @@ echo "Base: $BASE"
 # Get Public IP address.
 PUBLIC_IP=$(curl -s http://icanhazip.com)
 
+# Set the domain name here if desired.
+DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
+
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
 OLD_PORT=$(sudo docker inspect $OLD_ID | grep "HostPort" | cut -d ':' -f 2 | cut -d '"' -f 2)
@@ -22,10 +25,10 @@ ID=$(sudo docker run -P -d octohost/$BASE)
 PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
 
 # Zero out any existing items.
-/usr/bin/redis-cli ltrim frontend:$BASE.$PUBLIC_IP.xip.io 200 200
+/usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200
 # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
-/usr/bin/redis-cli rpush frontend:$BASE.$PUBLIC_IP.xip.io $BASE
-/usr/bin/redis-cli rpush frontend:$BASE.$PUBLIC_IP.xip.io http://127.0.0.1:$PORT
+/usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX $BASE
+/usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX http://127.0.0.1:$PORT
 
 # Support a CNAME file in repo src
 CNAME=/home/git/src/$1/CNAME
@@ -50,4 +53,4 @@ else
   echo "Not killing anything."
 fi
 
-echo "Your site is available at: http://$BASE.$PUBLIC_IP.xip.io"
+echo "Your site is available at: http://$BASE.$DOMAIN_SUFFIX"
