@@ -6,7 +6,7 @@ BASE=`basename $1 .git`
 echo "Base: $BASE"
 
 # Get Public IP address.
-PUBLIC_IP=$(curl -s http://icanhazip.com)
+PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
 
 # Set the domain name here if desired.
 DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
