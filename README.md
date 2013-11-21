@@ -6,6 +6,8 @@ A [Packer](http://www.packer.io/) template to build:
   1. An AMI using Ubuntu 12.04 in AWS USW-2 (Oregon) region. It's built using [another AMI](https://github.com/octohost/ubuntu-12.0.4-3.8).
   2. A Virtualbox Vagrant box.
 
+There's also an Ansible playbook to build on Rackspace and other systems that support it.
+
 Includes:
 
   1. [Docker](http://www.docker.io/)
@@ -38,7 +40,7 @@ Advanced Quickstart
 These are the minimum amount of commands needed to get started:
 
 ```
-ec2-run-instances --key your-key -g group-with-22-and-80-open ami-3c34af0c --region us-west-2
+ec2-run-instances --key your-key -g group-with-22-and-80-open ami-26d84216 --region us-west-2
 cat ~/.ssh/id_dsa.pub | ssh -i ~/.ssh/your-key.pem ubuntu@ip.address.here "sudo gitreceive upload-key ubuntu"
 git clone git@github.com:octohost/harp.git
 cd harp && git remote add octohost git@ip.address.here:harp.git
@@ -78,7 +80,7 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3\. Create a running instance using your AMI (or use ami-3c34af0c) and security group:
+3\. Create a running instance using your AMI (or use ami-26d84216) and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
 
@@ -129,7 +131,7 @@ A few notes
 3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server. We're using external managed MySQL and Memcache at the moment.
 4. If you want to use your own domain name, just point a wildcard record to the server and edit DOMAIN_SUFFIX in the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) file.
 5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise.
-6. Port 8000 is blocked off on AWS, but will be wide open on Rackspace - login and change the password from the [default](https://github.com/shipyard/shipyard).
+6. Port 8000 is blocked off on AWS (depending on your security group), but will be wide open on Rackspace and other providers - login and change the password from the [default](https://github.com/shipyard/shipyard).
 
 To Build the VM's
 --------
