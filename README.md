@@ -126,6 +126,10 @@ To Build the VM's
 To Install on Rackspace using Ansible:
 ---------
 
+You'll need to install Ansible on your local computer - on OS X:
+
+`brew install ansible`
+
 Create the instance. Add your public key to the root user - use [ssh-copy-id](https://github.com/beautifulcode/ssh-copy-id-for-OSX):
 
 `ssh-copy-id -i ~/.ssh/id_dsa.pub root@ip.address.here`
@@ -136,6 +140,6 @@ Upgrade the kernel and reboot:
 
 Update your Ansible Inventory file - add a "rackspace" group - then:
 
-`ansible-playbook site.yml`
+`ansible-playbook ansible.yml`
 
 Follow step 4 - 8 as above. PLEASE READ NOTE \#6.
