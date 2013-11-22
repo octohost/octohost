@@ -10,7 +10,7 @@ There's also an Ansible playbook to build on Rackspace and other systems that su
 
 Includes:
 
-  1. [Docker](http://www.docker.io/)
+  1. [Docker 0.6.7](http://www.docker.io/)
   2. [Serf](http://www.serfdom.io/) - Currently unused - we have some [plans](https://github.com/darron/serf-docker-events).
   3. [Hipache](https://github.com/dotcloud/hipache) - to route traffic to the proper docker container.
   4. [Gitreceive](https://github.com/progrium/gitreceive) - to receive pushes and do the magic.
@@ -40,7 +40,7 @@ Advanced Quickstart
 These are the minimum amount of commands needed to get started:
 
 ```
-ec2-run-instances --key your-key -g group-with-22-and-80-open ami-26d84216 --region us-west-2
+ec2-run-instances --key your-key -g group-with-22-and-80-open ami-06fa6036 --region us-west-2
 cat ~/.ssh/id_dsa.pub | ssh -i ~/.ssh/your-key.pem ubuntu@ip.address.here "sudo gitreceive upload-key ubuntu"
 git clone git@github.com:octohost/harp.git
 cd harp && git remote add octohost git@ip.address.here:harp.git
@@ -80,7 +80,7 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3\. Create a running instance using your AMI (or use ami-26d84216) and security group:
+3\. Create a running instance using your AMI (or use ami-06fa6036) and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
 
