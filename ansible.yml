@@ -1,5 +1,5 @@
 - hosts: all
-  user: root
+  user: ubuntu
   sudo: True
   gather_facts: False
 
