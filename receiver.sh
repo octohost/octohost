@@ -13,7 +13,13 @@ DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
 
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
-OLD_PORT=$(sudo docker inspect $OLD_ID | grep "HostPort" | cut -d ':' -f 2 | cut -d '"' -f 2)
+
+if [ -n "$OLD_ID" ]
+then
+  OLD_PORT=$(sudo docker inspect $OLD_ID | grep "HostPort" | cut -d ':' -f 2 | cut -d '"' -f 2)
+else
+  echo "Nothing running - no need to look for a port."
+fi
 
 # Look for the exposed port.
 INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
