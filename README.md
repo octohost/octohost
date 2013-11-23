@@ -32,7 +32,7 @@ To host any web code possible:
 
 The goal is to host anything - more are being worked on.
 
-PLEASE NOTE: There may be security holes, there are rough edges, it is not complete and eat your data - but *it works for us* at the moment. YMMV.
+PLEASE NOTE: There may be security holes, there are rough edges, it is not complete and may eat your data - but *it works for us* at the moment. We are experiencing some container crashing - but it's alpha software so that's to be expected. YMMV.
 
 Advanced Quickstart
 ---------
