@@ -18,5 +18,8 @@
 - name: Make sure it's running.
   service: name=ntp state=started
 
+- name: Install lynx
+  apt: pkg=lynx-cur state=installed
+
 - name: Fix locale.
   command: /usr/sbin/update-locale
