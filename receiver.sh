@@ -21,14 +21,20 @@ else
   echo "Nothing running - no need to look for a port."
 fi
 
-# Look for the exposed port.
-INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
+if [ -e "/home/git/src/$1/Dockerfile" ]
+then
+  # Look for the exposed port.
+  INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
+  # Build and get the ID.
+  sudo docker build -t octohost/$BASE /home/git/src/$1
 
-# Build and get the ID.
-sudo docker build -t octohost/$BASE /home/git/src/$1
-ID=$(sudo docker run -P -d octohost/$BASE)
-# Get the $PORT from the container.
-PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
+  ID=$(sudo docker run -P -d octohost/$BASE)
+  # Get the $PORT from the container.
+  PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
+else
+  echo "There is no Dockerfile present."
+  exit
+fi
 
 # Zero out any existing items.
 /usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200
