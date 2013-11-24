@@ -2,17 +2,22 @@
 source /etc/default/octohost
 
 case "$1" in
+
   status)
     cd $SRC_DIR
     for i in *; do
       echo "$i"
     done
+    ;;
+
   restart)
     if [ -n $2 ]; then
       echo "Restarting $2."
     else
       else "Need a site to restart."
     fi
+    ;;
+
   *)
     echo "Usage: octo <command> [options]"
     ;;
