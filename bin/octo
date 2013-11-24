@@ -6,15 +6,20 @@ case "$1" in
   status)
     cd $SRC_DIR
     for i in *; do
-      echo "$i"
+      site=`basename $i .git`
+      if (wget -S -t 3 --random-wait --delete-after -qO- http://$site.$SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
+        echo "$site: OK"
+      else
+        echo "$site: DOWN"
+      fi
     done
     ;;
 
   restart)
-    if [ -n $2 ]; then
+    if [ $2 ]; then
       echo "Restarting $2."
     else
-      else "Need a site to restart."
+      echo "Need a site to restart."
     fi
     ;;
 
