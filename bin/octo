@@ -7,10 +7,10 @@ case "$1" in
     cd $SRC_DIR
     for i in *; do
       site=`basename $i .git`
-      if (wget -S -t 3 --random-wait --delete-after -qO- http://$site.$SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
-        echo "$site: OK"
+      if (wget -S -t 1 -T 2 --delete-after -qO- http://$site.$SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
+        echo -e "$site: \e[32mOK\e[0m"
       else
-        echo "$site: DOWN"
+        echo -e "$site: \e[31mDOWN\e[0m"
       fi
     done
     ;;
