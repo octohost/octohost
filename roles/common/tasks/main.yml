@@ -23,3 +23,7 @@
 
 - name: Fix locale.
   command: /usr/sbin/update-locale
+
+- name: Install octo cli command.
+  get_url: url=https://raw.github.com/octohost/octohost/master/bin/octo dest=/usr/bin/octo
+  file: path=/usr/bin/octo owner=root group=docker mode=0750
