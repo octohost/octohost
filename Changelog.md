@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4 - ami-da910bea
+
+#### Changes
+
+* Add /usr/bin/octo status|restart - shows status and can reload from an uploaded git repo.
+* Update to Serf 0.2.1
+* Don't build without a Dockerfile.
+* Add a little better error checking on push.
+* Added Lynx.
+
 ## 0.3 - ami-06fa6036
 
 #### Changes

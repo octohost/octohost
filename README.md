@@ -40,7 +40,7 @@ Advanced Quickstart
 These are the minimum amount of commands needed to get started:
 
 ```
-ec2-run-instances --key your-key -g group-with-22-and-80-open ami-06fa6036 --region us-west-2
+ec2-run-instances --key your-key -g group-with-22-and-80-open ami-da910bea --region us-west-2
 cat ~/.ssh/id_dsa.pub | ssh -i ~/.ssh/your-key.pem ubuntu@ip.address.here "sudo gitreceive upload-key ubuntu"
 git clone git@github.com:octohost/harp.git
 cd harp && git remote add octohost git@ip.address.here:harp.git
@@ -80,7 +80,7 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3\. Create a running instance using your AMI (or use ami-06fa6036) and security group:
+3\. Create a running instance using your AMI (or use ami-da910bea) and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
 
@@ -123,13 +123,40 @@ There's lots to do, this is nowhere near done - but it's working as the backend 
 
 Got a change? Send us a pull request - we'll look at adding whatever is needed.
 
+The 'octo' cli
+--------
+
+In v0.4 we added a small cli to check status of all hosted sites and reload if needed:
+
+`sudo /usr/bin/octo status`
+
+Will show the status of all installed sites - example output:
+
+```
+harp: OK
+martini: OK
+middleman: OK
+octopress: OK
+php5-nginx: OK
+revel: OK
+sinatra: DOWN
+web.go: OK
+www: OK
+```
+
+Restarting a site that is "DOWN" is as easy as:
+
+`sudo /usr/bin/octo restart sinatra`
+
+Pretty nice way to quickly see problems and deal with them.
+
 A few notes
 --------
 
 1. The key to octohost is the Dockerfile in the root of any repo. That's what determines how the site is built and runs.
 2. Currently there is only a single exposed port working per container.
 3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server. We're using external managed MySQL and Memcache at the moment.
-4. If you want to use your own domain name, just point a wildcard record to the server and edit DOMAIN_SUFFIX in the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) file.
+4. If you want to use your own domain name, just point a wildcard record to the server and edit DOMAIN_SUFFIX in the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) and [/usr/bin/octo](https://github.com/octohost/octohost/blob/master/bin/octo) files.
 5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise.
 6. Port 8000 is blocked off on AWS (depending on your security group), but will be wide open on Rackspace and other providers - login and change the password from the [default](https://github.com/shipyard/shipyard).
 
