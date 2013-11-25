@@ -1,5 +1,9 @@
 #!/bin/bash
-source /etc/default/octohost
+
+# Directories and domain names.
+SRC_DIR="/home/git/src/"
+PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
+DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
 
 case "$1" in
 
@@ -7,7 +11,7 @@ case "$1" in
     cd $SRC_DIR
     for i in *; do
       site=`basename $i .git`
-      if (wget -S -t 1 -T 2 --delete-after -qO- http://$site.$SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
+      if (wget -S -t 1 -T 2 --delete-after -qO- http://$site.$DOMAIN_SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
         echo -e "$site: \e[32mOK\e[0m"
       else
         echo -e "$site: \e[31mDOWN\e[0m"
