@@ -14,7 +14,7 @@ To host any web code possible:
 6. Openresty - [1.4.2.8](https://github.com/octohost/openresty)
 7. Java - [OpenJDK7](https://github.com/octohost/openjdk7)
 
-The goal is to host anything - more are being worked on.
+The goal is to host anything - more options are being worked on and added.
 
 This repo contains a [Packer](http://www.packer.io/) template [to build](https://github.com/octohost/octohost/blob/master/docs/INSTALL.md):
 
@@ -23,7 +23,7 @@ This repo contains a [Packer](http://www.packer.io/) template [to build](https:/
 
 There's also an [Ansible playbook](https://github.com/octohost/octohost/blob/master/docs/INSTALL.md) to build on Rackspace and other systems that support it.
 
-Includes:
+A full installation includes:
 
   1. [Docker 0.6.7](http://www.docker.io/)
   2. [Serf](http://www.serfdom.io/) - Currently unused - we have some [plans](https://github.com/darron/serf-docker-events).
@@ -53,27 +53,7 @@ If this doesn't work - please see the [INSTALL document](https://github.com/octo
 The 'octo' cli
 --------
 
-In v0.4 we added a small cli to check status of all hosted sites and reload if needed:
+In v0.4 we added a small cli to check status of all hosted sites and reload if needed.
 
-`sudo /usr/bin/octo status`
-
-Will show the status of all installed sites - example output:
-
-```
-harp: OK
-martini: OK
-middleman: OK
-octopress: OK
-php5-nginx: OK
-revel: OK
-sinatra: DOWN
-web.go: OK
-www: OK
-```
-
-Restarting a site that is "DOWN" is as easy as:
-
-`sudo /usr/bin/octo restart sinatra`
-
-Pretty nice way to quickly see problems and deal with them.
+More information is located in the [documentation](https://github.com/octohost/octohost/blob/master/docs/octo-cli.md).
 
