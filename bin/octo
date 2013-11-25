@@ -18,6 +18,13 @@ case "$1" in
       fi
     done
     ;;
+  
+  clean)
+    echo "Cleaning old exited containers."
+    docker ps -a | grep "Exit" | cut -d ' ' -f 1 | xargs docker rm
+    echo "Showining all remaining containers."
+    docker ps -a
+    ;;
 
   restart)
     if [ $2 ]; then
@@ -31,6 +38,6 @@ case "$1" in
     ;;
 
   *)
-    echo "Usage: octo status|restart \$site"
+    echo "Usage: octo status|clean|restart \$site"
     ;;
 esac 
