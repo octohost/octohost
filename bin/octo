@@ -27,6 +27,6 @@ case "$1" in
     ;;
 
   *)
-    echo "Usage: octo <command> [options]"
+    echo "Usage: octo status|restart \$site"
     ;;
 esac 
