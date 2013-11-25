@@ -18,6 +18,9 @@ case "$1" in
   restart)
     if [ $2 ]; then
       echo "Restarting $2."
+      newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
+      cd /home/git/$2.git; git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE"  
+      rm -rf /home/git/src/$2
     else
       echo "Need a site to restart."
     fi
