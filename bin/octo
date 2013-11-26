@@ -28,13 +28,35 @@ case "$1" in
     ;;
   
   remove)
-    if [ $1 ]; then
-      rm -rf /home/git/$1.git
-      if [ -d /home/git/src/$1.git ]; then rm -rf /home/git/src/$1.git; fi
-      OLD_ID=$(docker ps | grep "$1:latest" | cut -d ' ' -f 1)
-      if [ $OLD_ID ]; then docker kill $OLD_ID; fi
+    if [ $2 ]; then
+      if [ -d /home/git/$2.git ]; then rm -rf /home/git/$2.git; fi
+      if [ -d /home/git/src/$2.git ]; then rm -rf /home/git/src/$2.git; fi
+      echo "Removed the source of $2."
+      OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
+      if [ $OLD_ID ]; then 
+        docker kill $OLD_ID
+        echo "Removed running conainter."
+      fi
     else
       echo "Need the name to remove."
+    fi
+    ;;
+  
+  move)
+    if [ -n $1 ]; then
+      echo "Please pick 'sites' or 'keys'."
+      exit
+    fi
+    if [ $2 ]; then
+      if [ "$2" == 'sites' ]; then
+        
+      elif [ "$2" == 'keys' ]; then
+      
+      else
+        echo "Options are 'sites' and 'keys'."
+      fi
+    else
+      echo "Please add the destination."
     fi
     ;;
 
