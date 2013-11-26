@@ -29,9 +29,14 @@ case "$1" in
   
   remove)
     if [ $2 ]; then
-      if [ -d /home/git/$2.git ]; then rm -rf /home/git/$2.git; fi
+      if [ -d /home/git/$2.git ]; then
+        rm -rf /home/git/$2.git
+      else
+        echo "There is no source with that name."
+        exit
+      fi
       if [ -d /home/git/src/$2.git ]; then rm -rf /home/git/src/$2.git; fi
-      echo "Removed the source of $2."
+      echo "Removed the source for $2."
       OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then 
         docker kill $OLD_ID
