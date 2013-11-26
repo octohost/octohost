@@ -21,9 +21,21 @@ case "$1" in
   
   clean)
     echo "Cleaning old exited containers."
+    # TODO: Errors if there's no containers - annoying.
     docker ps -a | grep "Exit" | cut -d ' ' -f 1 | xargs docker rm
-    echo "Showining all remaining containers."
+    echo "Showing all remaining containers."
     docker ps -a
+    ;;
+  
+  remove)
+    if [ $1 ]; then
+      rm -rf /home/git/$1.git
+      if [ -d /home/git/src/$1.git ]; then rm -rf /home/git/src/$1.git; fi
+      OLD_ID=$(docker ps | grep "$1:latest" | cut -d ' ' -f 1)
+      if [ $OLD_ID ]; then docker kill $OLD_ID; fi
+    else
+      echo "Need the name to remove."
+    fi
     ;;
 
   restart)
