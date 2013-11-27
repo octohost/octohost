@@ -29,3 +29,21 @@
 
 - name: Set permissions on octo cli command.
   file: path=/usr/bin/octo owner=root group=root mode=0750
+
+- name: Install /etc/sudoers.tmp file.
+  action: template src=../files/sudoers dest=/etc/sudoers.tmp
+
+- name: Set the permissions.
+  file: path=/etc/sudoers.tmp owner=root group=root mode=0440
+
+- name: Final sudoers file check
+  shell: visudo -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers
+
+- name: Install new sshd config
+  action: template src=../files/sshd-config dest=/etc/ssh/sshd_config
+
+- name: Make sure permissions are correct.
+  file: path=/etc/ssh/sshd_config owner=root group=root mode=0644
+
+- name: Restart sshd.
+  service: name=ssh state=restarted
