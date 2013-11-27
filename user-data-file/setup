@@ -1,0 +1,7 @@
+#!/bin/bash
+# Install keys.
+curl https://put-keys-here.com/keys >> /home/ubuntu/.ssh/authorized_keys
+curl https://put-keys-here.com/gitreceive-keys >> /home/git/.ssh/authorized_keys
+# Setup domain name.
+sed "s/\$PUBLIC_IP\.xip\.io/domain-name-goes-here\.com/" /usr/bin/octo --in-place
+sed "s/\$PUBLIC_IP\.xip\.io/domain-name-goes-here\.com/" /home/git/receiver --in-place
