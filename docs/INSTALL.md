@@ -33,7 +33,14 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 
 3\. Create a running instance using your AMI (or use ami-da910bea) and security group:
 
-`ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --region us-west-2`
+`ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --user-data-file user-data-file/setup --region us-west-2`
+
+_Make sure to edit_ the `user-data-file/setup` with the correct information if you're:
+
+1. Adding additional ssh keys during AMI creation.
+2. Using your own domain name instead of the xip.io default.
+
+You can safely leave that part out if you're not using the user-data-file.
 
 4\. Once it's launched - visit that ip address with your web browser - it should say:
 
@@ -81,7 +88,7 @@ A few notes
 2. Currently there is only a single exposed port working per container.
 3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server. We're using external managed MySQL and Memcache at the moment.
 4. If you want to use your own domain name, just point a wildcard record to the server and edit DOMAIN_SUFFIX in the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) and [/usr/bin/octo](https://github.com/octohost/octohost/blob/master/bin/octo) files.
-5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise.
+5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise. You can set this at deploy using `--user-data-file user-data-file/setup` - be sure to edit that file with your domain name.
 6. Port 8000 is blocked off on AWS (depending on your security group), but will be wide open on Rackspace and other providers - login and change the password from the [default](https://github.com/shipyard/shipyard).
 
 To Build the VM's
