@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5 - unreleased
+
+#### Changes
+
+* Allowing SSH Forwarding and keeping SSH\_AUTH\_SOCK so that `/usr/bin/octo move` works.
+* Added way to install ssh keys and configure domain name at AMI launch using [user-data](https://github.com/octohost/octohost/blob/master/user-data-file/setup).
+* Added `/usr/bin/octo remove $site` - removes active sites / repos.
+* Added [documentation](https://github.com/octohost/octohost/blob/master/docs/octo-cli.md) around octo cli.
+* Add `/usr/bin/octo clean` - removes old stopped containers.
+
 ## 0.4 - ami-da910bea
 
 #### Changes
