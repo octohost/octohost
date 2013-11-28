@@ -25,7 +25,7 @@ There's also an [Ansible playbook](https://github.com/octohost/octohost/blob/mas
 
 A full installation includes:
 
-  1. [Docker 0.6.7](http://www.docker.io/)
+  1. [Docker 0.7](http://www.docker.io/)
   2. [Serf](http://www.serfdom.io/) - Currently unused - we have some [plans](https://github.com/darron/serf-docker-events).
   3. [Hipache](https://github.com/dotcloud/hipache) - to route traffic to the proper docker container.
   4. [Gitreceive](https://github.com/progrium/gitreceive) - to receive pushes and do the magic.
