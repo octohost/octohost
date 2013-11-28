@@ -87,6 +87,33 @@ c221106f78c7        octohost/middleman:latest    /bin/sh -c cd /srv/w   18 hours
 bdffdd3fbce1        octohost/www:latest          /bin/sh -c cd /srv/w   18 hours ago         Up 18 hours         0.0.0.0:49156->5000/tcp                             lime_spider         
 b3fc849ec1f8        shipyard/shipyard:latest     /opt/apps/shipyard/.   19 hours ago         Up 19 hours         0.0.0.0:8000->8000/tcp, 443/tcp, 6379/tcp, 80/tcp   red_spider          
 ```
+4\. /usr/bin/octo remove sinatra
+
+```
+root@octohost:~# /usr/bin/octo remove sinatra
+Removed the source for sinatra.
+d2dcefd53f64
+Removed running conainter.
+```
+
+5\. /usr/bin/octo move sites ip.address.here
+
+As long as you have ssh access to the other server, you can pull all the git repos over and relaunch all of the active sites.
+
+v0.5 supports SSH Agent Forwarding - to forward your agent - in your ~/.ssh/config file:
+
+```
+Host octohost
+  ForwardAgent yes
+  Hostname ip.address.here
+  Port 22
+  User ubuntu
+  LocalForward 8000 127.0.0.1:8000
+```
+
+Launch your new AMI, then login and: `sudo /usr/bin/octo move sites old.ip.address.here`
+
+It will take a while, but seems to work pretty well.
 
 BASH Functions
 ---------
