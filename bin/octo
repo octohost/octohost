@@ -9,7 +9,7 @@ case "$1" in
 
   status)
     cd $SRC_DIR
-    for i in *; do
+    for i in *.git; do
       site=`basename $i .git`
       if (wget -S -t 1 -T 2 --delete-after -qO- http://$site.$DOMAIN_SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
         echo -e "$site: \e[32mOK\e[0m"
@@ -57,6 +57,8 @@ case "$1" in
           for i in *.git; do
             site=`basename $i .git`
             /usr/bin/octo restart $site
+            # Need a checkout and not a bare repo to build with later.
+            git clone /home/git/$site.git /home/git/src/$site.git
           done
         else
           echo "Need a source."
