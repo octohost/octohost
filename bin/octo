@@ -54,7 +54,7 @@ case "$1" in
           # Grab all of the sites.
           /usr/bin/rsync -avz ubuntu@$3:/home/git/*.git /home/git/
           cd /home/git
-          for i in *; do
+          for i in *.git; do
             site=`basename $i .git`
             /usr/bin/octo restart $site
           done
