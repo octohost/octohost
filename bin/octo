@@ -60,6 +60,7 @@ case "$1" in
             # Need a checkout and not a bare repo to build with later.
             git clone /home/git/$site.git /home/git/src/$site.git
           done
+          chown -R git.git /home/git/src
         else
           echo "Need a source."
         fi
