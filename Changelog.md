@@ -1,9 +1,11 @@
 # Changelog
 
-## 0.5 - unreleased
+## 0.5 - ami-a443d994
 
 #### Changes
 
+* Update to Docker 0.7
+* Add `/usr/bin/octo move` to pull sites from old octohost and relaunch them.
 * Allowing SSH Forwarding and keeping SSH\_AUTH\_SOCK so that `/usr/bin/octo move` works.
 * Added way to install ssh keys and configure domain name at AMI launch using [user-data](https://github.com/octohost/octohost/blob/master/user-data-file/setup).
 * Added `/usr/bin/octo remove $site` - removes active sites / repos.
