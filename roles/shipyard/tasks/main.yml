@@ -1,7 +1,0 @@
----
-
-- name: Pull Shipyard from Docker Index.
-  command: docker pull shipyard/shipyard
-
-- name: Run Shipyard on 8000
-  command: docker run -d -p 8000:8000 shipyard/shipyard

@@ -32,7 +32,6 @@ A full installation includes:
   3. [Hipache](https://github.com/dotcloud/hipache) - to route traffic to the proper docker container.
   4. [Gitreceive](https://github.com/progrium/gitreceive) - to receive pushes and do the magic.
   5. [Redis](http://redis.io/) - the storage backend for Hipache.
-  6. [Shipyard](https://github.com/shipyard/shipyard) - available on port 8000 to help manage containers.
 
 
 PLEASE NOTE: There may be security holes, there are rough edges, it is not complete and may eat your data - but *it works for us* at the moment. We are experiencing some container crashing - but it's alpha software so that's to be expected. YMMV.

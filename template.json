@@ -10,7 +10,7 @@
             "secret_key": "{{user `aws_secret_key` }}",
             "region": "us-west-2",
             "source_ami": "ami-806bf0b0",
-            "instance_type": "m1.small",
+            "instance_type": "c1.medium",
             "ssh_username": "ubuntu",
             "ami_name": "octohost {{timestamp}}"
             }],
@@ -18,7 +18,7 @@
     "provisioners": [{
         "type": "ansible-local",
         "playbook_file": "ansible.yml",
-        "role_paths": [ "roles/common", "roles/docker", "roles/redis", "roles/nodejs", "roles/hipache", "roles/serf", "roles/gitreceive", "roles/shipyard" ]
+        "role_paths": [ "roles/common", "roles/docker", "roles/redis", "roles/nodejs", "roles/hipache", "roles/serf", "roles/gitreceive" ]
     }],
 
     "post-processors": ["vagrant"]
