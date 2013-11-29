@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5 - ami-de72e8ee
+## 0.5 - ami-e876ecd8
 
 #### Changes
 
