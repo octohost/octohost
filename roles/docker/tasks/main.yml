@@ -23,3 +23,9 @@
 
 - name: Restart docker.
   service: name=docker state=restarted
+
+- name: Pull npm-proxy-cache from Docker Index.
+  command: docker pull octohost/npm-proxy-cache
+
+- name: Run npm-proxy-cache on 8080
+  command: docker run -d -p 8080:8080 octohost/npm-proxy-cache
