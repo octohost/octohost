@@ -23,18 +23,3 @@
 
 - name: Restart docker.
   service: name=docker state=restarted
-
-- name: Pull npm-proxy-cache from Docker Index.
-  command: docker pull octohost/npm-proxy-cache
-
-- name: Run npm-proxy-cache on 8080
-  command: docker run -d -p 8080:8080 octohost/npm-proxy-cache
-
-- name: Pull apt-cacher-ng from Docker Index.
-  command: docker pull octohost/apt-cacher-ng
-
-- name: Run apt-cacher-ng on 3142
-  command: docker run -d -p 3142:3142 octohost/apt-cacher-ng
-  
-- name: Enable apt-cacher-ng for local machine.
-  command: echo "Acquire::http { Proxy \"http://127.0.0.1:3142\"; };" > /etc/apt/apt.conf.d/01proxy
