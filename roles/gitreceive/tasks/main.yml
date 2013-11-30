@@ -4,7 +4,7 @@
   apt: pkg=git-core state=installed
 
 - name: Install gitreceive.
-  get_url: url=https://raw.github.com/progrium/gitreceive/master/gitreceive dest=/usr/bin/gitreceive mode=0755
+  get_url: url=https://raw.github.com/octohost/octohost/master/bin/gitreceive dest=/usr/bin/gitreceive mode=0755
 
 - name: Check if path exists
   stat: path=/home/git
