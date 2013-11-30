@@ -25,6 +25,10 @@ case "$1" in
     docker ps -a | grep "Exit" | cut -d ' ' -f 1 | xargs docker rm
     echo "Showing all remaining containers."
     docker ps -a
+    echo "Cleaning out all unused images."
+    docker images | grep "\<none\>" | awk '{ print $3 }' | xargs docker rmi
+    echo "Showing all remaining images."
+    docker images
     ;;
   
   remove)
