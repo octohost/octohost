@@ -1,5 +1,4 @@
-Octohost
-===========================
+<img src="http://github.froese.org/assets/octohost/octohost-300-words.png" border="0" />
 
 Purpose
 --------
