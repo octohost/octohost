@@ -1,4 +1,5 @@
 #!/bin/bash
+if [ -d /home/git/src/$1 ]; then rm -rf /home/git/src/$1; fi
 echo "Put repo in src format somewhere."
 mkdir -p /home/git/src/$1 && cat | tar -x -C /home/git/src/$1
 echo "Building Docker image."
