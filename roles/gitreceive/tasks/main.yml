@@ -28,4 +28,4 @@
   get_url: url=https://raw.github.com/octohost/octohost/master/receiver.sh dest=/home/git/receiver mode=0755
   
 - name: Add /home/git/src/
-  command: mkdir -p /home/git/src/; chown git.git /home/git/src/; chmod 775 /home/git/src/
+  shell: "mkdir -p /home/git/src/ && chown git.git /home/git/src/ && chmod 775 /home/git/src/"
