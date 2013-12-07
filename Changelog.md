@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6 - unreleased
+## 0.6 - ami-5c5e3b6c
 
 #### Changes
 

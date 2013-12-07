@@ -41,7 +41,7 @@ Advanced Quickstart
 These are the minimum amount of commands needed to get started:
 
 ```
-ec2-run-instances --key your-key -g group-with-22-and-80-open ami-e876ecd8 --user-data-file user-data-file/setup --region us-west-2
+ec2-run-instances --key your-key -g group-with-22-and-80-open ami-5c5e3b6c --user-data-file user-data-file/setup --region us-west-2
 cat ~/.ssh/id_dsa.pub | ssh -i ~/.ssh/your-key.pem ubuntu@ip.address.here "sudo gitreceive upload-key ubuntu"
 git clone git@github.com:octohost/harp.git
 cd harp && git remote add octohost git@ip.address.here:harp.git
