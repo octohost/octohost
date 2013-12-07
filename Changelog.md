@@ -4,6 +4,7 @@
 
 #### Changes
 
+* Update to [Docker 0.7.1](https://github.com/dotcloud/docker/blob/v0.7.1/CHANGELOG.md)
 * Fixed a bug when --force pushing that wouldn't update the site.
 * Added image cleaning to `octo clean`
 * Removed Shipyard.
