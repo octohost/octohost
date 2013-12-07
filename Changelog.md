@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6 - unreleased
+
+#### Changes
+
+* Update to [Docker 0.7.1](https://github.com/dotcloud/docker/blob/v0.7.1/CHANGELOG.md)
+* Fixed a bug when --force pushing that wouldn't update the site.
+* Added image cleaning to `octo clean`
+* Removed Shipyard.
+* Updated to Serf 0.3 - fixed bug with event handler discovery.
+* Fixed some bugs with octo cli. 
+
 ## 0.5 - ami-e876ecd8
 
 #### Changes
