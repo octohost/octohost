@@ -28,8 +28,16 @@ then
   # Look for the exposed port.
   INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
   # Build and get the ID.
-  sudo docker build -t octohost/$BASE /home/git/src/$1
-
+  BUILD_RESULT=$(sudo docker build -t octohost/$BASE /home/git/src/$1)
+  
+  if [ `echo $BUILD_RESULT | grep "Successfully built" --quiet` ]
+  then
+    echo "Build was good."
+  else
+    echo "Failed build. Exiting."
+    exit
+  fi
+  
   ID=$(sudo docker run -P -d octohost/$BASE)
   # Get the $PORT from the container.
   PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
