@@ -8,6 +8,7 @@ echo "Base: $BASE"
 
 # Get Public IP address.
 PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
+XIP_IO="$PUBLIC_IP.xip.io"
 
 # Set the domain name here if desired.
 DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
@@ -37,11 +38,23 @@ else
   exit
 fi
 
-# Zero out any existing items.
-/usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200
-# Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
-/usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX $BASE
-/usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX http://127.0.0.1:$PORT
+if [ -n "$XIP_IO"]
+then
+  # Zero out any existing items.
+  /usr/bin/redis-cli ltrim frontend:$BASE.$XIP_IO 200 200
+  # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
+  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO $BASE
+  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO http://127.0.0.1:$PORT
+fi
+
+if [ -n "$DOMAIN_SUFFIX"]
+then
+  # Zero out any existing items.
+  /usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200
+  # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
+  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX $BASE
+  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX http://127.0.0.1:$PORT
+fi
 
 # Support a CNAME file in repo src
 CNAME=/home/git/src/$1/CNAME
