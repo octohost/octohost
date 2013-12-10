@@ -48,20 +48,20 @@ if [ -n "$XIP_IO" ]
 then
   echo "Adding http://$BASE.$XIP_IO"
   # Zero out any existing items.
-  /usr/bin/redis-cli ltrim frontend:$BASE.$XIP_IO 200 200
+  /usr/bin/redis-cli ltrim frontend:$BASE.$XIP_IO 200 200 > /dev/null
   # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
-  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO $BASE
-  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO http://127.0.0.1:$PORT
+  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO $BASE > /dev/null
+  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO http://127.0.0.1:$PORT > /dev/null
 fi
 
 if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding http://$BASE.$DOMAIN_SUFFIX"
   # Zero out any existing items.
-  /usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200
+  /usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200 > /dev/null
   # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
-  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX $BASE
-  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX http://127.0.0.1:$PORT
+  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX $BASE > /dev/null
+  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX http://127.0.0.1:$PORT > /dev/null
 fi
 
 # Support a CNAME file in repo src
@@ -73,19 +73,19 @@ then
   while read DOMAIN
   do
     echo "Adding http://$DOMAIN"
-    /usr/bin/redis-cli ltrim frontend:$DOMAIN 200 200
-    /usr/bin/redis-cli rpush frontend:$DOMAIN $DOMAIN
-    /usr/bin/redis-cli rpush frontend:$DOMAIN http://127.0.0.1:$PORT
+    /usr/bin/redis-cli ltrim frontend:$DOMAIN 200 200 > /dev/null
+    /usr/bin/redis-cli rpush frontend:$DOMAIN $DOMAIN > /dev/null
+    /usr/bin/redis-cli rpush frontend:$DOMAIN http://127.0.0.1:$PORT > /dev/null
   done < $CNAME
 fi
 
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
 then
-  echo "Killing $OLD_ID"
-  sudo docker kill $OLD_ID
+  echo "Killing $OLD_ID container."
+  sudo docker kill $OLD_ID > /dev/null
 else
-  echo "Not killing anything."
+  echo "Not killing any containers."
 fi
 
 if [ -n "$XIP_IO" ]; then echo "Your site is available at: http://$BASE.$XIP_IO";fi
