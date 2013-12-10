@@ -10,7 +10,7 @@ echo "Base: $BASE"
 PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
 XIP_IO="$PUBLIC_IP.xip.io"
 
-# Set the domain name here if desired.
+# Set the domain name here if desired. Comment out if not used.
 DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
 
 # Find out the old container ID.
@@ -28,13 +28,11 @@ then
   # Look for the exposed port.
   INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
   # Build and get the ID.
-  BUILD_RESULT=$(sudo docker build -t octohost/$BASE /home/git/src/$1)
+  sudo docker build -q -t octohost/$BASE /home/git/src/$1
   
-  if [ `echo $BUILD_RESULT | grep "Successfully built" --quiet` ]
+  if [ $? -ne 0 ]
   then
-    echo "Build was good."
-  else
-    echo "Failed build. Exiting."
+    echo "Failed build - exiting."
     exit
   fi
   
@@ -46,8 +44,9 @@ else
   exit
 fi
 
-if [ -n "$XIP_IO"]
+if [ -n "$XIP_IO" ]
 then
+  echo "Adding http://$BASE.$XIP_IO"
   # Zero out any existing items.
   /usr/bin/redis-cli ltrim frontend:$BASE.$XIP_IO 200 200
   # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
@@ -55,8 +54,9 @@ then
   /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO http://127.0.0.1:$PORT
 fi
 
-if [ -n "$DOMAIN_SUFFIX"]
+if [ -n "$DOMAIN_SUFFIX" ]
 then
+  echo "Adding http://$BASE.$DOMAIN_SUFFIX"
   # Zero out any existing items.
   /usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200
   # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
@@ -72,6 +72,7 @@ then
   sed -i -e '$a\' $CNAME
   while read DOMAIN
   do
+    echo "Adding http://$DOMAIN"
     /usr/bin/redis-cli ltrim frontend:$DOMAIN 200 200
     /usr/bin/redis-cli rpush frontend:$DOMAIN $DOMAIN
     /usr/bin/redis-cli rpush frontend:$DOMAIN http://127.0.0.1:$PORT
@@ -87,4 +88,5 @@ else
   echo "Not killing anything."
 fi
 
-echo "Your site is available at: http://$BASE.$DOMAIN_SUFFIX"
+if [ -n "$XIP_IO" ]; then echo "Your site is available at: http://$BASE.$XIP_IO";fi
+if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: http://$BASE.$DOMAIN_SUFFIX";fi
