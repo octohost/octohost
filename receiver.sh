@@ -28,7 +28,7 @@ then
   # Look for the exposed port.
   INTERNAL_PORT=$(grep "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
   # Build and get the ID.
-  sudo docker build -q -t octohost/$BASE /home/git/src/$1
+  sudo docker build -t octohost/$BASE /home/git/src/$1
   
   if [ $? -ne 0 ]
   then
