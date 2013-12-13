@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7 - unreleased
+
+#### Changes
+
+* If you push a branch other than master, the domain name is suffixed with -branch.
+* If `docker build` fails, stop the rest of bin/receiver.sh
+* Always register Xip.io domain names tied to IP address.
+
 ## 0.6 - ami-5c5e3b6c
 
 #### Changes
