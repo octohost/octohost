@@ -64,8 +64,6 @@ EOF
   hook)
     while read oldrev newrev refname
     do
-      # Only run this script for the master branch. You can remove this 
-      # if block if you wish to run it for others as well.
       if [[ $refname != "refs/heads/master" ]] ; then
         BRANCH=$(echo $refname | cut -d '/' -f 3)
         RECEIVE_REPO="$RECEIVE_REPO-$BRANCH"
