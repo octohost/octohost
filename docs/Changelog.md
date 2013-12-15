@@ -1,9 +1,11 @@
 # Changelog
 
-## 0.7 - unreleased
+## 0.7 - ami-2c187c1c
 
 #### Changes
 
+* Updates to Node.JS, Ruby and Go base containers. Lots of small updates to frameworks.
+* Updated [base image](https://github.com/octohost/ubuntu-12.0.4-3.8)
 * If you push a branch other than master, the domain name is suffixed with -branch.
 * If `docker build` fails, stop the rest of bin/receiver.sh
 * Always register Xip.io domain names tied to IP address.
