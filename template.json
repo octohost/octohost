@@ -9,7 +9,7 @@
             "access_key": "{{user `aws_access_key`}}",
             "secret_key": "{{user `aws_secret_key` }}",
             "region": "us-west-2",
-            "source_ami": "ami-806bf0b0",
+            "source_ami": "ami-8e1d79be",
             "instance_type": "c1.medium",
             "ssh_username": "ubuntu",
             "ami_name": "octohost {{timestamp}}"
