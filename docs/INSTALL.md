@@ -89,7 +89,6 @@ A few notes
 3. Only websites can be pushed via git - any additional services - Redis, MySQL, Postgresql, etc. will need to be built and installed on the server. We're using external managed MySQL and Memcache at the moment.
 4. If you want to use your own domain name, just point a wildcard record to the server and edit DOMAIN_SUFFIX in the [/home/git/receiver](https://github.com/octohost/octohost/blob/master/receiver.sh) and [/usr/bin/octo](https://github.com/octohost/octohost/blob/master/bin/octo) files.
 5. If you want to add an additional domain name record for your website - add a CNAME text file to the root directory. Here's an [example file](https://gist.github.com/darron/7571573). If it's not a wildcard - make sure to point the DNS there - it won't work otherwise. You can set this at deploy using `--user-data-file user-data-file/setup` - be sure to edit that file with your domain name.
-6. Port 8000 is blocked off on AWS (depending on your security group), but will be wide open on Rackspace and other providers - login and change the password from the [default](https://github.com/shipyard/shipyard).
 
 To Build the VM's
 --------
