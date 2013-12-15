@@ -3,7 +3,7 @@
   apt: pkg=unzip state=installed update-cache=yes
 
 - name: Download serf.
-  command: wget -O serf.zip ${serf_url} chdir=/tmp
+  command: wget -O serf.zip {{ serf_url }} chdir=/tmp
 
 - name: Unzip serf.
   command: unzip serf.zip chdir=/tmp
