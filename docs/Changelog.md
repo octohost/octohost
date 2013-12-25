@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.2 - ami-74690e44
+
+#### Changes
+
+* Update to [Docker 0.7.2](https://github.com/dotcloud/docker/blob/master/CHANGELOG.md)
+* Built with new Chef based [octohost-cookbook](https://github.com/octohost/octohost-cookbook)
+
 ## 0.7 - ami-2c187c1c
 
 #### Changes
