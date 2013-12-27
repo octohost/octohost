@@ -15,6 +15,7 @@ Some example languages and frameworks that are already supported:
 6. Openresty - [1.4.2.8](https://github.com/octohost/openresty)
 7. Java - [OpenJDK7](https://github.com/octohost/openjdk7)
 8. Clojure - [leiningen](https://github.com/octohost/leiningen), [hoplon](https://github.com/octohost/hoplon)
+9. Erlang - [R16B03](https://github.com/octohost/erlang)
 
 The goal is to host anything - more options are being worked on and added.
 
