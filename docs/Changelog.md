@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.3 - ami-48147278
+
+#### Changes
+
+* Update to [Docker 0.7.3](https://github.com/dotcloud/docker/blob/8502ad4ba7b5410eb55f3517a801b33f61b1f625/CHANGELOG.md)
+* Added [Ruby 2.1](https://github.com/octohost/ruby-2.1.0), [Ramaze](https://github.com/octohost/ramaze), [Erlang](https://github.com/octohost/erlang), and [Sails.js](https://github.com/octohost/sails)
+
 ## 0.7.2 - ami-74690e44
 
 #### Changes
