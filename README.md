@@ -16,6 +16,7 @@ Some example languages and frameworks that are already supported:
 7. Java - [OpenJDK7](https://github.com/octohost/openjdk7)
 8. Clojure - [leiningen](https://github.com/octohost/leiningen), [hoplon](https://github.com/octohost/hoplon)
 9. Erlang - [R16B03](https://github.com/octohost/erlang)
+10. [Perl](https://github.com/octohost/perl) - [Mojolicious](https://github.com/octohost/mojolicious-app), [Perl Dancer](https://github.com/octohost/perldancer-app)
 
 The goal is to host anything - more options are being worked on and added.
 
