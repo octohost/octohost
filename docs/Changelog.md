@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.5 - ami-7e29484e
+
+#### Changes
+
+* Update to [Docker 0.7.5](https://github.com/dotcloud/docker/blob/c348c04fdfb00e013be9db15d37728e04fb94b76/CHANGELOG.md)
+* Added [Perl](https://github.com/octohost/perl), [Perl Dancer](https://github.com/octohost/perldancer-app), [Mojolicious](https://github.com/octohost/mojolicious-app) and [Slim](https://github.com/octohost/slim).
+
 ## 0.7.3 - ami-48147278
 
 #### Changes
