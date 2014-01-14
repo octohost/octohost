@@ -27,7 +27,9 @@ This repo contains a [Packer](http://www.packer.io/) template [to build](https:/
 
 As of version 0.7.2, we are building octohost using a fully test driven Chef based [octohost-cookbook](https://github.com/octohost/octohost-cookbook).
 
-There's also an [Ansible playbook](https://github.com/octohost/octohost/blob/master/docs/INSTALL.md) to build on Rackspace and other systems that support it.
+You can also [build a local octohost with Vagrant](https://github.com/octohost/octohost-cookbook) - if you run it on 192.168.62.86, you also get a free wildcard dns entry for *.octodev.io.
+
+Deprecated as of 0.7.2: There's also an [Ansible playbook](https://github.com/octohost/octohost/blob/master/docs/INSTALL.md) to build on Rackspace and other systems that support it. Will be replaced by the Chef cookbook at some point.
 
 A full installation includes:
 
