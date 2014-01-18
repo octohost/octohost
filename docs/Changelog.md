@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.6 - unreleased
+
+* Make sure to remove Hipache route when `octo remove` is used.
+* Comment out unused PUBLIC_IP when building Vagrant.
+* Added proper [OpenJDK7](https://github.com/octohost/openjdk7) and [Play Framework](https://github.com/octohost/play-app).
+* Added [Vagrant build](https://github.com/octohost/octovagrant) for local development.
+* Added [octodev.io](http://octodev.io/) wildcard dns for local development.
+
 ## 0.7.5 - ami-7e29484e
 
 #### Changes
