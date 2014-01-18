@@ -46,6 +46,7 @@ case "$1" in
         docker kill $OLD_ID
         echo "Removed running conainter."
       fi
+      /usr/bin/redis-cli del frontend:$2.$DOMAIN_SUFFIX >/dev/null
     else
       echo "Need the name to remove."
     fi
