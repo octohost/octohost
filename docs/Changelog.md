@@ -1,12 +1,18 @@
 # Changelog
 
-## 0.7.6 - unreleased
+## 0.7.6 - (unreleased - still testing)
 
-* Make sure to remove Hipache route when `octo remove` is used.
-* Comment out unused PUBLIC_IP when building Vagrant.
+* Make sure to [remove Hipache route](https://github.com/octohost/octohost/commit/b5d23f433812f3cf9ce2b5cc19770d668d0889a1) when `octo remove` is used.
+* [Comment out unused PUBLIC_IP](https://github.com/octohost/octohost-cookbook/commit/49a6a01528dece21104b7ab7d00c44471073c095) when building Vagrant.
 * Added proper [OpenJDK7](https://github.com/octohost/openjdk7) and [Play Framework](https://github.com/octohost/play-app).
 * Added [Vagrant build](https://github.com/octohost/octovagrant) for local development.
 * Added [octodev.io](http://octodev.io/) wildcard dns for local development.
+* Added a more consistent [Ubuntu base cookbook](https://github.com/darron/ubuntu_base-cookbook) to the build.
+* Added [sysstat](https://github.com/darron/octobase-cookbook/commit/c32167fe8fb044af52c9689caae0efef7fbac152) for some basic server metrics.
+* [Properly set en_US.UTF-8](https://github.com/darron/ubuntu_base-cookbook/commit/dbd45aefd79d3c67af01fc886ca9c67cf6ee57e8) as the locale.
+* Set [ulimit](https://github.com/darron/octobase-cookbook/commit/6def19aca5abe4e74fbaeba1c55ff3a20d7f7cf0) to 64000 open files.
+* Remove old init file and properly use [/etc/default/docker](https://github.com/darron/docker-cookbook/commit/77309c615a848173ad4db3ba110e6bfe3fd0979c).
+* Remove the extra .git from the [branch url](https://github.com/octohost/octohost/commit/83ec3c690faed7f3c9abfbadc0f9e043b384f95b).
 
 ## 0.7.5 - ami-7e29484e
 
