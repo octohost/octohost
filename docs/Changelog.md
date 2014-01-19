@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.7.6 - (unreleased - still testing)
+## 0.7.6 - ami-78eb8a48
 
 * Make sure to [remove Hipache route](https://github.com/octohost/octohost/commit/b5d23f433812f3cf9ce2b5cc19770d668d0889a1) when `octo remove` is used.
 * [Comment out unused PUBLIC_IP](https://github.com/octohost/octohost-cookbook/commit/49a6a01528dece21104b7ab7d00c44471073c095) when building Vagrant.
