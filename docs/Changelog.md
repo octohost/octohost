@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Add container memory usage to `octo status` listing.
+
 ## 0.7.6 - ami-78eb8a48
 
 * Update to Docker 0.7.6.
