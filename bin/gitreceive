@@ -66,11 +66,11 @@ EOF
     do
       if [[ $refname != "refs/heads/master" ]] ; then
         BRANCH=$(echo $refname | cut -d '/' -f 3)
-        BASE_NAME=`basename $RECEIVE_REPO .git`
-        RECEIVE_REPO="$BASE_NAME-$BRANCH"
+      else
+        BRANCH="master"
       fi
       
-      git archive $newrev | $GITHOME/receiver "$RECEIVE_REPO" "$newrev" "$RECEIVE_USER" "$RECEIVE_FINGERPRINT"  
+      git archive $newrev | $GITHOME/receiver "$RECEIVE_REPO" "$newrev" "$RECEIVE_USER" "$RECEIVE_FINGERPRINT" "$BRANCH"
 
       rc=$?
       if [[ $rc != 0 ]] ; then
