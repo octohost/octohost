@@ -1,9 +1,17 @@
 #!/bin/bash
-if [ -d /home/git/src/$1 ]; then rm -rf /home/git/src/$1; fi
+REPOSITORY="$1"
+BRANCH="$5"
+
+if [ -d /home/git/src/$REPOSITORY ]; then rm -rf /home/git/src/$REPOSITORY; fi
 echo "Put repo in src format somewhere."
-mkdir -p /home/git/src/$1 && cat | tar -x -C /home/git/src/$1
+mkdir -p /home/git/src/$REPOSITORY && cat | tar -x -C /home/git/src/$REPOSITORY
 echo "Building Docker image."
-BASE=`basename $1 .git`
+BASE=`basename $REPOSITORY .git`
+
+if [ $BRANCH != 'master' ]
+then
+  BASE="$BASE-$BRANCH"
+fi
 echo "Base: $BASE"
 
 # Get Public IP address.
@@ -23,12 +31,12 @@ else
   echo "Nothing running - no need to look for a port."
 fi
 
-if [ -e "/home/git/src/$1/Dockerfile" ]
+if [ -e "/home/git/src/$REPOSITORY/Dockerfile" ]
 then
   # Look for the exposed port.
-  INTERNAL_PORT=$(grep -i "EXPOSE" /home/git/src/$1/Dockerfile | cut -d ' ' -f 2)
+  INTERNAL_PORT=$(grep -i "^EXPOSE" /home/git/src/$REPOSITORY/Dockerfile | cut -d ' ' -f 2)
   # Build and get the ID.
-  sudo docker build -t octohost/$BASE /home/git/src/$1
+  sudo docker build -t octohost/$BASE /home/git/src/$REPOSITORY
   
   if [ $? -ne 0 ]
   then
@@ -65,7 +73,7 @@ then
 fi
 
 # Support a CNAME file in repo src
-CNAME=/home/git/src/$1/CNAME
+CNAME=/home/git/src/$REPOSITORY/CNAME
 if [ -f $CNAME ]
 then
   # Add a new line at end if it does not exist to ensure the loop gets last line
