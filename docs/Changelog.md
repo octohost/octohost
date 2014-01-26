@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Add container memory usage to `octo status` listing.
+* Fix Docker running out of file descriptors at 203 containers.
 
 ## 0.7.6 - ami-78eb8a48
 
