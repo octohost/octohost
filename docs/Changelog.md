@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-* Add container memory usage to `octo status` listing.
-* Fix Docker running out of file descriptors at 203 containers.
+* Add container [memory usage](https://github.com/octohost/octohost/commit/4e9276d8ea2efa7e0203637ef86f15e5a5fe542d) to `octo status` listing.
+* Fix Docker running out of file descriptors at [203 containers](https://github.com/darron/docker-cookbook/commit/3038d964e0afc63745b925f64586c641dee707ea).
+* [Add Google DNS](https://github.com/darron/docker-cookbook/commit/1872e8302b799147e45c9615c17736264d255084) to Docker containers.
 
 ## 0.7.6 - ami-78eb8a48
 
