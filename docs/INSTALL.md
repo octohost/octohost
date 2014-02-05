@@ -15,7 +15,7 @@ NOTE: The AMI in [template.json](https://github.com/octohost/octohost/blob/maste
 ec2-create-group -K your-key octohost -d "Octohost Group" --region us-west-2
 ec2-authorize octohost -P tcp -p 80 -s 0.0.0.0/0 --region us-west-2
 ec2-authorize octohost -P tcp -p 22 -s 0.0.0.0/0 --region us-west-2
-# Not totally required - but helpful with Serf and Shipyard.
+# Not totally required - but helpful with Serf.
 ec2-authorize octohost -P tcp -p 0-65535 -o sg-groupid --region us-west-2
 ec2-authorize octohost -P udp -p 0-65535 -o sg-groupid --region us-west-2
 ```
@@ -31,7 +31,7 @@ PERMISSION	457992882886	octohost	ALLOWS	tcp	22	22	FROM	CIDR	0.0.0.0/0	ingress
 PERMISSION	457992882886	octohost	ALLOWS	tcp	80	80	FROM	CIDR	0.0.0.0/0	ingress
 ```
 
-3\. Create a running instance using your AMI (or use ami-78eb8a48) and security group:
+3\. Create a running instance using your AMI (or use ami-2a80e31a) and security group:
 
 `ec2-run-instances --key your-key -g sg-groupid ami-yourAMI --user-data-file user-data-file/setup --region us-west-2`
 
