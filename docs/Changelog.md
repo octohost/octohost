@@ -1,13 +1,14 @@
 # Changelog
 
-## 0.8 - ami-7c83e04c
+## 0.8 - unreleased
 
 * Add container [memory usage](https://github.com/octohost/octohost/commit/4e9276d8ea2efa7e0203637ef86f15e5a5fe542d) to `octo status` listing.
 * Fix Docker running out of file descriptors at [203 containers](https://github.com/darron/docker-cookbook/commit/3038d964e0afc63745b925f64586c641dee707ea).
 * [Add Google DNS](https://github.com/darron/docker-cookbook/commit/1872e8302b799147e45c9615c17736264d255084) to Docker containers.
 * Update to [Docker 0.8](http://blog.docker.io/2014/02/docker-0-8-quality-new-builder-features-btrfs-storage-osx-support/).
 * Update to newer [Base Image](https://github.com/octohost/ubuntu-12.0.4-3.8).
-* Added SSL snake-oil cert as standard.
+* Added SSL snake-oil cert as standard. (Not done yet.)
+* Fix octo restart to pass branch along.
 
 ## 0.7.6 - ami-78eb8a48
 
