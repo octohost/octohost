@@ -8,7 +8,7 @@ mkdir -p /home/git/src/$REPOSITORY && cat | tar -x -C /home/git/src/$REPOSITORY
 echo "Building Docker image."
 BASE=`basename $REPOSITORY .git`
 
-if [ $BRANCH != 'master' ]
+if [ "$BRANCH" -ne 'master' ]
 then
   BASE="$BASE-$BRANCH"
 fi
