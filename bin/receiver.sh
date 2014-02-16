@@ -44,11 +44,35 @@ then
     exit
   fi
   
-  ID=$(sudo docker run -P -d octohost/$BASE)
+  RUN_OPTIONS="-P -d"
+  
+  ADD_A_NAME=$(grep -i "^# ADD_A_NAME" /home/git/src/$REPOSITORY/Dockerfile)
+  if [ -n "$ADD_A_NAME" ]
+  then
+    RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
+  fi
+  
+  echo "Options: $RUN_OPTIONS"
+
+  ID=$(sudo docker run $RUN_OPTIONS octohost/$BASE)
+  
   # Get the $PORT from the container.
-  PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
+  if [ -n "$INTERNAL_PORT" ]
+  then
+    PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
+  fi
 else
   echo "There is no Dockerfile present."
+  exit
+fi
+
+NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" /home/git/src/$REPOSITORY/Dockerfile)
+if [ -n "$NO_HTTP_PROXY" ]
+then
+  if [ -n "$PORT" ]
+  then
+    echo "Port: $PORT"
+  fi
   exit
 fi
 
