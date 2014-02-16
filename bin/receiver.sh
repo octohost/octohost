@@ -52,7 +52,19 @@ then
     RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
   fi
   
-  echo "Options: $RUN_OPTIONS"
+  VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" /home/git/src/$REPOSITORY/Dockerfile)
+  if [ -n "$VOLUMES_FROM" ]
+  then
+    VOLUME_NAME="${BASE}_data"
+    RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
+  fi
+  
+  LINK_DATA=$(grep -i "^# LINK_DATA" /home/git/src/$REPOSITORY/Dockerfile)
+  if [ -n "$LINK_DATA" ]
+  then
+    LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
+    RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
+  fi
 
   ID=$(sudo docker run $RUN_OPTIONS octohost/$BASE)
   
