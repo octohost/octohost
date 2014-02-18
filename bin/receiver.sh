@@ -1,6 +1,7 @@
 #!/bin/bash
 REPOSITORY="$1"
 BRANCH="$5"
+SOURCE="redis"
 
 if [ -d /home/git/src/$REPOSITORY ]; then rm -rf /home/git/src/$REPOSITORY; fi
 echo "Put repo in src format somewhere."
@@ -46,8 +47,8 @@ then
   
   RUN_OPTIONS="-P -d"
   
-  ADD_A_NAME=$(grep -i "^# ADD_A_NAME" /home/git/src/$REPOSITORY/Dockerfile)
-  if [ -n "$ADD_A_NAME" ]
+  ADD_NAME=$(grep -i "^# ADD_NAME" /home/git/src/$REPOSITORY/Dockerfile)
+  if [ -n "$ADD_NAME" ]
   then
     RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
   fi
@@ -59,8 +60,8 @@ then
     RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
   fi
   
-  LINK_DATA=$(grep -i "^# LINK_DATA" /home/git/src/$REPOSITORY/Dockerfile)
-  if [ -n "$LINK_DATA" ]
+  LINK_SERVICE=$(grep -i "^# LINK_SERVICE" /home/git/src/$REPOSITORY/Dockerfile)
+  if [ -n "$LINK_SERVICE" ]
   then
     LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
