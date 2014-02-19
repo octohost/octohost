@@ -60,7 +60,7 @@ case "$1" in
   clean)
     echo "Cleaning old exited containers."
     # TODO: Errors if there's no containers - annoying.
-    docker ps -a | grep "Exit" | cut -d ' ' -f 1 | xargs docker rm
+    docker ps -a | grep -v "octohost\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs docker rm
     echo "Showing all remaining containers."
     docker ps -a
     echo "Cleaning out all unused images."
@@ -82,7 +82,7 @@ case "$1" in
       OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then 
         docker kill $OLD_ID
-        echo "Removed running conainter."
+        echo "Removed running container."
       fi
       /usr/bin/redis-cli del frontend:$2.$DOMAIN_SUFFIX >/dev/null
     else
