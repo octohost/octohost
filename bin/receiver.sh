@@ -1,10 +1,12 @@
 #!/bin/bash
 REPOSITORY="$1"
 BRANCH="$5"
+REPO_PATH="/home/git/src/$REPOSITORY"
+DOCKERFILE="$REPO_PATH/Dockerfile"
 
-if [ -d /home/git/src/$REPOSITORY ]; then rm -rf /home/git/src/$REPOSITORY; fi
+if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
 echo "Put repo in src format somewhere."
-mkdir -p /home/git/src/$REPOSITORY && cat | tar -x -C /home/git/src/$REPOSITORY
+mkdir -p "$REPO_PATH" && cat | tar -x -C "$REPO_PATH"
 echo "Building Docker image."
 BASE=`basename $REPOSITORY .git`
 
@@ -31,12 +33,12 @@ else
   echo "Nothing running - no need to look for a port."
 fi
 
-if [ -e "/home/git/src/$REPOSITORY/Dockerfile" ]
+if [ -e "$DOCKERFILE" ]
 then
   # Look for the exposed port.
-  INTERNAL_PORT=$(grep -i "^EXPOSE" /home/git/src/$REPOSITORY/Dockerfile | cut -d ' ' -f 2)
+  INTERNAL_PORT=$(grep -i "^EXPOSE" $DOCKERFILE | cut -d ' ' -f 2)
   # Build and get the ID.
-  sudo docker build -t octohost/$BASE /home/git/src/$REPOSITORY
+  sudo docker build -t octohost/$BASE $REPO_PATH
   
   if [ $? -ne 0 ]
   then
@@ -46,23 +48,23 @@ then
   
   RUN_OPTIONS="-P -d"
   
-  ADD_NAME=$(grep -i "^# ADD_NAME" /home/git/src/$REPOSITORY/Dockerfile)
+  ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
   if [ -n "$ADD_NAME" ]
   then
     RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
   fi
   
-  VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" /home/git/src/$REPOSITORY/Dockerfile)
+  VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" $DOCKERFILE)
   if [ -n "$VOLUMES_FROM" ]
   then
     VOLUME_NAME="${BASE}_data"
     RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
   fi
   
-  LINK_SERVICE=$(grep -i "^# LINK_SERVICE" /home/git/src/$REPOSITORY/Dockerfile)
+  LINK_SERVICE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
   if [ -n "$LINK_SERVICE" ]
   then
-    SOURCE=$(grep -i "^# LINK_SERVICE" /home/git/src/$REPOSITORY/Dockerfile | awk '{ print $3 }')
+    SOURCE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $3 }')
     LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
   fi
@@ -79,7 +81,7 @@ else
   exit
 fi
 
-NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" /home/git/src/$REPOSITORY/Dockerfile)
+NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" $DOCKERFILE)
 if [ -n "$NO_HTTP_PROXY" ]
 then
   if [ -n "$PORT" ]
