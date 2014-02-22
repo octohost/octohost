@@ -1,7 +1,6 @@
 #!/bin/bash
 REPOSITORY="$1"
 BRANCH="$5"
-SOURCE="redis"
 
 if [ -d /home/git/src/$REPOSITORY ]; then rm -rf /home/git/src/$REPOSITORY; fi
 echo "Put repo in src format somewhere."
@@ -63,6 +62,7 @@ then
   LINK_SERVICE=$(grep -i "^# LINK_SERVICE" /home/git/src/$REPOSITORY/Dockerfile)
   if [ -n "$LINK_SERVICE" ]
   then
+    SOURCE=$(grep -i "^# LINK_SERVICE" /home/git/src/$REPOSITORY/Dockerfile | awk '{ print $3 }')
     LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
   fi
