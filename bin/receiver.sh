@@ -65,7 +65,16 @@ then
   if [ -n "$LINK_SERVICE" ]
   then
     SOURCE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $3 }')
-    LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
+    LINK_NAME=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $4 }')
+    if [ -n "$LINK_NAME" ]
+    then
+      LINK_NAME="$LINK_NAME:$SOURCE"
+      echo "Linking to: $LINK_NAME"
+    else
+      LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
+      echo "Linking to: $LINK_NAME"
+    fi
+    
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
   fi
 
