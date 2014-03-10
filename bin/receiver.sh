@@ -78,7 +78,7 @@ then
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
   fi
 
-  ENV_VARS=$(sudo /usr/bin/octo config $BASE)
+  ENV_VARS=$(sudo /usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
   if [ -n "$ENV_VARS" ]
   then
     ENV=""
