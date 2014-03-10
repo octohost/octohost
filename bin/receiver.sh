@@ -39,28 +39,28 @@ then
   INTERNAL_PORT=$(grep -i "^EXPOSE" $DOCKERFILE | cut -d ' ' -f 2)
   # Build and get the ID.
   sudo docker build -t octohost/$BASE $REPO_PATH
-  
+
   if [ $? -ne 0 ]
   then
     echo "Failed build - exiting."
     exit
   fi
-  
+
   RUN_OPTIONS="-P -d"
-  
+
   ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
   if [ -n "$ADD_NAME" ]
   then
     RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
   fi
-  
+
   VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" $DOCKERFILE)
   if [ -n "$VOLUMES_FROM" ]
   then
     VOLUME_NAME="${BASE}_data"
     RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
   fi
-  
+
   LINK_SERVICE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
   if [ -n "$LINK_SERVICE" ]
   then
@@ -74,12 +74,25 @@ then
       LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
       echo "Linking to: $LINK_NAME"
     fi
-    
+
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
   fi
 
+  ENV_VARS=$(sudo /usr/bin/octo config $BASE)
+  if [ -n "$ENV_VARS" ]
+  then
+    ENV=""
+    for conf in `sudo /usr/bin/octo config $BASE`;
+    do
+      KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
+      VAR=$(echo $conf | cut -d ':' -f 2)
+      ENV="$ENV -e $KEY=$VAR"
+    done
+    RUN_OPTIONS="$ENV $RUN_OPTIONS"
+  fi
+
   ID=$(sudo docker run $RUN_OPTIONS octohost/$BASE)
-  
+
   # Get the $PORT from the container.
   if [ -n "$INTERNAL_PORT" ]
   then
