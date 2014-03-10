@@ -4,6 +4,7 @@
 SRC_DIR="/home/git/src/"
 PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
 DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
+ETCD_SERVER="0.0.0.0:4001"
 
 get_short_container_id ()
 {
@@ -42,6 +43,27 @@ show_break ()
 
 case "$1" in
 
+  etcd)
+  docker pull coreos/etcd
+  docker run -d -p 4001:4001 -p 7001:7001 coreos/etcd
+  ;;
+
+  config:set)
+  /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 "$3"
+  ;;
+
+  config:get)
+  /usr/local/bin/etcdctl -C $ETCD_SERVER get $2
+  ;;
+
+  config:rm)
+  /usr/local/bin/etcdctl -C $ETCD_SERVER rm $2
+  ;;
+
+  config)
+  /usr/local/bin/etcdctl -C $ETCD_SERVER ls $2
+  ;;
+
   status)
     cd $SRC_DIR
     for i in *.git; do
@@ -56,7 +78,7 @@ case "$1" in
       fi
     done
     ;;
-  
+
   clean)
     echo "Cleaning old exited containers."
     # TODO: Errors if there's no containers - annoying.
@@ -68,7 +90,7 @@ case "$1" in
     echo "Showing all remaining images."
     docker images
     ;;
-  
+
   remove)
     if [ $2 ]; then
       if [ -d /home/git/$2.git ]; then
@@ -80,7 +102,7 @@ case "$1" in
       if [ -d /home/git/src/$2.git ]; then rm -rf /home/git/src/$2.git; fi
       echo "Removed the source for $2."
       OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
-      if [ $OLD_ID ]; then 
+      if [ $OLD_ID ]; then
         docker kill $OLD_ID
         echo "Removed running container."
       fi
@@ -89,7 +111,7 @@ case "$1" in
       echo "Need the name to remove."
     fi
     ;;
-  
+
   move)
     if [ $2 ]; then
       if [ "$2" == 'sites' ]; then
@@ -129,4 +151,4 @@ case "$1" in
   *)
     echo "Usage: octo status|clean|restart \$site|remove \$site|move"
     ;;
-esac 
+esac
