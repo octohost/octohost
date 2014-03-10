@@ -63,7 +63,7 @@ case "$1" in
   config)
   for conf in `/usr/local/bin/etcdctl -C $ETCD_SERVER ls $2`;
   do
-    echo -n "$conf : ";
+    echo -n "$conf:";
     /usr/local/bin/etcdctl -C $ETCD_SERVER get $conf
   done
   ;;
