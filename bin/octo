@@ -43,11 +43,6 @@ show_break ()
 
 case "$1" in
 
-  etcd)
-  docker pull coreos/etcd
-  docker run -d -p 4001:4001 -p 7001:7001 coreos/etcd
-  ;;
-
   config:set)
   /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 "$3"
   ;;
