@@ -44,34 +44,32 @@ show_break ()
 case "$1" in
 
   config:set)
-  if [ $2 && $3 ];
-  then
+  if [[ $2 && $3 ]]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 "$3"
   else
-    echo "Need $KEY $VAR"
+    echo "Need KEY VAR"
   fi
   ;;
 
   config:get)
-  if [ $2 ];
-  then
+  if [ $2 ]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER get $2
   else
-    echo "Need $KEY"
+    echo "Need KEY"
   fi
   ;;
 
   config:rm)
-  if [ $2 ];
+  if [ $2 ]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER rm $2
   else
-    echo "Neekd $KEY"
+    echo "Need KEY"
   fi
   ;;
 
   config)
-  if [ $2 ];
-    for conf in `/usr/local/bin/etcdctl -C $ETCD_SERVER ls $2`;
+  if [ $2 ]; then
+    for conf in `/usr/local/bin/etcdctl -C $ETCD_SERVER ls $2 | grep -v "Error: 100: Key not found"`;
     do
       echo -n "$conf:";
       /usr/local/bin/etcdctl -C $ETCD_SERVER get $conf
