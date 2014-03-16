@@ -3,6 +3,7 @@ REPOSITORY="$1"
 BRANCH="$5"
 REPO_PATH="/home/git/src/$REPOSITORY"
 DOCKERFILE="$REPO_PATH/Dockerfile"
+BUILD_ORG_NAME="octoprod"
 
 if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
 echo "Put repo in src format somewhere."
@@ -38,7 +39,7 @@ then
   # Look for the exposed port.
   INTERNAL_PORT=$(grep -i "^EXPOSE" $DOCKERFILE | cut -d ' ' -f 2)
   # Build and get the ID.
-  sudo docker build -t octohost/$BASE $REPO_PATH
+  sudo docker build -t $BUILD_ORG_NAME/$BASE $REPO_PATH
 
   if [ $? -ne 0 ]
   then
@@ -91,7 +92,7 @@ then
     RUN_OPTIONS="$ENV $RUN_OPTIONS"
   fi
 
-  ID=$(sudo docker run $RUN_OPTIONS octohost/$BASE)
+  ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
 
   # Get the $PORT from the container.
   if [ -n "$INTERNAL_PORT" ]
