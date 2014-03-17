@@ -86,7 +86,7 @@ then
     for conf in `sudo /usr/bin/octo config $BASE`;
     do
       KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
-      VAR=$(echo $conf | cut -d ':' -f 2)
+      VAR=$(echo $conf | cut -d ':' -f 2-10)
       ENV="$ENV -e $KEY=$VAR"
     done
     RUN_OPTIONS="$ENV $RUN_OPTIONS"
