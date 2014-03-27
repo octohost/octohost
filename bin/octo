@@ -38,7 +38,9 @@ get_container_memory_usage ()
 
 show_break ()
 {
-  echo "\n\n################################"
+  echo ""
+  echo ""
+  echo "################################"
 }
 
 case "$1" in
