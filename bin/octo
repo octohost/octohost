@@ -39,7 +39,7 @@ get_container_memory_usage ()
 show_break ()
 {
   echo ""
-  echo ""
+  echo "g"
   echo "################################"
 }
 
@@ -111,12 +111,12 @@ case "$1" in
   remove)
     if [ $2 ]; then
       if [ -d /home/git/$2.git ]; then
-        rm -rf /home/git/$2.git
+        sudo rm -rf /home/git/$2.git
       else
         echo "There is no source with that name."
         exit
       fi
-      if [ -d /home/git/src/$2.git ]; then rm -rf /home/git/src/$2.git; fi
+      if [ -d /home/git/src/$2.git ]; then sudo rm -rf /home/git/src/$2.git; fi
       echo "Removed the source for $2."
       OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then
@@ -134,15 +134,15 @@ case "$1" in
       if [ "$2" == 'sites' ]; then
         if [ $3 ]; then
           # Grab all of the sites.
-          /usr/bin/rsync -avz ubuntu@$3:/home/git/*.git /home/git/
+          sudo /usr/bin/rsync -avz ubuntu@$3:/home/git/*.git /home/git/
           cd /home/git
           for i in *.git; do
             site=`basename $i .git`
             /usr/bin/octo restart $site
             # Need a checkout and not a bare repo to build with later.
-            git clone /home/git/$site.git /home/git/src/$site.git
+            sudo git clone /home/git/$site.git /home/git/src/$site.git
           done
-          chown -R git.git /home/git/src
+          sudo chown -R git.git /home/git/src
         else
           echo "Need a source."
         fi
@@ -158,14 +158,14 @@ case "$1" in
       echo "Restarting $2."
       newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
       branch=`cd /home/git/$2.git; git branch | grep "*" | cut -d ' ' -f 2`
-      cd /home/git/$2.git; git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
-      rm -rf /home/git/src/$2
+      cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
+      sudo rm -rf /home/git/src/$2
     else
       echo "Need a site to restart."
     fi
     ;;
 
   *)
-    echo "Usage: octo status|clean|restart \$site|remove \$site|move"
+    echo "Usage: octo status|clean|restart|remove|move|config"
     ;;
 esac
