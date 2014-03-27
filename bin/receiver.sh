@@ -79,14 +79,15 @@ then
     RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
   fi
 
-  ENV_VARS=$(sudo /usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
+  ENV_VARS=$(/usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
   if [ -n "$ENV_VARS" ]
   then
     ENV=""
-    for conf in `sudo /usr/bin/octo config $BASE`;
+    for conf in `/usr/bin/octo config $BASE`;
     do
       KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
       VAR=$(echo $conf | cut -d ':' -f 2-10)
+      echo "Adding key: $KEY to $BASE container."
       ENV="$ENV -e $KEY=$VAR"
     done
     RUN_OPTIONS="$ENV $RUN_OPTIONS"
