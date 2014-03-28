@@ -47,7 +47,7 @@ then
     exit
   fi
 
-  RUN_OPTIONS="-P -d"
+  RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
 
   ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
   if [ -n "$ADD_NAME" ]
