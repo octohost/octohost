@@ -6,6 +6,8 @@ PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
 DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
 ETCD_SERVER="0.0.0.0:4001"
 BUILD_ORG_NAME="octoprod"
+PROXY_ADDR="127.0.0.1:8080"
+ENDPONT_ADDR="127.0.0.1"
 
 get_short_container_id ()
 {
@@ -44,6 +46,21 @@ show_break ()
   echo "################################"
 }
 
+set_proxy ()
+{
+  curl -s "http://$PROXY_ADDR/set?domain=$1&endpoint=$ENDPONT_ADDR:$2" > /dev/null
+}
+
+get_proxy ()
+{
+  curl "http://$PROXY_ADDR/get?domain=$1"
+}
+
+rm_proxy ()
+{
+  curl "http://$PROXY_ADDR/del?domain=$1"
+}
+
 case "$1" in
 
   config:set)
@@ -79,6 +96,30 @@ case "$1" in
     done
   else
     echo "Need the name of a container."
+  fi
+  ;;
+
+  proxy:get)
+  if [ $2 ]; then
+    get_proxy $2
+  else
+    echo "Need the name of a website"
+  fi
+  ;;
+
+  proxy:set)
+  if [[ $2 && $3 ]]; then
+    set_proxy $2 $3
+  else
+    echo "Need a domain name and a port."
+  fi
+  ;;
+
+  proxy:rm)
+  if [ $2 ]; then
+    rm_proxy $2
+  else
+    echo "Need the name of a website"
   fi
   ;;
 
