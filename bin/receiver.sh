@@ -118,21 +118,13 @@ fi
 if [ -n "$XIP_IO" ]
 then
   echo "Adding http://$BASE.$XIP_IO"
-  # Zero out any existing items.
-  /usr/bin/redis-cli ltrim frontend:$BASE.$XIP_IO 200 200 > /dev/null
-  # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
-  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO $BASE > /dev/null
-  /usr/bin/redis-cli rpush frontend:$BASE.$XIP_IO http://127.0.0.1:$PORT > /dev/null
+  `/usr/bin/octo proxy:set $BASE.$XIP_IO $PORT`
 fi
 
 if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding http://$BASE.$DOMAIN_SUFFIX"
-  # Zero out any existing items.
-  /usr/bin/redis-cli ltrim frontend:$BASE.$DOMAIN_SUFFIX 200 200 > /dev/null
-  # Connect $BASE.$PUBLIC_IP.xip.io to the $PORT
-  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX $BASE > /dev/null
-  /usr/bin/redis-cli rpush frontend:$BASE.$DOMAIN_SUFFIX http://127.0.0.1:$PORT > /dev/null
+  `/usr/bin/octo proxy:set $BASE.$DOMAIN_SUFFIX $PORT`
 fi
 
 # Support a CNAME file in repo src
@@ -144,9 +136,7 @@ then
   while read DOMAIN
   do
     echo "Adding http://$DOMAIN"
-    /usr/bin/redis-cli ltrim frontend:$DOMAIN 200 200 > /dev/null
-    /usr/bin/redis-cli rpush frontend:$DOMAIN $DOMAIN > /dev/null
-    /usr/bin/redis-cli rpush frontend:$DOMAIN http://127.0.0.1:$PORT > /dev/null
+    `/usr/bin/octo proxy:set $DOMAIN $PORT`
   done < $CNAME
 fi
 
