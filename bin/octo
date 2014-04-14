@@ -165,7 +165,7 @@ case "$1" in
         docker kill $OLD_ID
         echo "Removed running container."
       fi
-      /usr/bin/redis-cli del frontend:$2.$DOMAIN_SUFFIX >/dev/null
+      octo proxy:rm $2.$DOMAIN_SUFFIX
     else
       echo "Need the name to remove."
     fi
