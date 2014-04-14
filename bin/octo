@@ -79,16 +79,16 @@ pull_tentacles ()
 
 case "$1" in
 
-  tentacles:pull)
-    pull_tentacles
-  ;;
-
-  tentacles:stop)
-    stop_tentacles
-  ;;
-
-  tentacles:start)
-    start_tentacles
+  tentacles)
+    if [ "$2" == "start" ]; then
+      start_tentacles
+    elif [ "$2" == "stop" ]; then
+      stop_tentacles
+    elif [ "$2" == "pull" ]; then
+      stop_tentacles
+    else
+      echo "Need a start|stop|pull command."
+    fi
   ;;
 
   config:set)
