@@ -11,6 +11,7 @@ TENTACLES_PORT="82"
 TENTACLES_ADDR="http://127.0.0.1:$TENTACLES_PORT"
 TENTACLES_BUILD="octohost/tentacles"
 ENDPONT_ADDR="127.0.0.1"
+TENTACLES="docker run -d -e REDIS_URL=redis://$PRIVATE_IP:6379 -p $TENTACLES_PORT:5000 $TENTACLES_BUILD"
 
 get_short_container_id ()
 {
@@ -66,7 +67,13 @@ rm_proxy ()
 
 start_tentacles ()
 {
-  docker run -d -e REDIS_URL=redis://$PRIVATE_IP:6379 -p $TENTACLES_PORT:5000 $TENTACLES_BUILD
+  if [ -e "/var/run/docker.sock" ]; then
+    $TENTACLES
+  else
+    service docker start
+    sleep 5
+    $TENTACLES
+  fi
 }
 
 stop_tentacles ()
