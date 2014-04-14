@@ -85,7 +85,7 @@ case "$1" in
     elif [ "$2" == "stop" ]; then
       stop_tentacles
     elif [ "$2" == "pull" ]; then
-      stop_tentacles
+      pull_tentacles
     else
       echo "Need a start|stop|pull command."
     fi
