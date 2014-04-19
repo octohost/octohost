@@ -1,17 +1,8 @@
 #!/bin/bash
 
-# Directories and domain names.
-SRC_DIR="/home/git/src/"
-PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
-PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
-DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
-ETCD_SERVER="0.0.0.0:4001"
-BUILD_ORG_NAME="octoprod"
-TENTACLES_PORT="82"
-TENTACLES_ADDR="http://127.0.0.1:$TENTACLES_PORT"
-TENTACLES_BUILD="octohost/tentacles"
-ENDPONT_ADDR="127.0.0.1"
-TENTACLES="docker run -d -e REDIS_URL=redis://$PRIVATE_IP:6379 -p $TENTACLES_PORT:5000 $TENTACLES_BUILD"
+if [ -f /etc/default/octohost ]; then
+        . /etc/default/octohost
+fi
 
 get_short_container_id ()
 {

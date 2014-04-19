@@ -1,9 +1,11 @@
 #!/bin/bash
 REPOSITORY="$1"
 BRANCH="$5"
-REPO_PATH="/home/git/src/$REPOSITORY"
+if [ -f /etc/default/octohost ]; then
+        . /etc/default/octohost
+fi
+REPO_PATH="$SRC_DIR$REPOSITORY"
 DOCKERFILE="$REPO_PATH/Dockerfile"
-BUILD_ORG_NAME="octoprod"
 
 if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
 echo "Put repo in src format somewhere."
@@ -18,7 +20,6 @@ fi
 echo "Base: $BASE"
 
 # Get Public IP address.
-PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
 XIP_IO="$PUBLIC_IP.xip.io"
 
 # Set the domain name here if desired. Comment out if not used.
