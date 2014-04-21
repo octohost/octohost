@@ -69,12 +69,12 @@ start_tentacles ()
 
 stop_tentacles ()
 {
-  docker ps | grep "$TENTACLES_BUILD" | awk '{ print $1 }' | xargs docker kill
+  docker ps | grep "$TENTACLES_IMAGE" | awk '{ print $1 }' | xargs docker kill
 }
 
 pull_tentacles ()
 {
-  docker pull $TENTACLES_BUILD
+  docker pull $TENTACLES_IMAGE
 }
 
 case "$1" in

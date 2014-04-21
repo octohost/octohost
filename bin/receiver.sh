@@ -19,12 +19,6 @@ then
 fi
 echo "Base: $BASE"
 
-# Get Public IP address.
-XIP_IO="$PUBLIC_IP.xip.io"
-
-# Set the domain name here if desired. Comment out if not used.
-DOMAIN_SUFFIX="$PUBLIC_IP.xip.io"
-
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
 
