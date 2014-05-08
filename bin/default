@@ -24,3 +24,5 @@ TENTACLES="docker run -d -e REDIS_URL=redis://$REDIS_SERVER -p $TENTACLES_PORT:5
 # octohost servers that work as a cluster, then this should be a
 # different value.
 ENDPONT_ADDR="127.0.0.1"
+
+EMAIL_NOTIFICATION="sysadmin@example.com"
