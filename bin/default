@@ -16,7 +16,7 @@ TENTACLES_IMAGE="octohost/tentacles"
 TENTACLES_PORT="82"
 TENTACLES_ADDR="http://127.0.0.1:$TENTACLES_PORT"
 
-REDIS_SERVER="127.0.0.1:6379"
+REDIS_SERVER="$PRIVATE_IP:6379"
 TENTACLES="docker run -d -e REDIS_URL=redis://$REDIS_SERVER -p $TENTACLES_PORT:5000 $TENTACLES_IMAGE"
 
 # Where you are telling tentacles to direct HTTP traffic.
