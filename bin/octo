@@ -225,7 +225,12 @@ case "$1" in
     fi
     ;;
 
+  update)
+    echo "Updating your /usr/bin/octo from $OCTO_BIN"
+    cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
+  ;;
+
   *)
-    echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy"
+    echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy|update"
     ;;
 esac

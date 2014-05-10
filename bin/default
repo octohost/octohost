@@ -26,3 +26,5 @@ TENTACLES="docker run -d -e REDIS_URL=redis://$REDIS_SERVER -p $TENTACLES_PORT:5
 ENDPONT_ADDR="127.0.0.1"
 
 EMAIL_NOTIFICATION="sysadmin@example.com"
+
+OCTO_BIN="https://raw.githubusercontent.com/octohost/octohost/master/bin/octo"
