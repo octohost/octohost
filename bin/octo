@@ -14,24 +14,10 @@ get_long_container_id ()
   docker inspect $1 | jq '.[0].ID' | cut -d '"' -f 2
 }
 
-get_memory_usage ()
-{
-  cat /sys/fs/cgroup/memory/lxc/$1/memory.usage_in_bytes
-}
-
 reformat_bytes ()
 {
   (( size = $1/1024/1024 ))
   echo "$size"
-}
-
-get_container_memory_usage ()
-{
-  ID=$(get_short_container_id $1)
-  LONG=$(get_long_container_id $ID)
-  MEMORY=$(get_memory_usage $LONG)
-  MB=$(reformat_bytes $MEMORY)
-  echo -n $MB
 }
 
 show_break ()
@@ -87,7 +73,7 @@ case "$1" in
     elif [ "$2" == "pull" ]; then
       pull_tentacles
     else
-      echo "Need a start|stop|pull command."
+      echo "Usage: octo tentacles {start|stop|pull}"
     fi
   ;;
 
@@ -95,7 +81,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 "$3"
   else
-    echo "Need KEY VAR"
+    echo "Usage: octo config:set {key} {var}"
   fi
   ;;
 
@@ -103,7 +89,7 @@ case "$1" in
   if [ $2 ]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER get $2
   else
-    echo "Need KEY"
+    echo "Usage: octo config:get {key}"
   fi
   ;;
 
@@ -111,7 +97,7 @@ case "$1" in
   if [ $2 ]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER rm $2
   else
-    echo "Need KEY"
+    echo "Usage: octo config:rm {key}"
   fi
   ;;
 
@@ -123,7 +109,7 @@ case "$1" in
       /usr/local/bin/etcdctl -C $ETCD_SERVER get $conf
     done
   else
-    echo "Need the name of a container."
+    echo "Usage: octo config {container}"
   fi
   ;;
 
@@ -131,7 +117,7 @@ case "$1" in
   if [ $2 ]; then
     get_proxy $2
   else
-    echo "Need the name of a website"
+    echo "Usage: octo proxy:get {domain-name}"
   fi
   ;;
 
@@ -139,7 +125,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     set_proxy $2 $3
   else
-    echo "Need a domain name and a port."
+    echo "Usage: octo proxy:set {domain-name} {port}"
   fi
   ;;
 
@@ -147,7 +133,7 @@ case "$1" in
   if [ $2 ]; then
     rm_proxy $2
   else
-    echo "Need the name of a website"
+    echo "Usage: octo proxy:rm {domain-name}"
   fi
   ;;
 
@@ -195,7 +181,7 @@ case "$1" in
       fi
       octo proxy:rm $2.$DOMAIN_SUFFIX
     else
-      echo "Need the name to remove."
+      echo "Usage: octo remove {container}"
     fi
     ;;
 
@@ -218,7 +204,7 @@ case "$1" in
         fi
       fi
     else
-      echo "Please enter '/usr/bin/octo move sites source.ip.address'"
+      echo "Usage: octo move sites {ip-address}'"
     fi
     ;;
 
@@ -231,11 +217,11 @@ case "$1" in
       cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
       sudo rm -rf /home/git/src/$2
     else
-      echo "Need a site to restart."
+      echo "Usage: octo restart {container}"
     fi
     ;;
 
   *)
-    echo "Usage: octo status|clean|restart|remove|move|config"
+    echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy"
     ;;
 esac
