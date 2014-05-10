@@ -1,6 +1,6 @@
 # Configuration for /usr/bin/octo and octohost.
 
-SRC_DIR="/home/git/src/"
+SRC_DIR="/home/git/src"
 
 PUBLIC_IP=$(curl -s http://ipv4.icanhazip.com)
 PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)

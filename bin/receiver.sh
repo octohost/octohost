@@ -4,7 +4,7 @@ BRANCH="$5"
 if [ -f /etc/default/octohost ]; then
         . /etc/default/octohost
 fi
-REPO_PATH="$SRC_DIR$REPOSITORY"
+REPO_PATH="$SRC_DIR/$REPOSITORY"
 DOCKERFILE="$REPO_PATH/Dockerfile"
 
 if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
