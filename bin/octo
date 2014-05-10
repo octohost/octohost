@@ -233,7 +233,7 @@ case "$1" in
   *)
     echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy|update"
     cat<<EOF
-    
+
     octo status                              Show basic app status: OK or DOWN.
     octo clean                               Remove unused and stopped containers.
     octo restart {container}                 Restart {container} from src stored in $SRC_DIR.
@@ -254,6 +254,7 @@ case "$1" in
     octo proxy:rm {domain-name}              Remove record for {domain-name} in tentacles.
 
     octo update                              Update octo command from $OCTO_BIN.
+    
 EOF
   ;;
 esac
