@@ -137,6 +137,10 @@ case "$1" in
   fi
   ;;
 
+  proxy)
+  echo "Usage: octo proxy:{set|get|rm}"
+  ;;
+
   status)
     cd $SRC_DIR
     for i in *.git; do
