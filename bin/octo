@@ -233,16 +233,17 @@ case "$1" in
   *)
     echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy|update"
     cat<<EOF
-    octo status                              Show basic app status: OK or DOWN
+    
+    octo status                              Show basic app status: OK or DOWN.
     octo clean                               Remove unused and stopped containers.
-    octo restart {container}                 Restart {container} from src stored in $SRC_DIR
+    octo restart {container}                 Restart {container} from src stored in $SRC_DIR.
     octo remove {container}                  Remove {container}, the src and the proxy entry.
     octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
 
-    octo config {container}                  Show all ENV variables for {container}
-    octo config:set {container/key} {var}    Set an ENV variable for {container}
-    octo config:get {container/key}          Get an ENV variable for {container}
-    octo config:rm {container/key}           Remove an ENV variable for {container}
+    octo config {container}                  Show all ENV variables for {container}.
+    octo config:set {container/key} {var}    Set an ENV variable for {container}.
+    octo config:get {container/key}          Get an ENV variable for {container}.
+    octo config:rm {container/key}           Remove an ENV variable for {container}.
 
     octo tentacles pull                      Pull octohost/tentacles image.
     octo tentacles start                     Start octohost/tentacles service.
@@ -252,7 +253,7 @@ case "$1" in
     octo proxy:get {domain-name}             Get {port} for {domain-name} from tentacles.
     octo proxy:rm {domain-name}              Remove record for {domain-name} in tentacles.
 
-    octo update                              Update octo comman from $OCTO_BIN
+    octo update                              Update octo command from $OCTO_BIN.
 EOF
   ;;
 esac
