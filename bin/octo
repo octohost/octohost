@@ -81,7 +81,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 "$3"
   else
-    echo "Usage: octo config:set {key} {var}"
+    echo "Usage: octo config:set {container/key} {var}"
   fi
   ;;
 
@@ -89,7 +89,7 @@ case "$1" in
   if [ $2 ]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER get $2
   else
-    echo "Usage: octo config:get {key}"
+    echo "Usage: octo config:get {container/key}"
   fi
   ;;
 
@@ -97,7 +97,7 @@ case "$1" in
   if [ $2 ]; then
     /usr/local/bin/etcdctl -C $ETCD_SERVER rm $2
   else
-    echo "Usage: octo config:rm {key}"
+    echo "Usage: octo config:rm {container/key}"
   fi
   ;;
 
@@ -176,7 +176,7 @@ case "$1" in
         echo "There is no source with that name."
         exit
       fi
-      if [ -d /home/git/src/$2.git ]; then sudo rm -rf /home/git/src/$2.git; fi
+      if [ -d $SRC_DIR/$2.git ]; then sudo rm -rf $SRC_DIR/$2.git; fi
       echo "Removed the source for $2."
       OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then
@@ -200,9 +200,9 @@ case "$1" in
             site=`basename $i .git`
             /usr/bin/octo restart $site
             # Need a checkout and not a bare repo to build with later.
-            sudo git clone /home/git/$site.git /home/git/src/$site.git
+            sudo git clone /home/git/$site.git $SRC_DIR/$site.git
           done
-          sudo chown -R git.git /home/git/src
+          sudo chown -R git.git $SRC_DIR
         else
           echo "Need a source."
         fi
@@ -219,7 +219,7 @@ case "$1" in
       newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
       branch=`cd /home/git/$2.git; git branch | grep "*" | cut -d ' ' -f 2`
       cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
-      sudo rm -rf /home/git/src/$2
+      sudo rm -rf $SRC_DIR/$2
     else
       echo "Usage: octo restart {container}"
     fi
@@ -232,5 +232,27 @@ case "$1" in
 
   *)
     echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy|update"
-    ;;
+    cat && cat<<EOF
+    octo status                              Show basic app status: OK or DOWN
+    octo clean                               Remove unused and stopped containers.
+    octo restart {container}                 Restart {container} from src stored in $SRC_DIR
+    octo remove {container}                  Remove {container}, the src and the proxy entry.
+    octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
+
+    octo config {container}                  Show all ENV variables for {container}
+    octo config:set {container/key} {var}    Set an ENV variable for {container}
+    octo config:get {container/key}          Get an ENV variable for {container}
+    octo config:rm {container/key}           Remove an ENV variable for {container}
+
+    octo tentacles pull                      Pull octohost/tentacles image.
+    octo tentacles start                     Start octohost/tentacles service.
+    octo tentacles stop                      Stop octohost/tentacles service.
+
+    octo proxy:set {domain-name} {port}      Set {domain-name} and {port} in tentacles.
+    octo proxy:get {domain-name}             Get {port} for {domain-name} from tentacles.
+    octo proxy:rm {domain-name}              Remove record for {domain-name} in tentacles.
+
+    octo update                              Update octo comman from $OCTO_BIN
+EOF
+  ;;
 esac
