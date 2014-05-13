@@ -79,7 +79,7 @@ case "$1" in
 
   config:set)
   if [[ $2 && $3 ]]; then
-    /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 "$3"
+    /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 $3
   else
     echo "Usage: octo config:set {container/key} {var}"
   fi
