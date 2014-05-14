@@ -28,3 +28,7 @@ ENDPONT_ADDR="127.0.0.1"
 EMAIL_NOTIFICATION="sysadmin@example.com"
 
 OCTO_BIN="https://raw.githubusercontent.com/octohost/octohost/master/bin/octo"
+
+LOGSPOUT_IMAGE="progrium/logspout"
+#LOGSPOUT_TARGET=""
+LOGSPOUT="docker run -p 8000:8000 -d -v=/var/run/docker.sock:/tmp/docker.sock $LOGSPOUT_IMAGE $LOGSPOUT_TARGET"

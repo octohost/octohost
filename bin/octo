@@ -63,7 +63,44 @@ pull_tentacles ()
   docker pull $TENTACLES_IMAGE
 }
 
+start_logspout ()
+{
+  if [ -z "$LOGSPOUT_TARGET" ]; then
+    echo "No LOGSPOUT_TARGET in /etc/default/octohost - not starting."
+    exit
+  fi
+  if [ -e "/var/run/docker.sock" ]; then
+    $LOGSPOUT
+  else
+    service docker start
+    sleep 5
+    $LOGSPOUT
+  fi
+}
+
+stop_logspout ()
+{
+  docker ps | grep "$LOGSPOUT_IMAGE" | awk '{ print $1 }' | xargs docker kill
+}
+
+pull_logspout ()
+{
+  docker pull $LOGSPOUT_IMAGE
+}
+
 case "$1" in
+
+  logspout)
+  if [ "$2" == "start" ]; then
+    start_logspout
+  elif [ "$2" == "stop" ]; then
+    stop_logspout
+  elif [ "$2" == "pull" ]; then
+    pull_logspout
+  else
+    echo "Usage: octo logspout {start|stop|pull}"
+  fi
+  ;;
 
   tentacles)
     if [ "$2" == "start" ]; then
@@ -248,6 +285,10 @@ case "$1" in
   octo tentacles pull                      Pull octohost/tentacles image.
   octo tentacles start                     Start octohost/tentacles service.
   octo tentacles stop                      Stop octohost/tentacles service.
+
+  octo logspout pull                       Pull progrium/logspout image.
+  octo logspout start                      Start progrium/logspout service.
+  octo logspout stop                       Stop progrium/logspout service.
 
   octo proxy:set {domain-name} {port}      Set {domain-name} and {port} in tentacles.
   octo proxy:get {domain-name}             Get {port} for {domain-name} from tentacles.
