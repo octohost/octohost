@@ -293,7 +293,7 @@ case "$1" in
   ;;
 
   *)
-    echo "Usage: octo status|clean|restart|remove|move|config|tentacles|proxy|update"
+    echo "Usage: octo status|clean|restart|remove|move|config|tentacles|logspout|logs|proxy|update"
     cat<<EOF
 
   octo status                              Show basic app status: OK or DOWN.
