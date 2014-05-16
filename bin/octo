@@ -115,6 +115,8 @@ case "$1" in
   elif [ "$2" == "start" ]; then
     if [[ $3 && $4 ]]; then
       start_logs "$3" "$4"
+    else
+      echo "Usage: octo logs start {full-log-path} {mount}"
     fi
   else
     echo "Usage: octo logs {nginx:start|docker:start|start [full-log-path] [mount]}"
