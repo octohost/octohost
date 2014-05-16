@@ -32,3 +32,11 @@ OCTO_BIN="https://raw.githubusercontent.com/octohost/octohost/master/bin/octo"
 LOGSPOUT_IMAGE="progrium/logspout"
 #LOGSPOUT_TARGET=""
 LOGSPOUT="docker run -p 8000:8000 -d -v=/var/run/docker.sock:/tmp/docker.sock $LOGSPOUT_IMAGE $LOGSPOUT_TARGET"
+
+REMOTE_SYSLOG_IMAGE="octohost/remote_syslog"
+#REMOTE_SYSLOG_PORT=""
+#REMOTE_SYSLOG_DESTINATION=""
+REMOTE_SYSLOG_COMMAND="$REMOTE_SYSLOG_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION"
+
+NGINX_ACCESS="docker run -d -v=/var/log/nginx/access.log:/access.log $REMOTE_SYSLOG_COMMAND /access.log"
+NGINX_ERROR="docker run -d -v=/var/log/nginx/error.log:/error.log $REMOTE_SYSLOG_COMMAND /error.log"

@@ -88,7 +88,32 @@ pull_logspout ()
   docker pull $LOGSPOUT_IMAGE
 }
 
+start_nginx_logs ()
+{
+  if [ -z "$REMOTE_SYSLOG_PORT" ]; then
+    echo "No REMOTE_SYSLOG_PORT in /etc/default/octohost - not starting."
+    exit
+  fi
+  if [ -e "/var/run/docker.sock" ]; then
+    $NGINX_ACCESS
+    $NGINX_ERROR
+  else
+    service docker start
+    sleep 5
+    $NGINX_ACCESS
+    $NGINX_ERROR
+  fi
+}
+
 case "$1" in
+
+  logs)
+  if [ "$2" == "nginx:start" ]; then
+    start_nginx_logs
+  else
+    echo "Usage: octo logs {nginx:start}"
+  fi
+  ;;
 
   logspout)
   if [ "$2" == "start" ]; then
@@ -282,13 +307,11 @@ case "$1" in
   octo config:get {container/key}          Get an ENV variable for {container}.
   octo config:rm {container/key}           Remove an ENV variable for {container}.
 
-  octo tentacles pull                      Pull octohost/tentacles image.
-  octo tentacles start                     Start octohost/tentacles service.
-  octo tentacles stop                      Stop octohost/tentacles service.
+  octo tentacles {pull|start|stop}         Pull/start/stop octohost/tentacles image.
 
-  octo logspout pull                       Pull progrium/logspout image.
-  octo logspout start                      Start progrium/logspout service.
-  octo logspout stop                       Stop progrium/logspout service.
+  octo logspout {pull|start|stop}          Pull/start/stop progrium/logspout image.
+
+  octo logs nginx:start                    Use octohost/remote_syslog to send nginx logs to remote syslog.
 
   octo proxy:set {domain-name} {port}      Set {domain-name} and {port} in tentacles.
   octo proxy:get {domain-name}             Get {port} for {domain-name} from tentacles.
