@@ -300,9 +300,9 @@ case "$1" in
     cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
   ;;
 
-  *)
-    echo "Usage: octo status|clean|restart|remove|move|config|tentacles|logspout|logs|proxy|update"
-    cat<<EOF
+  help)
+  echo "Usage: octo status|clean|restart|remove|move|config|tentacles|logspout|logs|proxy|update"
+  cat<<EOF
 
   octo status                              Show basic app status: OK or DOWN.
   octo clean                               Remove unused and stopped containers.
@@ -330,5 +330,11 @@ case "$1" in
   octo update                              Update octo command from $OCTO_BIN.
 
 EOF
+  ;;
+
+  *)
+  for script in $(ls -d /usr/local/octohost/plugins/*/commands); do
+    $script "$@"
+  done
   ;;
 esac
