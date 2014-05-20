@@ -112,6 +112,8 @@ case "$1" in
     start_logs "/var/log/nginx/error.log" "/error.log"
   elif [ "$2" == "docker:start" ]; then
     start_logs "/var/log/upstart/docker.log" "/docker.log"
+  elif [ "$2" == "octologs:start" ]; then
+    $OCTOLOGS
   elif [ "$2" == "start" ]; then
     if [[ $3 && $4 ]]; then
       start_logs "$3" "$4"
@@ -119,7 +121,7 @@ case "$1" in
       echo "Usage: octo logs start {full-log-path} {mount}"
     fi
   else
-    echo "Usage: octo logs {nginx:start|docker:start|start [full-log-path] [mount]}"
+    echo "Usage: octo logs {nginx:start|docker:start|octologs:start|start [full-log-path] [mount]}"
   fi
   ;;
 
