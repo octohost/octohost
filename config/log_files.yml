@@ -1,0 +1,4 @@
+files:
+ - /access.log
+ - /error.log
+ - /docker.log
