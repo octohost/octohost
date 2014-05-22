@@ -104,16 +104,18 @@ start_logs ()
   fi
 }
 
+stop_octologs ()
+{
+  docker ps | grep "$OCTOLOGS_IMAGE" | awk '{ print $1 }' | xargs docker kill
+}
+
 case "$1" in
 
   logs)
-  if [ "$2" == "nginx:start" ]; then
-    start_logs "/var/log/nginx/access.log" "/access.log"
-    start_logs "/var/log/nginx/error.log" "/error.log"
-  elif [ "$2" == "docker:start" ]; then
-    start_logs "/var/log/upstart/docker.log" "/docker.log"
-  elif [ "$2" == "octologs:start" ]; then
+  if [ "$2" == "octostart" ]; then
     $OCTOLOGS
+  elif [ "$2" == "octostop" ]; then
+    stop_octologs
   elif [ "$2" == "start" ]; then
     if [[ $3 && $4 ]]; then
       start_logs "$3" "$4"
@@ -121,7 +123,7 @@ case "$1" in
       echo "Usage: octo logs start {full-log-path} {mount}"
     fi
   else
-    echo "Usage: octo logs {nginx:start|docker:start|octologs:start|start [full-log-path] [mount]}"
+    echo "Usage: octo logs {octostart|start [full-log-path] [mount]}"
   fi
   ;;
 
@@ -321,8 +323,8 @@ case "$1" in
 
   octo logspout {pull|start|stop}          Pull/start/stop progrium/logspout image.
 
-  octo logs nginx:start                    Use remote_syslog to send nginx logs to remote syslog.
-  octo logs docker:start                   Use remote_syslog to send Docker logs to remote syslog.
+  octo logs octostart                      Use remote_syslog to send Docker and nginx logs to remote syslog.
+  octo logs octostop                       Stop sending Docker and nginx logs to remote syslog.
   octo logs start {full-log-path} {mount}  Use remote_syslog to send {full-log-path} to remote syslog.
 
   octo proxy:set {domain-name} {port}      Set {domain-name} and {port} in tentacles.

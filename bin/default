@@ -38,4 +38,6 @@ REMOTE_SYSLOG_IMAGE="octohost/remote_syslog"
 #REMOTE_SYSLOG_DESTINATION=""
 REMOTE_SYSLOG_COMMAND="$REMOTE_SYSLOG_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION"
 
-OCTOLOGS="docker run -d -v=/etc/log_files.yml:/log_files.yml -v=/var/log/nginx/access.log:/access.log -v=/var/log/nginx/error.log:/error.log -v=/var/log/upstart/docker.log:/docker.log octohost/octologs -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION -c /log_files.yml"
+OCTOLOGS_IMAGE="octohost/octologs"
+OCTOLOGS_FILES="-v=/etc/log_files.yml:/log_files.yml -v=/var/log/nginx/access.log:/access.log -v=/var/log/nginx/error.log:/error.log -v=/var/log/upstart/docker.log:/docker.log"
+OCTOLOGS="docker run -d $OCTOLOGS_FILES $OCTOLOGS_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION -c /log_files.yml"
