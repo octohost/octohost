@@ -112,6 +112,10 @@ stop_octologs ()
 case "$1" in
 
   logs)
+  if [ -z "$REMOTE_SYSLOG_PORT" ]; then
+    echo "Need to define REMOTE_SYSLOG_PORT in /etc/default/octohost"
+    exit 1
+  fi
   if [ "$2" == "octostart" ]; then
     $OCTOLOGS
   elif [ "$2" == "octostop" ]; then
