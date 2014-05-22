@@ -109,19 +109,25 @@ stop_octologs ()
   docker ps | grep "$OCTOLOGS_IMAGE" | awk '{ print $1 }' | xargs docker kill
 }
 
-case "$1" in
-
-  logs)
+check_syslog_port ()
+{
   if [ -z "$REMOTE_SYSLOG_PORT" ]; then
     echo "Need to define REMOTE_SYSLOG_PORT in /etc/default/octohost"
     exit 1
   fi
+}
+
+case "$1" in
+
+  logs)
   if [ "$2" == "octostart" ]; then
+    check_syslog_port
     $OCTOLOGS
   elif [ "$2" == "octostop" ]; then
     stop_octologs
   elif [ "$2" == "start" ]; then
     if [[ $3 && $4 ]]; then
+      check_syslog_port
       start_logs "$3" "$4"
     else
       echo "Usage: octo logs start {full-log-path} {mount}"
@@ -133,6 +139,7 @@ case "$1" in
 
   logspout)
   if [ "$2" == "start" ]; then
+    check_syslog_port
     start_logspout
   elif [ "$2" == "stop" ]; then
     stop_logspout
