@@ -90,10 +90,7 @@ pull_logspout ()
 
 start_logs ()
 {
-  if [ -z "$REMOTE_SYSLOG_PORT" ]; then
-    echo "No REMOTE_SYSLOG_PORT in /etc/default/octohost - not starting."
-    exit
-  fi
+  check_syslog_port
   if [ -e "/var/run/docker.sock" ]; then
     LOG_COMMAND="docker run -d -v=$1:$2 $REMOTE_SYSLOG_COMMAND $2"
     $LOG_COMMAND
