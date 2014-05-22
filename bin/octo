@@ -330,8 +330,10 @@ case "$1" in
   octo proxy:rm {domain-name}              Remove record for {domain-name} in tentacles.
 
   octo update                              Update octo command from $OCTO_BIN.
-
 EOF
+  for script in $(ls -d /usr/local/octohost/plugins/*/commands); do
+    $script "$@"
+  done
   ;;
 
   *)
