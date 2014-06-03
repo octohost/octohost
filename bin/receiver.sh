@@ -96,6 +96,16 @@ then
     PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
   fi
 
+  NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" $DOCKERFILE)
+  if [ -n "$NO_HTTP_PROXY" ]
+  then
+    if [ -n "$PORT" ]
+    then
+      echo "Port: $PORT"
+    fi
+    exit
+  fi
+
   if [ -z "$PORT" ]
   then
     echo "#################################################"
@@ -118,16 +128,6 @@ then
 
 else
   echo "There is no Dockerfile present."
-  exit
-fi
-
-NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" $DOCKERFILE)
-if [ -n "$NO_HTTP_PROXY" ]
-then
-  if [ -n "$PORT" ]
-  then
-    echo "Port: $PORT"
-  fi
   exit
 fi
 
