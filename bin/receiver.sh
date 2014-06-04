@@ -103,6 +103,14 @@ then
     then
       echo "Port: $PORT"
     fi
+    Kill the old container by ID.
+    if [ -n "$OLD_ID" ]
+    then
+      echo "Killing $OLD_ID container."
+      sudo docker kill $OLD_ID > /dev/null
+    else
+      echo "Not killing any containers."
+    fi
     exit
   fi
 
