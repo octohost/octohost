@@ -41,3 +41,5 @@ REMOTE_SYSLOG_COMMAND="$REMOTE_SYSLOG_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SY
 OCTOLOGS_IMAGE="octohost/octologs"
 OCTOLOGS_FILES="-v=/etc/log_files.yml:/log_files.yml -v=/var/log/nginx/access.log:/access.log -v=/var/log/nginx/error.log:/error.log -v=/var/log/upstart/docker.log:/docker.log"
 OCTOLOGS="docker run -d $OCTOLOGS_FILES $OCTOLOGS_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION -c /log_files.yml"
+
+CONSUL_SERVER="0.0.0.0:8500"

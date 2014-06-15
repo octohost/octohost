@@ -161,7 +161,7 @@ case "$1" in
 
   config:set)
   if [[ $2 && $3 ]]; then
-    /usr/local/bin/etcdctl -C $ETCD_SERVER set $2 $3
+    /usr/bin/consulkv set $2 $3
   else
     echo "Usage: octo config:set {container/key} {var}"
   fi
@@ -169,7 +169,7 @@ case "$1" in
 
   config:get)
   if [ $2 ]; then
-    /usr/local/bin/etcdctl -C $ETCD_SERVER get $2
+    /usr/bin/consulkv get $2
   else
     echo "Usage: octo config:get {container/key}"
   fi
@@ -177,7 +177,7 @@ case "$1" in
 
   config:rm)
   if [ $2 ]; then
-    /usr/local/bin/etcdctl -C $ETCD_SERVER rm $2
+    /usr/bin/consulkv del $2
   else
     echo "Usage: octo config:rm {container/key}"
   fi
@@ -200,10 +200,10 @@ case "$1" in
 
   config)
   if [ $2 ]; then
-    for conf in `/usr/local/bin/etcdctl -C $ETCD_SERVER ls $2 | grep -v "Error: 100: Key not found"`;
+    for conf in `/usr/bin/consulkv ls $2`;
     do
-      echo -n "$conf:";
-      /usr/local/bin/etcdctl -C $ETCD_SERVER get $conf
+      echo -n "/$2/$conf:";
+      /usr/bin/octo config:get $2/$conf
     done
   else
     echo "Usage: octo config {container}"
