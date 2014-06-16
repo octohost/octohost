@@ -207,6 +207,21 @@ case "$1" in
   fi
   ;;
 
+  config:env)
+  if [ $2 ]; then
+    ENV="-e CONTAINER_NAME=$2"
+    for conf in `/usr/bin/octo config $2`;
+    do
+      KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
+      VAR=$(echo $conf | cut -d ':' -f 2-10)
+      ENV="$ENV -e $KEY=$VAR"
+    done
+    echo "$ENV"
+  else
+    echo "octo config:env {container}"
+  fi
+  ;;
+
   proxy:get)
   if [ $2 ]; then
     get_proxy $2
