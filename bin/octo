@@ -270,6 +270,30 @@ case "$1" in
   fi
   ;;
 
+  service:set)
+  if [[ $2 && $3 ]]; then
+    CONTAINER="$2"
+    PORT="$3"
+    PAYLOAD="{\"ID\": \"$CONTAINER\",\"Name\": \"$CONTAINER\",\"Port\": $PORT}"
+    /usr/bin/consulkv service:set "$PAYLOAD"
+  else
+    echo "Usage: octo service:set {container} {port}"
+  fi
+  ;;
+
+  service:rm)
+  if [ $2 ]; then
+    CONTAINER="$2"
+    /usr/bin/consulkv service:del "$CONTAINER"
+  else
+    echo "Usage: octo service:rm {container}"
+  fi
+  ;;
+
+  service:ls)
+    /usr/bin/consulkv service:ls
+  ;;
+
   proxy:get)
   if [ $2 ]; then
     get_proxy $2

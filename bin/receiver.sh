@@ -93,6 +93,10 @@ else
   exit
 fi
 
+echo "Registering a new Consul service."
+`/usr/bin/octo service:rm $BASE`
+`/usr/bin/octo service:set $BASE $PORT`
+
 if [ -n "$XIP_IO" ]
 then
   echo "Adding http://$BASE.$XIP_IO"
