@@ -185,15 +185,12 @@ case "$1" in
 
   config:export)
 
-  RESULTS=$(curl -s -L http://$ETCD_SERVER/v2/keys/?recursive=true | jq '[.node.nodes[] | {nodes}]' | jq -r .[] | jq '.nodes[] .key, .value' | sort | uniq)
-
-  for key in $RESULTS
+  for key in `/usr/bin/consulkv ls`
   do
     if [ "$key" != "null" ]
     then
-      KEY=$(echo $key | cut -d '"' -f 2)
-      VALUE=$(octo config:get $KEY)
-      echo "octo config:set $KEY '$VALUE'"
+      VALUE=$(octo config:get $key)
+      echo "octo config:set $key '$VALUE'"
     fi
   done
   ;;
