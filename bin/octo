@@ -472,6 +472,8 @@ case "$1" in
 
   octo status                              Show basic app status: OK or DOWN.
   octo clean                               Remove unused and stopped containers.
+  octo start {image}                       Start a {container} from an already built image.
+  octo stop {container}                    Stop all {containers} that match.
   octo restart {container}                 Restart {container} from src stored in $SRC_DIR.
   octo remove {container}                  Remove {container}, the src and the proxy entry.
   octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
@@ -481,6 +483,10 @@ case "$1" in
   octo config:get {container/key}          Get an ENV variable for {container}.
   octo config:rm {container/key}           Remove an ENV variable for {container}.
   octo config:export                       Get all config variables for all containers.
+
+  octo service:set {container} {port}      Add service to Consul.
+  octo service:rm {container-port}         Remove a service from Consul.
+  octo service:ls                          List all services that Consul knows about.
 
   octo tentacles {pull|start|stop}         Pull/start/stop octohost/tentacles image.
 
