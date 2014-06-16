@@ -114,6 +114,32 @@ check_syslog_port ()
   fi
 }
 
+get_exposed_port ()
+{
+  INTERNAL_PORT=$(grep -i "^EXPOSE" $DOCKERFILE | cut -d ' ' -f 2)
+  echo $INTERNAL_PORT
+}
+
+get_external_port()
+{
+  PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
+  echo $PORT
+}
+
+launch_container_return_id ()
+{
+  ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
+  echo $ID
+}
+
+set_src_variables ()
+{
+  BASE="$1"
+  REPOSITORY="$BASE.git"
+  REPO_PATH="$SRC_DIR/$REPOSITORY"
+  DOCKERFILE="$REPO_PATH/Dockerfile"
+}
+
 case "$1" in
 
   logs)
@@ -157,6 +183,35 @@ case "$1" in
     else
       echo "Usage: octo tentacles {start|stop|pull}"
     fi
+  ;;
+
+  start)
+  if [ $2 ]; then
+    set_src_variables "$2"
+    RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
+    INTERNAL_PORT=$(get_exposed_port)
+    ID=$(launch_container_return_id)
+    PORT=$(get_external_port)
+    octo service:set "$BASE" "$PORT"
+  else
+    echo "Usage: octo start {container}"
+  fi
+  ;;
+
+  stop)
+  if [ $2 ]; then
+    set_src_variables "$2"
+    for container in `docker ps | grep "$BUILD_ORG_NAME\/$BASE:latest" | cut -d ' ' -f 1`
+    do
+      ID="$container"
+      INTERNAL_PORT=$(get_exposed_port)
+      PORT=$(get_external_port)
+      docker kill "$ID" > /dev/null
+      octo service:rm "$BASE-$PORT"
+    done
+  else
+    echo "Usage: octo stop {container}"
+  fi
   ;;
 
   config:set)
@@ -209,7 +264,7 @@ case "$1" in
 
   config:env)
   if [ $2 ]; then
-    ENV="-e CONTAINER_NAME=$2"
+    ENV=""
     for conf in `/usr/bin/octo config $2`;
     do
       KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
@@ -226,7 +281,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     BASE="$2"
     DOCKERFILE="$3"
-    RUN_OPTIONS="-P -d"
+    RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
 
     ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
     if [ -n "$ADD_NAME" ]
@@ -262,7 +317,7 @@ case "$1" in
     if [ -n "$ENV_VARS" ]
     then
       ENV=$(/usr/bin/octo config:env $BASE)
-      RUN_OPTIONS="$ENV $RUN_OPTIONS"
+      RUN_OPTIONS="$RUN_OPTIONS $ENV"
     fi
     echo "$RUN_OPTIONS"
   else
@@ -274,7 +329,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     CONTAINER="$2"
     PORT="$3"
-    PAYLOAD="{\"ID\": \"$CONTAINER\",\"Name\": \"$CONTAINER\",\"Port\": $PORT}"
+    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT}"
     /usr/bin/consulkv service:set "$PAYLOAD"
   else
     echo "Usage: octo service:set {container} {port}"
