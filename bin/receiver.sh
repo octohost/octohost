@@ -4,8 +4,6 @@ BRANCH="$5"
 if [ -f /etc/default/octohost ]; then
         . /etc/default/octohost
 fi
-REPO_PATH="$SRC_DIR/$REPOSITORY"
-DOCKERFILE="$REPO_PATH/Dockerfile"
 
 if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
 echo "Put repo in src format somewhere."
@@ -42,45 +40,7 @@ then
     exit
   fi
 
-  RUN_OPTIONS="-P -d"
-
-  ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
-  if [ -n "$ADD_NAME" ]
-  then
-    RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
-  fi
-
-  VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" $DOCKERFILE)
-  if [ -n "$VOLUMES_FROM" ]
-  then
-    VOLUME_NAME="${BASE}_data"
-    RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
-  fi
-
-  LINK_SERVICE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
-  if [ -n "$LINK_SERVICE" ]
-  then
-    SOURCE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $3 }')
-    LINK_NAME=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $4 }')
-    if [ -n "$LINK_NAME" ]
-    then
-      LINK_NAME="$LINK_NAME:$SOURCE"
-      echo "Linking to: $LINK_NAME"
-    else
-      LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
-      echo "Linking to: $LINK_NAME"
-    fi
-
-    RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
-  fi
-
-  ENV_VARS=$(/usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
-  if [ -n "$ENV_VARS" ]
-  then
-    echo "Adding ENV vars to the container."
-    ENV=$(/usr/bin/octo config:env $BASE)
-    RUN_OPTIONS="$ENV $RUN_OPTIONS"
-  fi
+  RUN_OPTIONS=$(/usr/bin/octo config:options $BASE $DOCKERFILE)
 
   ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
 
