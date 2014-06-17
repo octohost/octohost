@@ -94,19 +94,18 @@ else
 fi
 
 echo "Registering a new Consul service."
-`/usr/bin/octo service:rm $BASE`
-`/usr/bin/octo service:set $BASE $PORT`
+/usr/bin/octo service:set $BASE $PORT
 
 if [ -n "$XIP_IO" ]
 then
   echo "Adding http://$BASE.$XIP_IO"
-  `/usr/bin/octo proxy:set $BASE.$XIP_IO $PORT`
+  /usr/bin/octo proxy:set $BASE.$XIP_IO $PORT
 fi
 
 if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding http://$BASE.$DOMAIN_SUFFIX"
-  `/usr/bin/octo proxy:set $BASE.$DOMAIN_SUFFIX $PORT`
+  /usr/bin/octo proxy:set $BASE.$DOMAIN_SUFFIX $PORT
 fi
 
 # Support a CNAME file in repo src
@@ -118,7 +117,7 @@ then
   while read DOMAIN
   do
     echo "Adding http://$DOMAIN"
-    `/usr/bin/octo proxy:set $DOMAIN $PORT`
+    /usr/bin/octo proxy:set $DOMAIN $PORT
   done < $CNAME
 fi
 
