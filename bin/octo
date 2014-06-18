@@ -326,13 +326,14 @@ case "$1" in
   ;;
 
   service:set)
-  if [[ $2 && $3 ]]; then
+  if [[ $2 && $3 && $4 ]]; then
     CONTAINER="$2"
     PORT="$3"
-    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT}"
+    TAGS="$4"
+    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]}"
     /usr/bin/consulkv service:set "$PAYLOAD"
   else
-    echo "Usage: octo service:set {container} {port}"
+    echo "Usage: octo service:set {container} {port} {tags}"
   fi
   ;;
 
@@ -350,7 +351,7 @@ case "$1" in
     for tag  in $( docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
       if echo $tag | grep -q "CONSUL_TAGS"
       then
-        TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2)
+        TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
       fi
     done
     echo $TAG

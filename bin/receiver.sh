@@ -94,7 +94,13 @@ else
 fi
 
 echo "Registering a new Consul service."
-/usr/bin/octo service:set $BASE $PORT
+TAGS=$(/usr/bin/octo service:tags $ID)
+if [ -n "$TAGS" ]
+then
+  /usr/bin/octo service:set $BASE $PORT $TAGS
+else
+  /usr/bin/octo service:set $BASE $PORT proto=http
+fi
 
 if [ -n "$XIP_IO" ]
 then
