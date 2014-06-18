@@ -345,8 +345,24 @@ case "$1" in
   fi
   ;;
 
-  service:ls)
-    /usr/bin/consulkv service:ls
+  service:tags)
+  if [ $2 ]; then
+    for tag  in $( docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
+      if echo $tag | grep -q "CONSUL_TAGS"
+      then
+        TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2)
+      fi
+    done
+    echo $TAG
+  fi
+  ;;
+
+  services)
+    /usr/bin/consulkv services
+  ;;
+
+  services:catalog)
+    /usr/bin/consulkv services:catalog
   ;;
 
   proxy:get)
@@ -486,7 +502,9 @@ case "$1" in
 
   octo service:set {container} {port}      Add service to Consul.
   octo service:rm {container-port}         Remove a service from Consul.
-  octo service:ls                          List all services that Consul knows about.
+  octo service:tags {container}            Get service tags from CONSUL_TAGS ENV in a container.
+  octo services                            List all services that the local Consul agent knows about.
+  octo services:catalog                    List all services that the Consul cluster knows about.
 
   octo tentacles {pull|start|stop}         Pull/start/stop octohost/tentacles image.
 
