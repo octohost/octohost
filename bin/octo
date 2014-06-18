@@ -126,6 +126,12 @@ get_external_port()
   echo $PORT
 }
 
+inspect_to_get_external_port()
+{
+  PORT=$(docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $ID)
+  echo $PORT
+}
+
 launch_container_return_id ()
 {
   ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
@@ -188,11 +194,17 @@ case "$1" in
   start)
   if [ $2 ]; then
     set_src_variables "$2"
-    RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
-    INTERNAL_PORT=$(get_exposed_port)
+    if [ -e "$DOCKERFILE" ]; then
+      RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
+    else
+      RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+      ENV=$(/usr/bin/octo config:env $BASE)
+      RUN_OPTIONS="$RUN_OPTIONS $ENV"
+    fi
     ID=$(launch_container_return_id)
-    PORT=$(get_external_port)
-    octo service:set "$BASE" "$PORT"
+    PORT=$(inspect_to_get_external_port)
+    TAGS=$(/usr/bin/octo service:tags $ID)
+    /usr/bin/octo service:set $BASE $PORT $TAGS
   else
     echo "Usage: octo start {container}"
   fi
@@ -200,12 +212,11 @@ case "$1" in
 
   stop)
   if [ $2 ]; then
-    set_src_variables "$2"
-    for container in `docker ps | grep "$BUILD_ORG_NAME\/$BASE:latest" | cut -d ' ' -f 1`
+    BASE="$2"
+    for container in `docker ps | grep "$BASE:latest" | cut -d ' ' -f 1`
     do
       ID="$container"
-      INTERNAL_PORT=$(get_exposed_port)
-      PORT=$(get_external_port)
+      PORT=$(inspect_to_get_external_port)
       docker kill "$ID" > /dev/null
       octo service:rm "$BASE-$PORT"
     done
@@ -326,10 +337,10 @@ case "$1" in
   ;;
 
   service:set)
-  if [[ $2 && $3 && $4 ]]; then
+  if [[ $2 && $3 ]]; then
     CONTAINER="$2"
     PORT="$3"
-    TAGS="$4"
+    TAGS=${4:-http}
     PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]}"
     /usr/bin/consulkv service:set "$PAYLOAD"
   else
@@ -478,6 +489,15 @@ case "$1" in
     fi
     ;;
 
+  reload)
+    if [ $2 ]; then
+      /usr/bin/octo stop $2
+      /usr/bin/octo start $2
+    else
+      echo "Usage: octo reload {container}"
+    fi
+  ;;
+
   update)
     echo "Updating your /usr/bin/octo from $OCTO_BIN"
     cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
@@ -491,7 +511,8 @@ case "$1" in
   octo clean                               Remove unused and stopped containers.
   octo start {image}                       Start a {container} from an already built image.
   octo stop {container}                    Stop all {containers} that match.
-  octo restart {container}                 Restart {container} from src stored in $SRC_DIR.
+  octo restart {container}                 Rebuild and restart {container} from src stored in $SRC_DIR.
+  octo reload {container}                  Reload {container} without a rebuild.
   octo remove {container}                  Remove {container}, the src and the proxy entry.
   octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
 
