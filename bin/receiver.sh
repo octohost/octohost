@@ -99,7 +99,7 @@ if [ -n "$TAGS" ]
 then
   /usr/bin/octo service:set $BASE $PORT $TAGS
 else
-  /usr/bin/octo service:set $BASE $PORT proto=http
+  /usr/bin/octo service:set $BASE $PORT http
 fi
 
 if [ -n "$XIP_IO" ]
