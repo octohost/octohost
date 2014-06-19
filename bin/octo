@@ -352,7 +352,13 @@ case "$1" in
     CONTAINER="$2"
     PORT="$3"
     TAGS=${4:-http}
-    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"],\"check\": {\"script\": \"curl -s http://$PRIVATE_IP:$PORT\",\"interval\": \"30s\"}}"
+    if echo $TAGS | grep -q 'http'
+    then
+      CHECK=",\"check\": {\"script\": \"curl -s http://$PRIVATE_IP:$PORT\",\"interval\": \"60s\"}"
+    else
+      CHECK=""
+    fi
+    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
     /usr/bin/consulkv service:set "$PAYLOAD"
   else
     echo "Usage: octo service:set {container} {port} {tags}"
