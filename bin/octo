@@ -352,7 +352,7 @@ case "$1" in
     CONTAINER="$2"
     PORT="$3"
     TAGS=${4:-http}
-    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]}"
+    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"],\"check\": {\"script\": \"curl -s http://$PRIVATE_IP:$PORT\",\"interval\": \"30s\"}}"
     /usr/bin/consulkv service:set "$PAYLOAD"
   else
     echo "Usage: octo service:set {container} {port} {tags}"
@@ -361,10 +361,10 @@ case "$1" in
 
   service:rm)
   if [ $2 ]; then
-    CONTAINER="$2"
-    /usr/bin/consulkv service:del "$CONTAINER"
+    CONTAINER_PORT="$2"
+    /usr/bin/consulkv service:del "$CONTAINER_PORT"
   else
-    echo "Usage: octo service:rm {container}"
+    echo "Usage: octo service:rm {container-port}"
   fi
   ;;
 
@@ -395,6 +395,15 @@ case "$1" in
     BASE=$(inspect_to_get_container_name)
     TAGS=$(/usr/bin/octo service:tags $ID)
     /usr/bin/octo service:set $BASE $PORT $TAGS
+  done
+  ;;
+
+  services:clear)
+  for container in $( docker ps -q ); do
+    ID=$container
+    PORT=$(inspect_to_get_external_port)
+    BASE=$(inspect_to_get_container_name)
+    /usr/bin/octo service:rm $BASE-$PORT
   done
   ;;
 
