@@ -394,7 +394,7 @@ case "$1" in
     PORT=$(inspect_to_get_external_port)
     BASE=$(inspect_to_get_container_name)
     TAGS=$(/usr/bin/octo service:tags $ID)
-    echo "/usr/bin/octo service:set $BASE $PORT $TAGS"
+    /usr/bin/octo service:set $BASE $PORT $TAGS
   done
   ;;
 
