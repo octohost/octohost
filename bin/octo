@@ -132,6 +132,17 @@ inspect_to_get_external_port()
   echo $PORT
 }
 
+inspect_to_get_container_name()
+{
+  for tag in $( docker inspect -f '{{json .Config.Env}}' $ID | jq '.[]' ); do
+  if echo $tag | grep -q "CONTAINER_NAME"
+  then
+    CONTAINER_NAME=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
+  fi
+  done
+  echo $CONTAINER_NAME
+}
+
 launch_container_return_id ()
 {
   ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
@@ -359,7 +370,7 @@ case "$1" in
 
   service:tags)
   if [ $2 ]; then
-    for tag  in $( docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
+    for tag in $( docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
       if echo $tag | grep -q "CONSUL_TAGS"
       then
         TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
@@ -375,6 +386,16 @@ case "$1" in
 
   services:catalog)
     /usr/bin/consulkv services:catalog
+  ;;
+
+  services:register)
+  for container in $( docker ps -q ); do
+    ID=$container
+    PORT=$(inspect_to_get_external_port)
+    BASE=$(inspect_to_get_container_name)
+    TAGS=$(/usr/bin/octo service:tags $ID)
+    echo "/usr/bin/octo service:set $BASE $PORT $TAGS"
+  done
   ;;
 
   proxy:get)
