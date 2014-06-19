@@ -1,7 +1,7 @@
 # Configuration for /usr/bin/octo and octohost.
 
-SRC_DIR="/home/git/src"
 # These may only be set correctly through /home/git/receiver.
+SRC_DIR="/home/git/src"
 REPO_PATH="$SRC_DIR/$REPOSITORY"
 DOCKERFILE="$REPO_PATH/Dockerfile"
 
