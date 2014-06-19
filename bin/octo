@@ -205,17 +205,21 @@ case "$1" in
   start)
   if [ $2 ]; then
     set_src_variables "$2"
-    if [ -e "$DOCKERFILE" ]; then
-      RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
-    else
-      RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
-      ENV=$(/usr/bin/octo config:env $BASE)
-      RUN_OPTIONS="$RUN_OPTIONS $ENV"
-    fi
-    ID=$(launch_container_return_id)
-    PORT=$(inspect_to_get_external_port)
-    TAGS=$(/usr/bin/octo service:tags $ID)
-    /usr/bin/octo service:set $BASE $PORT $TAGS
+    NUMBER=${3:-1}
+    for (( i=1; i <= $NUMBER; i++ ))
+    do
+      if [ -e "$DOCKERFILE" ]; then
+        RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
+      else
+        RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+        ENV=$(/usr/bin/octo config:env $BASE)
+        RUN_OPTIONS="$RUN_OPTIONS $ENV"
+      fi
+      ID=$(launch_container_return_id)
+      PORT=$(inspect_to_get_external_port)
+      TAGS=$(/usr/bin/octo service:tags $ID)
+      /usr/bin/octo service:set $BASE $PORT $TAGS
+    done
   else
     echo "Usage: octo start {container}"
   fi
