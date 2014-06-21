@@ -4,5 +4,5 @@ curl -L https://put-keys-here.com/keys >> /home/ubuntu/.ssh/authorized_keys
 curl -L https://put-keys-here.com/gitreceive-keys >> /home/git/.ssh/authorized_keys
 
 # Setup domain name.
-sed -i '8s/.*/DOMAIN_SUFFIX=\"put-your-domain-name-here\.io\"/' /etc/default/octohost
-sed -i '28s/.*/EMAIL_NOTIFICATION=\"sysadmin@example\.com\"/' /etc/default/octohost
+sed -i '11s/.*/DOMAIN_SUFFIX=\"put-your-domain-name-here\.io\"/' /etc/default/octohost
+sed -i '31s/.*/EMAIL_NOTIFICATION=\"sysadmin@example\.com\"/' /etc/default/octohost
