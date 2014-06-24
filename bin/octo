@@ -538,6 +538,20 @@ case "$1" in
     fi
   ;;
 
+  push)
+    if [ $2 ]; then
+      BASE="$2"
+      if [ -n "$PRIVATE_REGISTRY" ]; then
+        docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
+        docker push $PRIVATE_REGISTRY/$BASE
+      else
+        echo "This features requires a private registry."
+      fi
+    else
+      echo "Usage: octo push {container}"
+    fi
+  ;;
+
   update)
     echo "Updating your /usr/bin/octo from $OCTO_BIN"
     cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
