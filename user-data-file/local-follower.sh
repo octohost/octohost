@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-NEW_IP="192.168.0.41"
+NEW_IP="192.168.0.42"
 START_JOIN="192.168.0.16"
-CONSUL_NODE_NAME="consul-follower-1"
+CONSUL_NODE_NAME="consul-follower-2"
 
 # Fix PUBLIC_IP
 sed -i "8s/.*/PUBLIC_IP=\"$NEW_IP\"/" /etc/default/octohost

@@ -134,3 +134,8 @@ fi
 
 if [ -n "$XIP_IO" ]; then echo "Your site is available at: http://$BASE.$XIP_IO";fi
 if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: http://$BASE.$DOMAIN_SUFFIX";fi
+
+if [ -n "$PRIVATE_REGISTRY" ]; then
+  echo "Pushing $BASE to a private registry."
+  /usr/bin/octo push $BASE > /dev/null
+fi
