@@ -445,6 +445,14 @@ case "$1" in
   echo "Usage: octo proxy:{set|get|rm}"
   ;;
 
+  domains:set)
+  if [[ $2 && $3 ]]; then
+    /usr/bin/consulkv set $2/DOMAINS $3
+  else
+    echo "Usage: octo domains:set {base} {domains}"
+  fi
+  ;;
+
   status)
     cd $SRC_DIR
     for i in *.git; do

@@ -97,16 +97,19 @@ echo "Registering a new Consul service."
 TAGS=$(/usr/bin/octo service:tags $ID)
 /usr/bin/octo service:set $BASE $PORT $TAGS
 
+
 if [ -n "$XIP_IO" ]
 then
   echo "Adding http://$BASE.$XIP_IO"
   /usr/bin/octo proxy:set $BASE.$XIP_IO $PORT
+  DOMAINS="$BASE.$XIP_IO"
 fi
 
 if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding http://$BASE.$DOMAIN_SUFFIX"
   /usr/bin/octo proxy:set $BASE.$DOMAIN_SUFFIX $PORT
+  DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
 fi
 
 # Support a CNAME file in repo src
@@ -119,8 +122,11 @@ then
   do
     echo "Adding http://$DOMAIN"
     /usr/bin/octo proxy:set $DOMAIN $PORT
+    DOMAINS="$DOMAINS,$DOMAIN"
   done < $CNAME
 fi
+
+/usr/bin/octo domains:set $BASE $DOMAINS
 
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
