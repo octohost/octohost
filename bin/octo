@@ -453,6 +453,14 @@ case "$1" in
   fi
   ;;
 
+  domains:get)
+  if [ $2 ]; then
+    /usr/bin/consulkv get $2/DOMAINS
+  else
+    echo "Usage: octo domains:get {base}"
+  fi
+  ;;
+
   status)
     cd $SRC_DIR
     for i in *.git; do
