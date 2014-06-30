@@ -101,14 +101,12 @@ TAGS=$(/usr/bin/octo service:tags $ID)
 if [ -n "$XIP_IO" ]
 then
   echo "Adding http://$BASE.$XIP_IO"
-  /usr/bin/octo proxy:set $BASE.$XIP_IO $PORT
   DOMAINS="$BASE.$XIP_IO"
 fi
 
 if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding http://$BASE.$DOMAIN_SUFFIX"
-  /usr/bin/octo proxy:set $BASE.$DOMAIN_SUFFIX $PORT
   DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
 fi
 
@@ -121,7 +119,6 @@ then
   while read DOMAIN
   do
     echo "Adding http://$DOMAIN"
-    /usr/bin/octo proxy:set $DOMAIN $PORT
     DOMAINS="$DOMAINS,$DOMAIN"
   done < $CNAME
 fi
