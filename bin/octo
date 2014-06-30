@@ -534,8 +534,8 @@ case "$1" in
   octo remove {container}                  Remove {container}, the src and the service entry.
   octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
 
-  octo push {container}                    Tag and push {container} to a private registry.
-  octo pull {container}                    Pull and re-tag {container} from a private registry.
+  octo push {image}                        Tag and push {image} to a private registry.
+  octo pull {image}                        Pull and re-tag {image} from a private registry.
 
   octo config {container}                  Show all ENV variables for {container}.
   octo config:set {container/key} {var}    Set an ENV variable for {container}.
