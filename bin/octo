@@ -385,6 +385,10 @@ case "$1" in
   fi
   ;;
 
+  config:proxy)
+  sudo octoconfig update
+  ;;
+
   status)
     cd $SRC_DIR
     for i in *.git; do
