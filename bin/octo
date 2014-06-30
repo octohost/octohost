@@ -27,42 +27,6 @@ show_break ()
   echo "################################"
 }
 
-set_proxy ()
-{
-  curl -s "$TENTACLES_ADDR/set?domain=$1&endpoint=$ENDPONT_ADDR:$2" > /dev/null
-}
-
-get_proxy ()
-{
-  curl "$TENTACLES_ADDR/get?domain=$1"
-}
-
-rm_proxy ()
-{
-  curl "$TENTACLES_ADDR/del?domain=$1"
-}
-
-start_tentacles ()
-{
-  if [ -e "/var/run/docker.sock" ]; then
-    $TENTACLES
-  else
-    service docker start
-    sleep 5
-    $TENTACLES
-  fi
-}
-
-stop_tentacles ()
-{
-  docker ps | grep "$TENTACLES_IMAGE" | awk '{ print $1 }' | xargs docker kill
-}
-
-pull_tentacles ()
-{
-  docker pull $TENTACLES_IMAGE
-}
-
 start_logspout ()
 {
   if [ -z "$LOGSPOUT_TARGET" ]; then
@@ -188,18 +152,6 @@ case "$1" in
   else
     echo "Usage: octo logspout {start|stop|pull}"
   fi
-  ;;
-
-  tentacles)
-    if [ "$2" == "start" ]; then
-      start_tentacles
-    elif [ "$2" == "stop" ]; then
-      stop_tentacles
-    elif [ "$2" == "pull" ]; then
-      pull_tentacles
-    else
-      echo "Usage: octo tentacles {start|stop|pull}"
-    fi
   ;;
 
   start)
@@ -417,34 +369,6 @@ case "$1" in
   done
   ;;
 
-  proxy:get)
-  if [ $2 ]; then
-    get_proxy $2
-  else
-    echo "Usage: octo proxy:get {domain-name}"
-  fi
-  ;;
-
-  proxy:set)
-  if [[ $2 && $3 ]]; then
-    set_proxy $2 $3
-  else
-    echo "Usage: octo proxy:set {domain-name} {port}"
-  fi
-  ;;
-
-  proxy:rm)
-  if [ $2 ]; then
-    rm_proxy $2
-  else
-    echo "Usage: octo proxy:rm {domain-name}"
-  fi
-  ;;
-
-  proxy)
-  echo "Usage: octo proxy:{set|get|rm}"
-  ;;
-
   domains:set)
   if [[ $2 && $3 ]]; then
     /usr/bin/consulkv set $2/DOMAINS $3
@@ -500,10 +424,13 @@ case "$1" in
       echo "Removed the source for $2."
       OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then
+        ID=$OLD_ID
+        PORT=$(inspect_to_get_external_port)
+        octo service:rm $2-$PORT
         docker kill $OLD_ID
         echo "Removed running container."
       fi
-      octo proxy:rm $2.$DOMAIN_SUFFIX
+
     else
       echo "Usage: octo remove {container}"
     fi
@@ -588,7 +515,7 @@ case "$1" in
   ;;
 
   help)
-  echo "Usage: octo status|clean|restart|remove|move|config|tentacles|logspout|logs|proxy|update"
+  echo "Usage: octo status|clean|restart|remove|move|config|tentacles|logspout|logs|update"
   cat<<EOF
 
   octo status                              Show basic app status: OK or DOWN.
@@ -597,7 +524,7 @@ case "$1" in
   octo stop {container}                    Stop all {containers} that match.
   octo restart {container}                 Rebuild and restart {container} from src stored in $SRC_DIR.
   octo reload {container}                  Reload {container} without a rebuild.
-  octo remove {container}                  Remove {container}, the src and the proxy entry.
+  octo remove {container}                  Remove {container}, the src and the service entry.
   octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
 
   octo push {container}                    Tag and push {container} to a private registry.
@@ -615,17 +542,11 @@ case "$1" in
   octo services                            List all services that the local Consul agent knows about.
   octo services:catalog                    List all services that the Consul cluster knows about.
 
-  octo tentacles {pull|start|stop}         Pull/start/stop octohost/tentacles image.
-
   octo logspout {pull|start|stop}          Pull/start/stop progrium/logspout image.
 
   octo logs octostart                      Use remote_syslog to send Docker and nginx logs to remote syslog.
   octo logs octostop                       Stop sending Docker and nginx logs to remote syslog.
   octo logs start {full-log-path} {mount}  Use remote_syslog to send {full-log-path} to remote syslog.
-
-  octo proxy:set {domain-name} {port}      Set {domain-name} and {port} in tentacles.
-  octo proxy:get {domain-name}             Get {port} for {domain-name} from tentacles.
-  octo proxy:rm {domain-name}              Remove record for {domain-name} in tentacles.
 
   octo update                              Update octo command from $OCTO_BIN.
 EOF
