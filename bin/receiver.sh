@@ -135,6 +135,8 @@ else
   echo "Not killing any containers."
 fi
 
+/usr/bin/octo config:proxy
+
 if [ -n "$XIP_IO" ]; then echo "Your site is available at: http://$BASE.$XIP_IO";fi
 if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: http://$BASE.$DOMAIN_SUFFIX";fi
 

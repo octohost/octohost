@@ -171,6 +171,7 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       TAGS=$(/usr/bin/octo service:tags $ID)
       /usr/bin/octo service:set $BASE $PORT $TAGS
+      /usr/bin/octo config:proxy
     done
   else
     echo "Usage: octo start {container}"
@@ -186,6 +187,7 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       docker kill "$ID" > /dev/null
       octo service:rm "$BASE-$PORT"
+      /usr/bin/octo config:proxy
     done
   else
     echo "Usage: octo stop {container}"
@@ -433,6 +435,7 @@ case "$1" in
         octo service:rm $2-$PORT
         docker kill $OLD_ID
         echo "Removed running container."
+        /usr/bin/octo config:proxy
       fi
 
     else
@@ -539,6 +542,7 @@ case "$1" in
   octo config:get {container/key}          Get an ENV variable for {container}.
   octo config:rm {container/key}           Remove an ENV variable for {container}.
   octo config:export                       Get all config variables for all containers.
+  octo config:proxy                        Update the proxy configuration from Consul data.
 
   octo service:set {container} {port}      Add service to Consul.
   octo service:rm {container-port}         Remove a service from Consul.
