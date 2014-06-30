@@ -130,7 +130,7 @@ if [ -n "$OLD_ID" ]
 then
   echo "Killing $OLD_ID container."
   sudo docker kill $OLD_ID > /dev/null
-  /usr/bin/octo service:rm $BASE-$OLD_PORT
+  /usr/bin/octo service:rm $BASE $OLD_PORT
 else
   echo "Not killing any containers."
 fi

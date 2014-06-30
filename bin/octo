@@ -186,7 +186,7 @@ case "$1" in
       ID="$container"
       PORT=$(inspect_to_get_external_port)
       docker kill "$ID" > /dev/null
-      octo service:rm "$BASE-$PORT"
+      octo service:rm "$BASE" "$PORT"
       /usr/bin/octo config:proxy
     done
   else
@@ -324,11 +324,12 @@ case "$1" in
   ;;
 
   service:rm)
-  if [ $2 ]; then
-    CONTAINER_PORT="$2"
-    /usr/bin/consulkv service:del "$CONTAINER_PORT"
+  if [[ $2 && $3 ]]; then
+    CONTAINER="$2"
+    PORT="$3"
+    /usr/bin/consulkv service:del "$CONTAINER-$PORT"
   else
-    echo "Usage: octo service:rm {container-port}"
+    echo "Usage: octo service:rm {container} {port}"
   fi
   ;;
 
@@ -367,7 +368,7 @@ case "$1" in
     ID=$container
     PORT=$(inspect_to_get_external_port)
     BASE=$(inspect_to_get_container_name)
-    /usr/bin/octo service:rm $BASE-$PORT
+    /usr/bin/octo service:rm $BASE $PORT
   done
   ;;
 
@@ -432,7 +433,7 @@ case "$1" in
       if [ $OLD_ID ]; then
         ID=$OLD_ID
         PORT=$(inspect_to_get_external_port)
-        octo service:rm $2-$PORT
+        octo service:rm $2 $PORT
         docker kill $OLD_ID
         echo "Removed running container."
         /usr/bin/octo config:proxy
@@ -545,7 +546,7 @@ case "$1" in
   octo config:proxy                        Update the proxy configuration from Consul data.
 
   octo service:set {container} {port}      Add service to Consul.
-  octo service:rm {container-port}         Remove a service from Consul.
+  octo service:rm {container} {port}       Remove a service from Consul.
   octo service:tags {container}            Get service tags from CONSUL_TAGS ENV in a container.
   octo services                            List all services that the local Consul agent knows about.
   octo services:catalog                    List all services that the Consul cluster knows about.
