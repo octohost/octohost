@@ -27,6 +27,8 @@ else
   echo "Nothing running - no need to look for a port."
 fi
 
+IMAGE_ID=$(docker images | grep $BASE | awk '{ print $3 }')
+
 if [ -e "$DOCKERFILE" ]
 then
   # Look for the exposed port.
@@ -128,9 +130,7 @@ fi
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
 then
-  echo "Killing $OLD_ID container."
-  sudo docker kill $OLD_ID > /dev/null
-  /usr/bin/octo service:rm $BASE $OLD_PORT
+  /usr/bin/octo stop $BASE $IMAGE_ID
 else
   echo "Not killing any containers."
 fi

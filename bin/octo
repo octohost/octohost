@@ -181,7 +181,13 @@ case "$1" in
   stop)
   if [ $2 ]; then
     BASE="$2"
-    for container in `docker ps | grep "$BASE:latest" | cut -d ' ' -f 1`
+    if [ $3 ]; then
+      IMAGE_ID="$3"
+      CONTAINERS=$(docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
+    else
+      CONTAINERS=$(docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+    fi
+    for container in $CONTAINERS
     do
       ID="$container"
       PORT=$(inspect_to_get_external_port)
