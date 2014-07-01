@@ -127,6 +127,15 @@ fi
 
 /usr/bin/octo domains:set $BASE $DOMAINS
 
+NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
+
+# Launch more containers based on the KV set.
+if [ -n "$NUM_CONTAINERS" ]
+then
+  let NUM_CONTAINERS-=1
+  /usr/bin/octo start $BASE $NUM_CONTAINERS
+fi
+
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
 then
