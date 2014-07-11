@@ -428,19 +428,20 @@ case "$1" in
 
   remove)
     if [ $2 ]; then
-      if [ -d /home/git/$2.git ]; then
-        sudo rm -rf /home/git/$2.git
+      BASE="$2"
+      if [ -d /home/git/$BASE.git ]; then
+        sudo rm -rf /home/git/$BASE.git
       else
         echo "There is no source with that name."
         exit
       fi
-      if [ -d $SRC_DIR/$2.git ]; then sudo rm -rf $SRC_DIR/$2.git; fi
-      echo "Removed the source for $2."
-      OLD_ID=$(docker ps | grep "$2:latest" | cut -d ' ' -f 1)
+      if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
+      echo "Removed the source for $BASE."
+      OLD_ID=$(docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then
         ID=$OLD_ID
         PORT=$(inspect_to_get_external_port)
-        octo service:rm $2 $PORT
+        octo service:rm $BASE $PORT
         docker kill $OLD_ID
         echo "Removed running container."
         /usr/bin/octo config:proxy
@@ -530,7 +531,7 @@ case "$1" in
   ;;
 
   help)
-  echo "Usage: octo status|clean|restart|remove|move|config|tentacles|logspout|logs|update"
+  echo "Usage: octo status|clean|restart|remove|move|config|logspout|logs|update"
   cat<<EOF
 
   octo status                              Show basic app status: OK or DOWN.
