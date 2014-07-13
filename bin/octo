@@ -121,6 +121,26 @@ set_src_variables ()
   DOCKERFILE="$REPO_PATH/Dockerfile"
 }
 
+get_unique_domains ()
+{
+  SCRATCH=`mktemp`
+  DOMAINS="$1"
+
+  for domain in ${DOMAINS//,/ } ; do
+    echo $domain
+  done | sort | uniq > $SCRATCH
+
+  FINAL_DOMAINS=""
+
+  for line in $( cat $SCRATCH ); do
+    FINAL_DOMAINS="$FINAL_DOMAINS,$line"
+  done
+
+  rm -f $SCRATCH
+
+  echo $FINAL_DOMAINS | cut -d ',' -f 2-100
+}
+
 case "$1" in
 
   logs)
@@ -380,7 +400,8 @@ case "$1" in
 
   domains:set)
   if [[ $2 && $3 ]]; then
-    /usr/bin/consulkv set $2/DOMAINS $3
+    DOMAINS=$(get_unique_domains $3)
+    /usr/bin/consulkv set $2/DOMAINS $DOMAINS
   else
     echo "Usage: octo domains:set {container} {domains}"
     echo "Domains are comma separated."
