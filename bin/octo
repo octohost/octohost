@@ -221,8 +221,8 @@ case "$1" in
   ;;
 
   config:set)
-  if [[ $2 && $3 ]]; then
-    /usr/bin/consulkv set $2 $3
+  if [[ $2 && "$3" ]]; then
+    /usr/bin/consulkv set $2 "$3"
   else
     echo "Usage: octo config:set {container/key} {var}"
   fi
