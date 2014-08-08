@@ -425,9 +425,7 @@ case "$1" in
     for i in *.git; do
       site=`basename $i .git`
       echo -n "$site: "
-      # get_container_memory_usage $site
-      # echo -n " MB): "
-      if (wget -S -t 1 -T 2 --delete-after -qO- http://$site.$DOMAIN_SUFFIX 2>&1 | grep -q "HTTP/1.1 200 OK"); then
+      if (/usr/bin/consulkv service:health $site | grep -q "passing"); then
         echo -e "\e[32mOK\e[0m"
       else
         echo -e "\e[31mDOWN\e[0m"
