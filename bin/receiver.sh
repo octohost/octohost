@@ -37,7 +37,7 @@ then
 
   RUN_OPTIONS=$(/usr/bin/octo config:options $BASE $DOCKERFILE)
 
-  ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
+  ID=$(echo "$RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | xargs sudo docker run)
 
   # Get the $PORT from the container.
   if [ -n "$INTERNAL_PORT" ]
@@ -70,7 +70,7 @@ then
     echo "Killing the container we just launched."
     sudo docker kill $ID > /dev/null
     echo "Launching a new one"
-    ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
+    ID=$(echo "$RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | xargs sudo docker run)
     PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
     if [ -z "$PORT" ]
     then

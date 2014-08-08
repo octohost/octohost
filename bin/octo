@@ -109,7 +109,7 @@ inspect_to_get_container_name()
 
 launch_container_return_id ()
 {
-  ID=$(sudo docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE)
+  ID=$(echo "$RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | xargs sudo docker run)
   echo $ID
 }
 
@@ -221,8 +221,8 @@ case "$1" in
   ;;
 
   config:set)
-  if [[ $2 && $3 ]]; then
-    /usr/bin/consulkv set $2 $3
+  if [[ $2 && "$3" ]]; then
+    /usr/bin/consulkv set $2 "$3"
   else
     echo "Usage: octo config:set {container/key} {var}"
   fi
@@ -271,12 +271,12 @@ case "$1" in
   config:env)
   if [ $2 ]; then
     ENV=""
-    for conf in `/usr/bin/octo config $2`;
+    while read conf
     do
       KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
       VAR=$(echo $conf | cut -d ':' -f 2-10)
-      ENV="$ENV -e $KEY=$VAR"
-    done
+      ENV="$ENV -e $KEY=\"$VAR\""
+    done < <(/usr/bin/octo config $2)
     echo "$ENV"
   else
     echo "octo config:env {container}"
