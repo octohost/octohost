@@ -95,13 +95,13 @@ TAGS=$(/usr/bin/octo service:tags $ID)
 
 if [ -n "$XIP_IO" ]
 then
-  echo "Adding http://$BASE.$XIP_IO"
+  echo "Adding $LINK_PREFIX://$BASE.$XIP_IO"
   DOMAINS="$BASE.$XIP_IO"
 fi
 
 if [ -n "$DOMAIN_SUFFIX" ]
 then
-  echo "Adding http://$BASE.$DOMAIN_SUFFIX"
+  echo "Adding $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX"
   DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
 fi
 
@@ -113,7 +113,7 @@ then
   sed -i -e '$a\' $CNAME
   while read DOMAIN
   do
-    echo "Adding http://$DOMAIN"
+    echo "Adding $LINK_PREFIX://$DOMAIN"
     DOMAINS="$DOMAINS,$DOMAIN"
   done < $CNAME
 fi
@@ -140,8 +140,8 @@ fi
 
 /usr/bin/octo config:proxy
 
-if [ -n "$XIP_IO" ]; then echo "Your site is available at: http://$BASE.$XIP_IO";fi
-if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: http://$BASE.$DOMAIN_SUFFIX";fi
+if [ -n "$XIP_IO" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$XIP_IO";fi
+if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX";fi
 
 if [ -n "$PRIVATE_REGISTRY" ]; then
   echo "Pushing $BASE to a private registry."
