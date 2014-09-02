@@ -549,7 +549,7 @@ case "$1" in
     cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
   ;;
 
-  help)
+  help|-h|--help)
   echo "Usage: octo status|clean|restart|remove|move|config|logspout|logs|update"
   cat<<EOF
 
