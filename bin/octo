@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -f /etc/default/octohost ]; then
-        . /etc/default/octohost
+  . /etc/default/octohost
 fi
 
 get_short_container_id ()
@@ -245,7 +245,6 @@ case "$1" in
   ;;
 
   config:export)
-
   for key in `/usr/bin/consulkv ls`
   do
     if [ "$key" != "null" ]
@@ -372,11 +371,11 @@ case "$1" in
   ;;
 
   services)
-    /usr/bin/consulkv services
+  /usr/bin/consulkv services
   ;;
 
   services:catalog)
-    /usr/bin/consulkv services:catalog
+  /usr/bin/consulkv services:catalog
   ;;
 
   services:register)
@@ -421,132 +420,132 @@ case "$1" in
   ;;
 
   status)
-    cd $SRC_DIR
-    for i in *.git; do
-      site=`basename $i .git`
-      echo -n "$site: "
-      if (/usr/bin/consulkv service:health $site | grep -q "passing"); then
-        echo -e "\e[32mOK\e[0m"
-      else
-        echo -e "\e[31mDOWN\e[0m"
-      fi
-    done
-    ;;
+  cd $SRC_DIR
+  for i in *.git; do
+    site=`basename $i .git`
+    echo -n "$site: "
+    if (/usr/bin/consulkv service:health $site | grep -q "passing"); then
+      echo -e "\e[32mOK\e[0m"
+    else
+      echo -e "\e[31mDOWN\e[0m"
+    fi
+  done
+  ;;
 
   clean)
-    echo "Cleaning old exited containers."
-    # TODO: Errors if there's no containers - annoying.
-    sudo docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker rm
-    echo "Showing all remaining containers."
-    sudo docker ps -a
-    echo "Cleaning out all unused images."
-    sudo docker images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker rmi
-    echo "Showing all remaining images."
-    sudo docker images
-    ;;
+  echo "Cleaning old exited containers."
+  # TODO: Errors if there's no containers - annoying.
+  sudo docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker rm
+  echo "Showing all remaining containers."
+  sudo docker ps -a
+  echo "Cleaning out all unused images."
+  sudo docker images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker rmi
+  echo "Showing all remaining images."
+  sudo docker images
+  ;;
 
   remove)
-    if [ $2 ]; then
-      BASE="$2"
-      if [ -d /home/git/$BASE.git ]; then
-        sudo rm -rf /home/git/$BASE.git
-      else
-        echo "There is no source with that name."
-        exit
-      fi
-      if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
-      echo "Removed the source for $BASE."
-      OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
-      if [ $OLD_ID ]; then
-        ID=$OLD_ID
-        PORT=$(inspect_to_get_external_port)
-        octo service:rm $BASE $PORT
-        sudo docker kill $OLD_ID
-        echo "Removed running container."
-        /usr/bin/octo config:proxy
-      fi
-
+  if [ $2 ]; then
+    BASE="$2"
+    if [ -d /home/git/$BASE.git ]; then
+      sudo rm -rf /home/git/$BASE.git
     else
-      echo "Usage: octo remove {container}"
+      echo "There is no source with that name."
+      exit
     fi
-    ;;
+    if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
+    echo "Removed the source for $BASE."
+    OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+    if [ $OLD_ID ]; then
+      ID=$OLD_ID
+      PORT=$(inspect_to_get_external_port)
+      octo service:rm $BASE $PORT
+      sudo docker kill $OLD_ID
+      echo "Removed running container."
+      /usr/bin/octo config:proxy
+    fi
+
+  else
+    echo "Usage: octo remove {container}"
+  fi
+  ;;
 
   move)
-    if [ $2 ]; then
-      if [ "$2" == 'sites' ]; then
-        if [ $3 ]; then
-          # Grab all of the sites.
-          sudo /usr/bin/rsync -avz ubuntu@$3:/home/git/*.git /home/git/
-          cd /home/git
-          for i in *.git; do
-            site=`basename $i .git`
-            /usr/bin/octo restart $site
-            # Need a checkout and not a bare repo to build with later.
-            sudo git clone /home/git/$site.git $SRC_DIR/$site.git
-          done
-          sudo chown -R git.git $SRC_DIR
-        else
-          echo "Need a source."
-        fi
+  if [ $2 ]; then
+    if [ "$2" == 'sites' ]; then
+      if [ $3 ]; then
+        # Grab all of the sites.
+        sudo /usr/bin/rsync -avz ubuntu@$3:/home/git/*.git /home/git/
+        cd /home/git
+        for i in *.git; do
+          site=`basename $i .git`
+          /usr/bin/octo restart $site
+          # Need a checkout and not a bare repo to build with later.
+          sudo git clone /home/git/$site.git $SRC_DIR/$site.git
+        done
+        sudo chown -R git.git $SRC_DIR
+      else
+        echo "Need a source."
       fi
-    else
-      echo "Usage: octo move sites {ip-address}'"
     fi
-    ;;
+  else
+    echo "Usage: octo move sites {ip-address}'"
+  fi
+  ;;
 
   restart)
-    if [ $2 ]; then
-      show_break
-      echo "Restarting $2."
-      newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
-      branch=`cd /home/git/$2.git; git branch | grep "*" | cut -d ' ' -f 2`
-      cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
-      sudo rm -rf $SRC_DIR/$2
-    else
-      echo "Usage: octo restart {container}"
-    fi
-    ;;
+  if [ $2 ]; then
+    show_break
+    echo "Restarting $2."
+    newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
+    branch=`cd /home/git/$2.git; git branch | grep "*" | cut -d ' ' -f 2`
+    cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
+    sudo rm -rf $SRC_DIR/$2
+  else
+    echo "Usage: octo restart {container}"
+  fi
+  ;;
 
   reload)
-    if [ $2 ]; then
-      /usr/bin/octo stop $2
-      /usr/bin/octo start $2
-    else
-      echo "Usage: octo reload {container}"
-    fi
+  if [ $2 ]; then
+    /usr/bin/octo stop $2
+    /usr/bin/octo start $2
+  else
+    echo "Usage: octo reload {container}"
+  fi
   ;;
 
   push)
-    if [ $2 ]; then
-      BASE="$2"
-      if [ -n "$PRIVATE_REGISTRY" ]; then
-        sudo docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
-        sudo docker push $PRIVATE_REGISTRY/$BASE
-      else
-        echo "This feature requires a private registry."
-      fi
+  if [ $2 ]; then
+    BASE="$2"
+    if [ -n "$PRIVATE_REGISTRY" ]; then
+      sudo docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
+      sudo docker push $PRIVATE_REGISTRY/$BASE
     else
-      echo "Usage: octo push {container}"
+      echo "This feature requires a private registry."
     fi
+  else
+    echo "Usage: octo push {container}"
+  fi
   ;;
 
   pull)
-    if [ $2 ]; then
-      BASE="$2"
-      if [ -n "$PRIVATE_REGISTRY" ]; then
-        sudo docker pull $PRIVATE_REGISTRY/$BASE
-        sudo docker tag $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
-      else
-        echo "This feature requires a private registry."
-      fi
+  if [ $2 ]; then
+    BASE="$2"
+    if [ -n "$PRIVATE_REGISTRY" ]; then
+      sudo docker pull $PRIVATE_REGISTRY/$BASE
+      sudo docker tag $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
     else
-      echo "Usage: octo pull {container}"
+      echo "This feature requires a private registry."
     fi
+  else
+    echo "Usage: octo pull {container}"
+  fi
   ;;
 
   update)
-    echo "Updating your /usr/bin/octo from $OCTO_BIN"
-    cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
+  echo "Updating your /usr/bin/octo from $OCTO_BIN"
+  cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
   ;;
 
   help|-h|--help)
