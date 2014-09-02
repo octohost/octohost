@@ -102,7 +102,11 @@ fi
 if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX"
-  DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
+  if [ -n "$XIP_IO" ]
+    DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
+  else
+    DOMAINS="$BASE.$DOMAIN_SUFFIX"
+  fi
 fi
 
 # Support a CNAME file in repo src
