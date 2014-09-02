@@ -6,12 +6,12 @@ fi
 
 get_short_container_id ()
 {
-  docker ps | grep "$BUILD_ORG_NAME/$1:latest" | cut -d ' ' -f 1
+  sudo docker ps | grep "$BUILD_ORG_NAME/$1:latest" | cut -d ' ' -f 1
 }
 
 get_long_container_id ()
 {
-  docker inspect $1 | jq '.[0].ID' | cut -d '"' -f 2
+  sudo docker inspect $1 | jq '.[0].ID' | cut -d '"' -f 2
 }
 
 reformat_bytes ()
@@ -36,7 +36,7 @@ start_logspout ()
   if [ -e "/var/run/docker.sock" ]; then
     $LOGSPOUT
   else
-    service docker start
+    sudo service docker start
     sleep 5
     $LOGSPOUT
   fi
@@ -44,22 +44,22 @@ start_logspout ()
 
 stop_logspout ()
 {
-  docker ps | grep "$LOGSPOUT_IMAGE" | awk '{ print $1 }' | xargs docker kill
+  sudo docker ps | grep "$LOGSPOUT_IMAGE" | awk '{ print $1 }' | xargs sudo docker kill
 }
 
 pull_logspout ()
 {
-  docker pull $LOGSPOUT_IMAGE
+  sudo docker pull $LOGSPOUT_IMAGE
 }
 
 start_logs ()
 {
   check_syslog_port
   if [ -e "/var/run/docker.sock" ]; then
-    LOG_COMMAND="docker run -d -v=$1:$2 $REMOTE_SYSLOG_COMMAND $2"
+    LOG_COMMAND="sudo docker run -d -v=$1:$2 $REMOTE_SYSLOG_COMMAND $2"
     $LOG_COMMAND
   else
-    service docker start
+    sudo service docker start
     sleep 5
     $LOG_COMMAND
   fi
@@ -67,7 +67,7 @@ start_logs ()
 
 stop_octologs ()
 {
-  docker ps | grep "$OCTOLOGS_IMAGE" | awk '{ print $1 }' | xargs docker kill
+  sudo docker ps | grep "$OCTOLOGS_IMAGE" | awk '{ print $1 }' | xargs sudo docker kill
 }
 
 check_syslog_port ()
@@ -92,13 +92,13 @@ get_external_port()
 
 inspect_to_get_external_port()
 {
-  PORT=$(docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $ID)
+  PORT=$(sudo docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $ID)
   echo $PORT
 }
 
 inspect_to_get_container_name()
 {
-  for tag in $( docker inspect -f '{{json .Config.Env}}' $ID | jq '.[]' ); do
+  for tag in $(sudo docker inspect -f '{{json .Config.Env}}' $ID | jq '.[]' ); do
   if echo $tag | grep -q "CONTAINER_NAME"
   then
     CONTAINER_NAME=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
@@ -203,15 +203,15 @@ case "$1" in
     BASE="$2"
     if [ $3 ]; then
       IMAGE_ID="$3"
-      CONTAINERS=$(docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
+      CONTAINERS=$(sudo docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
     else
-      CONTAINERS=$(docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+      CONTAINERS=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
     fi
     for container in $CONTAINERS
     do
       ID="$container"
       PORT=$(inspect_to_get_external_port)
-      docker kill "$ID" > /dev/null
+      sudo docker kill "$ID" > /dev/null
       octo service:rm "$BASE" "$PORT"
       /usr/bin/octo config:proxy
     done
@@ -361,7 +361,7 @@ case "$1" in
 
   service:tags)
   if [ $2 ]; then
-    for tag in $( docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
+    for tag in $(sudo docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
       if echo $tag | grep -q "CONSUL_TAGS"
       then
         TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
@@ -380,7 +380,7 @@ case "$1" in
   ;;
 
   services:register)
-  for container in $( docker ps -q ); do
+  for container in $(sudo docker ps -q ); do
     ID=$container
     PORT=$(inspect_to_get_external_port)
     BASE=$(inspect_to_get_container_name)
@@ -390,7 +390,7 @@ case "$1" in
   ;;
 
   services:clear)
-  for container in $( docker ps -q ); do
+  for container in $(sudo docker ps -q ); do
     ID=$container
     PORT=$(inspect_to_get_external_port)
     BASE=$(inspect_to_get_container_name)
@@ -436,13 +436,13 @@ case "$1" in
   clean)
     echo "Cleaning old exited containers."
     # TODO: Errors if there's no containers - annoying.
-    docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs docker rm
+    sudo docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker rm
     echo "Showing all remaining containers."
-    docker ps -a
+    sudo docker ps -a
     echo "Cleaning out all unused images."
-    docker images | grep "\<none\>" | awk '{ print $3 }' | xargs docker rmi
+    sudo docker images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker rmi
     echo "Showing all remaining images."
-    docker images
+    sudo docker images
     ;;
 
   remove)
@@ -456,12 +456,12 @@ case "$1" in
       fi
       if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
       echo "Removed the source for $BASE."
-      OLD_ID=$(docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+      OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
       if [ $OLD_ID ]; then
         ID=$OLD_ID
         PORT=$(inspect_to_get_external_port)
         octo service:rm $BASE $PORT
-        docker kill $OLD_ID
+        sudo docker kill $OLD_ID
         echo "Removed running container."
         /usr/bin/octo config:proxy
       fi
@@ -520,8 +520,8 @@ case "$1" in
     if [ $2 ]; then
       BASE="$2"
       if [ -n "$PRIVATE_REGISTRY" ]; then
-        docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
-        docker push $PRIVATE_REGISTRY/$BASE
+        sudo docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
+        sudo docker push $PRIVATE_REGISTRY/$BASE
       else
         echo "This feature requires a private registry."
       fi
@@ -534,8 +534,8 @@ case "$1" in
     if [ $2 ]; then
       BASE="$2"
       if [ -n "$PRIVATE_REGISTRY" ]; then
-        docker pull $PRIVATE_REGISTRY/$BASE
-        docker tag $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
+        sudo docker pull $PRIVATE_REGISTRY/$BASE
+        sudo docker tag $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
       else
         echo "This feature requires a private registry."
       fi
