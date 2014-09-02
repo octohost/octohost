@@ -381,7 +381,7 @@ case "$1" in
   ;;
 
   services:register)
-  for container in $(sudo docker ps -q ); do
+  for container in $(sudo docker ps | grep $BUILD_ORG_NAME | awk '{ print $1 }'); do
     ID=$container
     PORT=$(inspect_to_get_external_port)
     BASE=$(inspect_to_get_container_name)
