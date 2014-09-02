@@ -2,7 +2,7 @@
 REPOSITORY="$1"
 BRANCH="$5"
 if [ -f /etc/default/octohost ]; then
-        . /etc/default/octohost
+  . /etc/default/octohost
 fi
 
 if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
@@ -20,7 +20,7 @@ echo "Base: $BASE"
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
 
-IMAGE_ID=$(docker images | grep $BASE | awk '{ print $3 }')
+IMAGE_ID=$(sudo docker images | grep $BASE | awk '{ print $3 }')
 
 if [ -e "$DOCKERFILE" ]
 then
