@@ -103,6 +103,7 @@ if [ -n "$DOMAIN_SUFFIX" ]
 then
   echo "Adding $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX"
   if [ -n "$XIP_IO" ]
+  then
     DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
   else
     DOMAINS="$BASE.$DOMAIN_SUFFIX"
