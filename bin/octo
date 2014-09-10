@@ -486,26 +486,38 @@ case "$1" in
   fi
   ;;
 
-  move)
+  move:sites)
   if [ $2 ]; then
-    if [ "$2" == 'sites' ]; then
-      if [ $3 ]; then
-        # Grab all of the sites.
-        sudo /usr/bin/rsync -avz ubuntu@$3:/home/git/*.git /home/git/
-        cd /home/git
-        for i in *.git; do
-          site=`basename $i .git`
-          /usr/bin/octo restart $site
-          # Need a checkout and not a bare repo to build with later.
-          sudo git clone /home/git/$site.git $SRC_DIR/$site.git
-        done
-        sudo chown -R git.git $SRC_DIR
-      else
-        echo "Need a source."
-      fi
-    fi
+    # Grab all of the sites.
+    sudo /usr/bin/rsync -avz ubuntu@$2:/home/git/*.git /home/git/
+    cd /home/git
+    for i in *.git; do
+      site=`basename $i .git`
+      /usr/bin/octo restart $site
+      # Need a checkout and not a bare repo to build with later.
+      sudo git clone /home/git/$site.git $SRC_DIR/$site.git
+    done
+    sudo chown -R git.git $SRC_DIR
   else
-    echo "Usage: octo move sites {ip-address}'"
+    echo "Usage: octo move:sites {ip-address}'"
+  fi
+  ;;
+
+  move:config)
+  if [ $2 ]; then
+    ssh `whoami`@$2 "octo config:export" | bash
+    echo "## Done moving the config from $2. ##"
+    octo config:export
+  else
+    echo "Usage: octo move:config {ip-address}"
+  fi
+  ;;
+
+  move:redis)
+  if [ $2 ]; then
+    # Coming soon.
+  else
+    echo "Usage: octo move:redis {ip-address}"
   fi
   ;;
 
@@ -575,7 +587,9 @@ case "$1" in
   octo restart {container}                 Rebuild and restart {container} from src stored in $SRC_DIR.
   octo reload {container}                  Reload {container} without a rebuild.
   octo remove {container}                  Remove {container}, the src and the service entry.
-  octo move sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
+
+  octo move:sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
+  octo move:config {ip-address}            Move config from targeted octohost.
 
   octo push {image}                        Tag and push {image} to a private registry.
   octo pull {image}                        Pull and re-tag {image} from a private registry.
