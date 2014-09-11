@@ -514,10 +514,14 @@ case "$1" in
   ;;
 
   move:redis)
-  if [ $2 ]; then
-    # Coming soon.
+  if [[ $2 && $3 ]]; then
+    WHOAMI=`whoami`
+    ssh -f -N -L 9999:127.0.01:$3 $WHOAMI@$2
+    python /usr/local/bin/redis-copy.py -s 127.0.0.1:9999 -t 127.0.0.1:$3 -d 0 --clean
+    python /usr/local/bin/redis-copy.py -s 127.0.0.1:9999 -t 127.0.0.1:$3 -d 0
+    ps auwx | grep "$WHOAMI@$2" | awk '{ print $2 }' | xargs kill
   else
-    echo "Usage: octo move:redis {ip-address}"
+    echo "Usage: octo move:redis {ip-address} {port}"
   fi
   ;;
 
@@ -577,7 +581,7 @@ case "$1" in
   ;;
 
   help|-h|--help)
-  echo "Usage: octo status|clean|restart|remove|move|config|logspout|logs|update"
+  echo "Usage: octo status|clean|restart|reload|remove|move|config|logspout|logs|update"
   cat<<EOF
 
   octo status                              Show basic app status: OK or DOWN.
@@ -590,6 +594,7 @@ case "$1" in
 
   octo move:sites {ip-address}             Move sites from targeted octohost, rebuilding all containers from src.
   octo move:config {ip-address}            Move config from targeted octohost.
+  octo move:redis {ip-address} {port}      Move all keys from Redis from {ip-address}:{port} to 127.0.0.1:{port}
 
   octo push {image}                        Tag and push {image} to a private registry.
   octo pull {image}                        Pull and re-tag {image} from a private registry.
