@@ -309,10 +309,10 @@ case "$1" in
       if [ -n "$CONTAINER_PATH" ]
       then
         MOUNT_PATH="$HOST_PATH:$CONTAINER_PATH"
-        echo "Mounting $MOUNT_PATH"
+        echo "Mounting at $MOUNT_PATH"
       else
         MOUNT_PATH="$HOST_PATH:$HOST_PATH"
-        echo "Mounting $MOUNT_PATH"
+        echo "Mounting at $MOUNT_PATH"
       fi
 
       RUN_OPTIONS="$RUN_OPTIONS -v $MOUNT_PATH"
