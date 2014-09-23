@@ -314,7 +314,6 @@ case "$1" in
       fi
 
       RUN_OPTIONS="$RUN_OPTIONS -v $MOUNT_PATH"
-      echo "Mounting at $MOUNT_PATH"
     fi
 
     LINK_SERVICE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
