@@ -301,6 +301,21 @@ case "$1" in
       RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
     fi
 
+    MOUNT_FROM_HOST=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE)
+    if [ -n "$MOUNT_FROM_HOST" ]
+    then
+      HOST_PATH=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE | awk '{ print $3 }')
+      CONTAINER_PATH=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE | awk '{ print $4 }')
+      if [ -n "$CONTAINER_PATH" ]
+      then
+        MOUNT_PATH="$HOST_PATH:$CONTAINER_PATH"
+      else
+        MOUNT_PATH="$HOST_PATH:$HOST_PATH"
+      fi
+
+      RUN_OPTIONS="$RUN_OPTIONS -v $MOUNT_PATH"
+    fi
+
     LINK_SERVICE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$LINK_SERVICE" ]
     then
