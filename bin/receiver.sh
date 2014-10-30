@@ -2,7 +2,7 @@
 REPOSITORY="$1"
 BRANCH="$5"
 
-if [ "$REPOSITORY" == "" ] 
+if [ "$REPOSITORY" == "" ] ; then
   echo "Something is wrong. Your Repository name is blank!"
   exit 1
 fi 
