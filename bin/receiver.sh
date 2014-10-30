@@ -1,6 +1,12 @@
 #!/bin/bash
 REPOSITORY="$1"
 BRANCH="$5"
+
+if [ "$REPOSITORY" == "" ] 
+  echo "Something is wrong. Your Repository name is blank!"
+  exit 1
+fi 
+
 if [ -f /etc/default/octohost ]; then
   . /etc/default/octohost
 fi
