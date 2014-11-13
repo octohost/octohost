@@ -324,10 +324,8 @@ case "$1" in
       if [ -n "$LINK_NAME" ]
       then
         LINK_NAME="$LINK_NAME:$SOURCE"
-        echo "Linking to: $LINK_NAME"
       else
         LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
-        echo "Linking to: $LINK_NAME"
       fi
 
       RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
