@@ -316,21 +316,24 @@ case "$1" in
       RUN_OPTIONS="$RUN_OPTIONS -v $MOUNT_PATH"
     fi
 
-    LINK_SERVICE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
-    if [ -n "$LINK_SERVICE" ]
-    then
-      SOURCE=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $3 }')
-      LINK_NAME=$(grep -i "^# LINK_SERVICE" $DOCKERFILE | awk '{ print $4 }')
-      if [ -n "$LINK_NAME" ]
-      then
-        LINK_NAME="$LINK_NAME:$SOURCE"
-      else
-        LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
-      fi
 
-      RUN_OPTIONS="$RUN_OPTIONS -link $LINK_NAME"
+    FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
+    if [ -n "$FOUND_LINKS" ]; then
+      while read LINK_LINE
+      do
+        SOURCE=$(echo $LINK_LINE | awk '{ print $3 }')
+        LINK_NAME=$(echo $LINK_LINE | awk '{ print $4 }')
+        if [ -n "$LINK_NAME" ]
+        then
+          LINK_NAME="$LINK_NAME:$SOURCE"
+        else
+          LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
+        fi  
+        RUN_OPTIONS="$RUN_OPTIONS --link $LINK_NAME"
+      done <<<"$FOUND_LINKS"
     fi
 
+    
     ENV_VARS=$(/usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
     if [ -n "$ENV_VARS" ]
     then
