@@ -313,7 +313,7 @@ case "$1" in
         MOUNT_PATH="$HOST_PATH:$HOST_PATH"
       fi
 
-      RUN_OPTIONS="-v $MOUNT_PATH $RUN_OPTIONS"
+      RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
     fi
     done
 
