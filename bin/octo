@@ -317,6 +317,19 @@ case "$1" in
     fi
     done
 
+    grep -i '^# PORTS_FROM_HOST' $DOCKERFILE | while read -r PORTS_FROM_HOST ; do
+    if [ -n "$PORTS_FROM_HOST" ]
+    then
+      HOST_PORT=$(grep -i "^# PORTS_FROM_HOST" $DOCKERFILE | awk '{ print $3 }')
+      CONTAINER_PORT=$(grep -i "^# PORTS_FROM_HOST" $DOCKERFILE | awk '{ print $4 }')
+      NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+
+      COMBINED_PORTS="$NEW_PORT $COMBINED_PORTS"
+    fi
+    done
+    if [ -n "$COMBINED_PORTS" ]
+      RUN_OPTIONS=" -p $COMBINED_PORTS $RUN_OPTIONS"
+    fi
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$FOUND_LINKS" ]; then
