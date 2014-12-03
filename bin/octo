@@ -324,12 +324,9 @@ case "$1" in
       CONTAINER_PORT=$(grep -i "^# PORTS_FROM_HOST" $DOCKERFILE | awk '{ print $4 }')
       NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
 
-      COMBINED_PORTS="$NEW_PORT $COMBINED_PORTS"
+      RUN_OPTIONS=" -p $NEW_PORT $RUN_OPTIONS"
     fi
     done
-    if [ -n "$COMBINED_PORTS" ]
-      RUN_OPTIONS=" -p $COMBINED_PORTS $RUN_OPTIONS"
-    fi
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$FOUND_LINKS" ]; then
