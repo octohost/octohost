@@ -183,7 +183,7 @@ case "$1" in
       if [ -e "$DOCKERFILE" ]; then
         RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
       else
-        RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+        RUN_OPTIONS=" -d -e CONTAINER_NAME=$BASE"
         ENV=$(/usr/bin/octo config:env $BASE)
         RUN_OPTIONS="$RUN_OPTIONS $ENV"
       fi
@@ -286,7 +286,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     BASE="$2"
     DOCKERFILE="$3"
-    RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+    RUN_OPTIONS=" -d -e CONTAINER_NAME=$BASE"
 
     ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
     if [ -n "$ADD_NAME" ]
@@ -325,6 +325,8 @@ case "$1" in
       NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
 
       RUN_OPTIONS=" -p $NEW_PORT $RUN_OPTIONS"
+    else
+      RUN_OPTIONS=" -P $RUN_OPTIONS"
     fi
     done
 
