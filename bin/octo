@@ -125,6 +125,10 @@ get_unique_domains ()
 {
   SCRATCH=`mktemp`
   DOMAINS="$1"
+  if [ -n "$DOMAINS_TO_ASSIGN_LIST" ]
+  then
+    DOMAINS="$DOMAINS,$DOMAINS_TO_ASSIGN_LIST"
+  fi 
 
   for domain in ${DOMAINS//,/ } ; do
     echo $domain
@@ -333,6 +337,14 @@ case "$1" in
     else
       RUN_OPTIONS=" -P $RUN_OPTIONS"
     fi 
+
+    while read -r ASSIGNED_DOMAIN ; do
+    if [ -n "$ASSIGNED_DOMAIN" ]
+    then
+      DOMAIN_TO_ASSIGN=$(echo $ASSIGNED_DOMAIN | awk '{ print $3 }')
+      DOMAINS_TO_ASSIGN_LIST="$DOMAIN_TO_ASSIGN,$DOMAINS_TO_ASSIGN_LIST"
+    fi
+    done < <(grep -i '^# ASSIGNED_DOMAIN' $DOCKERFILE )
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$FOUND_LINKS" ]; then
