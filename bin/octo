@@ -286,7 +286,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     BASE="$2"
     DOCKERFILE="$3"
-    RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+    RUN_OPTIONS=" -d -e CONTAINER_NAME=$BASE"
 
     ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
     if [ -n "$ADD_NAME" ]
@@ -301,11 +301,11 @@ case "$1" in
       RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
     fi
 
-    MOUNT_FROM_HOST=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE)
+    while read -r MOUNT_FROM_HOST ; do
     if [ -n "$MOUNT_FROM_HOST" ]
     then
-      HOST_PATH=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE | awk '{ print $3 }')
-      CONTAINER_PATH=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE | awk '{ print $4 }')
+      HOST_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $3 }')
+      CONTAINER_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $4 }')
       if [ -n "$CONTAINER_PATH" ]
       then
         MOUNT_PATH="$HOST_PATH:$CONTAINER_PATH"
@@ -313,9 +313,45 @@ case "$1" in
         MOUNT_PATH="$HOST_PATH:$HOST_PATH"
       fi
 
-      RUN_OPTIONS="$RUN_OPTIONS -v $MOUNT_PATH"
+      RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
     fi
+    done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
 
+
+    while read -r PORTS_FROM_HOST ; do
+    if [ -n "$PORTS_FROM_HOST" ]
+    then
+      HOST_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $3 }')
+      CONTAINER_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $4 }')
+      NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+      PORT_OPTIONS=" -p $NEW_PORT $PORT_OPTIONS"
+    fi
+    done < <(grep -i '^# PORTS_FROM_HOST' $DOCKERFILE )
+    if [ -n "$PORT_OPTIONS" ]
+    then
+      RUN_OPTIONS=" $PORT_OPTIONS $RUN_OPTIONS"
+    else
+      RUN_OPTIONS=" -P $RUN_OPTIONS"
+    fi 
+
+    while read -r ASSIGNED_DOMAIN ; do
+    if [ -n "$ASSIGNED_DOMAIN" ]
+    then
+      DOMAIN_TO_ASSIGN=$(echo $ASSIGNED_DOMAIN | awk '{ print $3 }')
+      if [ -n "$DOMAINS_TO_ASSIGN_LIST" ]
+      then
+        DOMAINS_TO_ASSIGN_LIST="$DOMAIN_TO_ASSIGN,$DOMAINS_TO_ASSIGN_LIST"
+      else
+        DOMAINS_TO_ASSIGN_LIST="$DOMAIN_TO_ASSIGN"
+      fi
+    fi
+    done < <(grep -i '^# ASSIGNED_DOMAIN' $DOCKERFILE )
+    if [ -n "$DOMAINS_TO_ASSIGN_LIST" ]
+    then
+      echo '$DOMAINLIST' >> /tmp/debugdomain
+      echo $DOMAINS_TO_ASSIGN_LIST >> /tmp/debugdomain
+      /usr/bin/octo domains:set "$BASE" "$DOMAINS_TO_ASSIGN_LIST"
+    fi 
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$FOUND_LINKS" ]; then
