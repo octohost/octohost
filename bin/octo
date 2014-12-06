@@ -312,7 +312,6 @@ case "$1" in
       else
         MOUNT_PATH="$HOST_PATH:$HOST_PATH"
       fi
-
       RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
     fi
     done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
