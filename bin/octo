@@ -334,24 +334,6 @@ case "$1" in
       RUN_OPTIONS=" -P $RUN_OPTIONS"
     fi 
 
-    while read -r ASSIGNED_DOMAIN ; do
-    if [ -n "$ASSIGNED_DOMAIN" ]
-    then
-      DOMAIN_TO_ASSIGN=$(echo $ASSIGNED_DOMAIN | awk '{ print $3 }')
-      if [ -n "$DOMAINS_TO_ASSIGN_LIST" ]
-      then
-        DOMAINS_TO_ASSIGN_LIST="$DOMAIN_TO_ASSIGN,$DOMAINS_TO_ASSIGN_LIST"
-      else
-        DOMAINS_TO_ASSIGN_LIST="$DOMAIN_TO_ASSIGN"
-      fi
-    fi
-    done < <(grep -i '^# ASSIGNED_DOMAIN' $DOCKERFILE )
-    if [ -n "$DOMAINS_TO_ASSIGN_LIST" ]
-    then
-      echo '$DOMAINLIST' >> /tmp/debugdomain
-      echo $DOMAINS_TO_ASSIGN_LIST >> /tmp/debugdomain
-      /usr/bin/octo domains:set "$BASE" "$DOMAINS_TO_ASSIGN_LIST"
-    fi 
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$FOUND_LINKS" ]; then
