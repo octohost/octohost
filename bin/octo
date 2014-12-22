@@ -286,7 +286,7 @@ case "$1" in
   if [[ $2 && $3 ]]; then
     BASE="$2"
     DOCKERFILE="$3"
-    RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+    RUN_OPTIONS=" -d -e CONTAINER_NAME=$BASE"
 
     ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
     if [ -n "$ADD_NAME" ]
@@ -301,20 +301,37 @@ case "$1" in
       RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
     fi
 
-    MOUNT_FROM_HOST=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE)
+    while read -r MOUNT_FROM_HOST ; do
     if [ -n "$MOUNT_FROM_HOST" ]
     then
-      HOST_PATH=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE | awk '{ print $3 }')
-      CONTAINER_PATH=$(grep -i "^# MOUNT_FROM_HOST" $DOCKERFILE | awk '{ print $4 }')
+      HOST_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $3 }')
+      CONTAINER_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $4 }')
       if [ -n "$CONTAINER_PATH" ]
       then
         MOUNT_PATH="$HOST_PATH:$CONTAINER_PATH"
       else
         MOUNT_PATH="$HOST_PATH:$HOST_PATH"
       fi
-
-      RUN_OPTIONS="$RUN_OPTIONS -v $MOUNT_PATH"
+      RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
     fi
+    done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
+
+
+    while read -r PORTS_FROM_HOST ; do
+    if [ -n "$PORTS_FROM_HOST" ]
+    then
+      HOST_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $3 }')
+      CONTAINER_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $4 }')
+      NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+      PORT_OPTIONS=" -p $NEW_PORT $PORT_OPTIONS"
+    fi
+    done < <(grep -i '^# PORTS_FROM_HOST' $DOCKERFILE )
+    if [ -n "$PORT_OPTIONS" ]
+    then
+      RUN_OPTIONS=" $PORT_OPTIONS $RUN_OPTIONS"
+    else
+      RUN_OPTIONS=" -P $RUN_OPTIONS"
+    fi 
 
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
