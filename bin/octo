@@ -448,7 +448,7 @@ case "$1" in
   domains:set)
   if [[ $2 && $3 ]]; then
     DOMAINS=$(get_unique_domains $3)
-    /usr/bin/consulkv set $2/DOMAINS $DOMAINS
+    /usr/bin/consulkv set $CONSUL_PREFIX/$2/DOMAINS $DOMAINS
   else
     echo "Usage: octo domains:set {container} {domains}"
     echo "Domains are comma separated."
@@ -457,7 +457,7 @@ case "$1" in
 
   domains:get)
   if [ $2 ]; then
-    /usr/bin/consulkv get $2/DOMAINS
+    /usr/bin/consulkv get $CONSUL_PREFIX/$2/DOMAINS
   else
     echo "Usage: octo domains:get {container}"
   fi
