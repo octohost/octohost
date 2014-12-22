@@ -222,7 +222,7 @@ case "$1" in
 
   config:set)
   if [[ $2 && "$3" ]]; then
-    /usr/bin/consulkv set octohost/$2 "$3"
+    /usr/bin/consulkv set $CONSUL_PREFIX/$2 "$3"
   else
     echo "Usage: octo config:set {container/key} {var}"
   fi
@@ -230,7 +230,7 @@ case "$1" in
 
   config:get)
   if [ $2 ]; then
-    /usr/bin/consulkv get octohost/$2
+    /usr/bin/consulkv get $CONSUL_PREFIX/$2
   else
     echo "Usage: octo config:get {container/key}"
   fi
@@ -238,7 +238,7 @@ case "$1" in
 
   config:rm)
   if [ $2 ]; then
-    /usr/bin/consulkv del octohost/$2
+    /usr/bin/consulkv del $CONSUL_PREFIX/$2
   else
     echo "Usage: octo config:rm {container/key}"
   fi
@@ -257,7 +257,7 @@ case "$1" in
 
   config)
   if [ $2 ]; then
-    for conf in `/usr/bin/consulkv ls octohost/$2`;
+    for conf in `/usr/bin/consulkv ls $CONSUL_PREFIX/$2`;
     do
       echo -n "/$2/$conf:";
       /usr/bin/octo config:get $2/$conf
