@@ -350,6 +350,12 @@ case "$1" in
       done <<<"$FOUND_LINKS"
     fi
 
+    MEMORY_LIMIT=$(/usr/bin/octo config:get $BASE/MEMORY_LIMIT)
+    if [ -n "$MEMORY_LIMIT" ]
+    then
+      RUN_OPTIONS="$RUN_OPTIONS --memory='$MEMORY_LIMIT'"
+    fi
+
     ENV_VARS=$(/usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
     if [ -n "$ENV_VARS" ]
     then
@@ -503,16 +509,7 @@ case "$1" in
     fi
     if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
     echo "Removed the source for $BASE."
-    OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
-    if [ $OLD_ID ]; then
-      ID=$OLD_ID
-      PORT=$(inspect_to_get_external_port)
-      octo service:rm $BASE $PORT
-      sudo docker kill $OLD_ID
-      echo "Removed running container."
-      /usr/bin/octo config:proxy
-    fi
-
+    /usr/bin/octo stop $BASE
   else
     echo "Usage: octo remove {container}"
   fi
