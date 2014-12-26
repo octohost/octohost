@@ -373,9 +373,18 @@ case "$1" in
     CONTAINER="$2"
     PORT="$3"
     TAGS=${4:-http}
+
+    CUSTOM_CHECK=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK)
+    if [ -z "$CUSTOM_CHECK" ]
+    then
+      CHECK_COMMAND="curl -s http://$PRIVATE_IP:$PORT"
+    else
+      CHECK_COMMAND="$CUSTOM_CHECK"
+    fi
+
     if echo $TAGS | grep -q 'http'
     then
-      CHECK=",\"check\": {\"script\": \"curl -s http://$PRIVATE_IP:$PORT\",\"interval\": \"60s\"}"
+      CHECK=",\"check\": {\"script\": \"$CHECK_COMMAND\",\"interval\": \"60s\"}"
     else
       CHECK=""
     fi
