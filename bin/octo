@@ -191,6 +191,7 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       TAGS=$(/usr/bin/octo service:tags $ID)
       /usr/bin/octo service:set $BASE $PORT $TAGS
+      /usr/bin/octo config:consul_template $BASE
       /usr/bin/octo config:proxy
     done
   else
@@ -213,6 +214,7 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       sudo docker kill "$ID" > /dev/null
       octo service:rm "$BASE" "$PORT"
+      /usr/bin/octo config:consul_template $BASE
       /usr/bin/octo config:proxy
     done
   else
