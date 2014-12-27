@@ -191,7 +191,8 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       TAGS=$(/usr/bin/octo service:tags $ID)
       /usr/bin/octo service:set $BASE $PORT $TAGS
-      /usr/bin/octo config:consul_template $BASE
+      # Removing this for now - depending on the watch.
+      # /usr/bin/octo config:consul_template $BASE
     done
   else
     echo "Usage: octo start {container}"
@@ -213,7 +214,8 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       sudo docker kill "$ID" > /dev/null
       octo service:rm "$BASE" "$PORT"
-      /usr/bin/octo config:consul_template $BASE
+      # Removing this for now - depending on the watch.
+      # /usr/bin/octo config:consul_template $BASE
     done
   else
     echo "Usage: octo stop {container}"
@@ -548,6 +550,8 @@ case "$1" in
   remove)
   if [ $2 ]; then
     BASE="$2"
+    # Remove the Consul watch.
+    /usr/bin/octo remove:consul_watch $BASE
     if [ -d /home/git/$BASE.git ]; then
       sudo rm -rf /home/git/$BASE.git
     else
@@ -559,6 +563,22 @@ case "$1" in
     /usr/bin/octo stop $BASE
   else
     echo "Usage: octo remove {container}"
+  fi
+  ;;
+
+  remove:consul_watch)
+  if [ $2 ]; then
+    BASE="$2"
+    CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
+    if [ -f $CONSUL_WATCH_JSON ]; then
+      sudo rm -f $CONSUL_WATCH_JSON
+      sudo service consul reload
+      echo "Removed the watch and reloaded Consul."
+    else
+      echo "There was no Consul watch for the container."
+    fi
+  else
+    echo "Usage: octo remove:consul_watch {container}"
   fi
   ;;
 
