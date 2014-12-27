@@ -382,9 +382,17 @@ case "$1" in
       CHECK_COMMAND="$CUSTOM_CHECK"
     fi
 
+    CUSTOM_CHECK_INTERVAL=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK_INTERVAL)
+    if [ -z "$CUSTOM_CHECK_INTERVAL" ]
+    then
+      CHECK_INTERVAL="15s"
+    else
+      CHECK_INTERVAL="$CUSTOM_CHECK_INTERVAL"
+    fi
+
     if echo $TAGS | grep -q 'http'
     then
-      CHECK=",\"check\": {\"script\": \"$CHECK_COMMAND\",\"interval\": \"60s\"}"
+      CHECK=",\"check\": {\"script\": \"$CHECK_COMMAND\",\"interval\": \"$CHECK_INTERVAL\"}"
     else
       CHECK=""
     fi
