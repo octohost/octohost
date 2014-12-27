@@ -482,6 +482,26 @@ case "$1" in
   sudo octoconfig update
   ;;
 
+  config:consul_template)
+    BASE="$2"
+    # If there isn't a template already, copy the template and set the name.
+    NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
+    if [ ! -f $NGINX_TEMPLATE ]
+      then
+      cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
+      sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
+    fi
+    # If there isn't a Consul template config already, copy and update.
+    CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
+    if [ ! -f $CONSUL_CONFIG ]
+      then
+      cp /etc/nginx/template.cfg $CONSUL_CONFIG
+      sed -i "s/REPLACEME/$BASE/" $CONSUL_CONFIG
+    fi
+    # Render the proper template and restart the proxy service.
+    consul-template -config $CONSUL_CONFIG -once
+  ;;
+
   status)
   cd $SRC_DIR
   for i in *.git; do

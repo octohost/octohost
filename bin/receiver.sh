@@ -5,7 +5,7 @@ BRANCH="$5"
 if [ "$REPOSITORY" == "" ] ; then
   echo "Something is wrong. Your Repository name is blank!"
   exit 1
-fi 
+fi
 
 if [ -f /etc/default/octohost ]; then
   . /etc/default/octohost
@@ -149,6 +149,7 @@ else
   echo "Not killing any containers."
 fi
 
+/usr/bin/octo config:consul_template $BASE
 /usr/bin/octo config:proxy
 
 if [ -n "$XIP_IO" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$XIP_IO";fi
