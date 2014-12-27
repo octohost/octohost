@@ -502,6 +502,12 @@ case "$1" in
     sudo consul-template -config $CONSUL_CONFIG -once
   ;;
 
+  config:consul_template_render)
+    BASE="$2"
+    CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
+    sudo consul-template -config $CONSUL_CONFIG -once
+  ;;
+
   status)
   cd $SRC_DIR
   for i in *.git; do
