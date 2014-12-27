@@ -499,7 +499,7 @@ case "$1" in
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_CONFIG
     fi
     # Render the proper template and restart the proxy service.
-    sudo consul-template -config $CONSUL_CONFIG -once
+    /usr/bin/octo config:consul_template_render $BASE
   ;;
 
   config:consul_template_render)
