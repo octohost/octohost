@@ -566,6 +566,34 @@ case "$1" in
   fi
   ;;
 
+  remove:config)
+  if [ $2 ]; then
+    BASE="$2"
+    # Remove the nginx config.
+    NGINX_CONFIG="/etc/nginx/containers/$BASE.conf"
+    if [ -f $NGINX_CONFIG ]; then
+      sudo rm -f $NGINX_CONFIG
+      sudo service proxy reload
+    fi
+    # Remove the nginx template.
+    NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
+    if [ -f $NGINX_TEMPLATE ]; then
+      sudo rm -f $NGINX_TEMPLATE
+    fi
+    # Remove the Consul template config.
+    CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
+    if [ -f $CONSUL_CONFIG ]; then
+      sudo rm -f $CONSUL_CONFIG
+    fi
+    # Remove the Consul Watch.
+    /usr/bin/octo remove:consul_watch $BASE
+    # Remove the kv data.
+    /usr/bin/octo config:rm $BASE
+  else
+    echo "Usage: octo remove:config {container}"
+  fi
+  ;;
+
   remove:consul_watch)
   if [ $2 ]; then
     BASE="$2"
