@@ -133,12 +133,12 @@ get_unique_domains ()
   FINAL_DOMAINS=""
 
   for line in $( cat $SCRATCH ); do
-    FINAL_DOMAINS="$FINAL_DOMAINS,$line"
+    FINAL_DOMAINS="$FINAL_DOMAINS $line"
   done
 
   rm -f $SCRATCH
 
-  echo $FINAL_DOMAINS | cut -d ',' -f 2-100
+  echo "$FINAL_DOMAINS"
 }
 
 case "$1" in
@@ -463,10 +463,10 @@ case "$1" in
   domains:set)
   if [[ $2 && $3 ]]; then
     DOMAINS=$(get_unique_domains $3)
-    /usr/bin/consulkv set $CONSUL_PREFIX/$2/DOMAINS $DOMAINS
+    /usr/bin/consulkv set $CONSUL_PREFIX/$2/DOMAINS "$DOMAINS"
   else
     echo "Usage: octo domains:set {container} {domains}"
-    echo "Domains are comma separated."
+    echo "Domains are space separated."
   fi
   ;;
 
