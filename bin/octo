@@ -508,6 +508,14 @@ case "$1" in
       sudo cp /etc/nginx/template.cfg $CONSUL_CONFIG
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_CONFIG
     fi
+    # If there isn't a Consul watch config already, copy, update and reload consul.
+    CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
+    if [ ! -f $CONSUL_WATCH_JSON ]
+      then
+      sudo cp /etc/nginx/template.watch $CONSUL_WATCH_JSON
+      sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_JSON
+      sudo service consul reload
+    fi
     # Render the proper template and restart the proxy service.
     /usr/bin/octo config:consul_template_render $BASE
   ;;
