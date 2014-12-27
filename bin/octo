@@ -192,7 +192,6 @@ case "$1" in
       TAGS=$(/usr/bin/octo service:tags $ID)
       /usr/bin/octo service:set $BASE $PORT $TAGS
       /usr/bin/octo config:consul_template $BASE
-      /usr/bin/octo config:proxy
     done
   else
     echo "Usage: octo start {container}"
@@ -215,7 +214,6 @@ case "$1" in
       sudo docker kill "$ID" > /dev/null
       octo service:rm "$BASE" "$PORT"
       /usr/bin/octo config:consul_template $BASE
-      /usr/bin/octo config:proxy
     done
   else
     echo "Usage: octo stop {container}"
@@ -488,10 +486,6 @@ case "$1" in
   fi
   ;;
 
-  config:proxy)
-  sudo octoconfig update
-  ;;
-
   config:consul_template)
     BASE="$2"
     # If there isn't a template already, copy the template and set the name.
@@ -686,7 +680,6 @@ case "$1" in
   octo config:get {container/key}          Get an ENV variable for {container}.
   octo config:rm {container/key}           Remove an ENV variable for {container}.
   octo config:export                       Get all config variables for all containers.
-  octo config:proxy                        Update the proxy configuration from Consul data.
 
   octo domains:set {container} {domains}   Put list of comma separated domains into Consul for a {container}
   octo domains:get {container}             Get list of domains from Consul for a {container}

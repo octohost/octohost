@@ -150,7 +150,6 @@ else
 fi
 
 /usr/bin/octo config:consul_template $BASE
-/usr/bin/octo config:proxy
 
 if [ -n "$XIP_IO" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$XIP_IO";fi
 if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX";fi
