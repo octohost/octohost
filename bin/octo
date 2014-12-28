@@ -247,7 +247,7 @@ case "$1" in
   ;;
 
   config:export)
-  for key in `/usr/bin/consulkv ls`
+  for key in `/usr/bin/consulkv ls $CONSUL_PREFIX`
   do
     if [ "$key" != "null" ]
     then
