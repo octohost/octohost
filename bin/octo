@@ -664,8 +664,12 @@ case "$1" in
 
   reload)
   if [ $2 ]; then
-    /usr/bin/octo stop $2
-    /usr/bin/octo start $2
+    BASE="$2"
+    NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
+    if [ -z "$NUM_CONTAINERS" ]; then NUM_CONTAINERS="1"; fi
+
+    /usr/bin/octo stop $BASE
+    /usr/bin/octo start $BASE $NUM_CONTAINERS
   else
     echo "Usage: octo reload {container}"
   fi
