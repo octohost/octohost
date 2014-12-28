@@ -504,7 +504,7 @@ case "$1" in
       sudo cp /etc/nginx/template.cfg $CONSUL_CONFIG
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_CONFIG
     fi
-    # If there isn't a Consul watch config already, copy, update and reload consul.
+    # If there isn't a Consul service watch, copy, update and reload consul.
     CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
     if [ ! -f $CONSUL_WATCH_JSON ]
       then
@@ -512,6 +512,15 @@ case "$1" in
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_JSON
       sudo service consul reload
     fi
+    # If there isn't a Consul KV watch, copy, update and reload consul.
+    CONSUL_WATCH_KV_JSON="/etc/consul.d/watch-kv-$BASE.json"
+    if [ ! -f $CONSUL_WATCH_KV_JSON ]
+      then
+      sudo cp /etc/nginx/template.kv.watch $CONSUL_WATCH_KV_JSON
+      sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_KV_JSON
+      sudo service consul reload
+    fi
+
     # Render the proper template and restart the proxy service.
     /usr/bin/octo config:consul_template_render $BASE
   ;;
@@ -585,7 +594,7 @@ case "$1" in
     if [ -f $CONSUL_CONFIG ]; then
       sudo rm -f $CONSUL_CONFIG
     fi
-    # Remove the Consul Watch.
+    # Remove the Consul Watches.
     /usr/bin/octo remove:consul_watch $BASE
     # Remove the kv data.
     /usr/bin/octo config:rm $BASE
@@ -598,13 +607,15 @@ case "$1" in
   if [ $2 ]; then
     BASE="$2"
     CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
+    CONSUL_WATCH_KV_JSON="/etc/consul.d/watch-kv-$BASE.json"
     if [ -f $CONSUL_WATCH_JSON ]; then
       sudo rm -f $CONSUL_WATCH_JSON
-      sudo service consul reload
-      echo "Removed the watch and reloaded Consul."
-    else
-      echo "There was no Consul watch for the container."
     fi
+    if [ -f $CONSUL_WATCH_KV_JSON ]; then
+      sudo rm -f $CONSUL_WATCH_KV_JSON
+    fi
+    sudo service consul reload
+    echo "Removed any watches and reloaded Consul."
   else
     echo "Usage: octo remove:consul_watch {container}"
   fi
