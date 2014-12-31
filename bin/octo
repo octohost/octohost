@@ -116,364 +116,357 @@ get_unique_domains ()
 case "$1" in
 
   logs)
-  if [ "$2" == "octostart" ]; then
-    check_syslog_port
-    $OCTOLOGS
-  elif [ "$2" == "octostop" ]; then
-    stop_octologs
-  elif [ "$2" == "start" ]; then
-    if [[ $3 && $4 ]]; then
+    if [ "$2" == "octostart" ]; then
       check_syslog_port
-      start_logs "$3" "$4"
+      $OCTOLOGS
+    elif [ "$2" == "octostop" ]; then
+      stop_octologs
+    elif [ "$2" == "start" ]; then
+      if [[ $3 && $4 ]]; then
+        check_syslog_port
+        start_logs "$3" "$4"
+      else
+        echo "Usage: octo logs start {full-log-path} {mount}"
+      fi
     else
-      echo "Usage: octo logs start {full-log-path} {mount}"
+      echo "Usage: octo logs {octostart|start [full-log-path] [mount]}"
     fi
-  else
-    echo "Usage: octo logs {octostart|start [full-log-path] [mount]}"
-  fi
   ;;
 
   logspout)
-  if [ "$2" == "start" ]; then
-    check_syslog_port
-    start_logspout
-  elif [ "$2" == "stop" ]; then
-    stop_logspout
-  elif [ "$2" == "pull" ]; then
-    pull_logspout
-  else
-    echo "Usage: octo logspout {start|stop|pull}"
-  fi
+    if [ "$2" == "start" ]; then
+      check_syslog_port
+      start_logspout
+    elif [ "$2" == "stop" ]; then
+      stop_logspout
+    elif [ "$2" == "pull" ]; then
+      pull_logspout
+    else
+      echo "Usage: octo logspout {start|stop|pull}"
+    fi
   ;;
 
   start)
-  if [ $2 ]; then
-    set_src_variables "$2"
-    NUMBER=${3:-1}
-    for (( i=1; i <= $NUMBER; i++ ))
-    do
-      if [ -e "$DOCKERFILE" ]; then
-        RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
-      else
-        RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
-        ENV=$(/usr/bin/octo config:env $BASE)
-        RUN_OPTIONS="$RUN_OPTIONS $ENV"
-      fi
-      ID=$(launch_container_return_id)
-      PORT=$(inspect_to_get_external_port)
-      TAGS=$(/usr/bin/octo service:tags $ID)
-      /usr/bin/octo service:set $BASE $PORT $TAGS
-    done
-  else
-    echo "Usage: octo start {container}"
-  fi
+    if [ $2 ]; then
+      set_src_variables "$2"
+      NUMBER=${3:-1}
+      for (( i=1; i <= $NUMBER; i++ ))
+      do
+        if [ -e "$DOCKERFILE" ]; then
+          RUN_OPTIONS=$(/usr/bin/octo config:options "$BASE" "$DOCKERFILE")
+        else
+          RUN_OPTIONS="-P -d -e CONTAINER_NAME=$BASE"
+          ENV=$(/usr/bin/octo config:env $BASE)
+          RUN_OPTIONS="$RUN_OPTIONS $ENV"
+        fi
+        ID=$(launch_container_return_id)
+        PORT=$(inspect_to_get_external_port)
+        TAGS=$(/usr/bin/octo service:tags $ID)
+        /usr/bin/octo service:set $BASE $PORT $TAGS
+      done
+    else
+      echo "Usage: octo start {container}"
+    fi
   ;;
 
   stop)
-  if [ $2 ]; then
-    BASE="$2"
-    if [ $3 ]; then
-      IMAGE_ID="$3"
-      CONTAINERS=$(sudo docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
+    if [ $2 ]; then
+      BASE="$2"
+      if [ $3 ]; then
+        IMAGE_ID="$3"
+        CONTAINERS=$(sudo docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
+      else
+        CONTAINERS=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+      fi
+      for container in $CONTAINERS
+      do
+        ID="$container"
+        PORT=$(inspect_to_get_external_port)
+        sudo docker kill "$ID" > /dev/null
+        octo service:rm "$BASE" "$PORT"
+      done
     else
-      CONTAINERS=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+      echo "Usage: octo stop {container}"
     fi
-    for container in $CONTAINERS
-    do
-      ID="$container"
-      PORT=$(inspect_to_get_external_port)
-      sudo docker kill "$ID" > /dev/null
-      octo service:rm "$BASE" "$PORT"
-    done
-  else
-    echo "Usage: octo stop {container}"
-  fi
   ;;
 
   config:set)
-  if [[ $2 && "$3" ]]; then
-    /usr/bin/consulkv set $CONSUL_PREFIX/$2 "$3"
-  else
-    echo "Usage: octo config:set {container/key} {var}"
-  fi
+    if [[ $2 && "$3" ]]; then
+      /usr/bin/consulkv set $CONSUL_PREFIX/$2 "$3"
+    else
+      echo "Usage: octo config:set {container/key} {var}"
+    fi
   ;;
 
   config:get)
-  if [ $2 ]; then
-    /usr/bin/consulkv get $CONSUL_PREFIX/$2
-  else
-    echo "Usage: octo config:get {container/key}"
-  fi
+    if [ $2 ]; then
+      /usr/bin/consulkv get $CONSUL_PREFIX/$2
+    else
+      echo "Usage: octo config:get {container/key}"
+    fi
   ;;
 
   config:rm)
-  if [ $2 ]; then
-    /usr/bin/consulkv del $CONSUL_PREFIX/$2
-  else
-    echo "Usage: octo config:rm {container/key}"
-  fi
+    if [ $2 ]; then
+      /usr/bin/consulkv del $CONSUL_PREFIX/$2
+    else
+      echo "Usage: octo config:rm {container/key}"
+    fi
   ;;
 
   config:export)
-  for key in `/usr/bin/consulkv ls $CONSUL_PREFIX`
-  do
-    if [ "$key" != "null" ]
-    then
-      VALUE=$(octo config:get $key)
-      echo "octo config:set $key '$VALUE'"
-    fi
-  done
+    for key in `/usr/bin/consulkv ls $CONSUL_PREFIX`
+    do
+      if [ "$key" != "null" ]; then
+        VALUE=$(octo config:get $key)
+        echo "octo config:set $key '$VALUE'"
+      fi
+    done
   ;;
 
   config)
-  if [ $2 ]; then
-    for conf in `/usr/bin/consulkv ls $CONSUL_PREFIX/$2`;
-    do
-      echo -n "/$2/$conf:";
-      /usr/bin/octo config:get $2/$conf
-    done
-  else
-    echo "Usage: octo config {container}"
-  fi
+    if [ $2 ]; then
+      for conf in `/usr/bin/consulkv ls $CONSUL_PREFIX/$2`;
+      do
+        echo -n "/$2/$conf:";
+        /usr/bin/octo config:get $2/$conf
+      done
+    else
+      echo "Usage: octo config {container}"
+    fi
   ;;
 
   config:env)
-  if [ $2 ]; then
-    ENV=""
-    while read conf
-    do
-      KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
-      VAR=$(echo $conf | cut -d ':' -f 2-10)
-      ENV="$ENV -e $KEY=\"$VAR\""
-    done < <(/usr/bin/octo config $2)
-    echo "$ENV"
-  else
-    echo "octo config:env {container}"
-  fi
+    if [ $2 ]; then
+      ENV=""
+      while read conf
+      do
+        KEY=$(echo $conf | cut -d '/' -f 3 | cut -d ':' -f 1)
+        VAR=$(echo $conf | cut -d ':' -f 2-10)
+        ENV="$ENV -e $KEY=\"$VAR\""
+      done < <(/usr/bin/octo config $2)
+      echo "$ENV"
+    else
+      echo "octo config:env {container}"
+    fi
   ;;
 
   config:options)
-  if [[ $2 && $3 ]]; then
-    BASE="$2"
-    DOCKERFILE="$3"
-    RUN_OPTIONS=" -d -e CONTAINER_NAME=$BASE"
+    if [[ $2 && $3 ]]; then
+      BASE="$2"
+      DOCKERFILE="$3"
+      RUN_OPTIONS=" -d -e CONTAINER_NAME=$BASE"
 
-    ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
-    if [ -n "$ADD_NAME" ]
-    then
-      RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
-    fi
-
-    VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" $DOCKERFILE)
-    if [ -n "$VOLUMES_FROM" ]
-    then
-      VOLUME_NAME="${BASE}_data"
-      RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
-    fi
-
-    while read -r MOUNT_FROM_HOST ; do
-    if [ -n "$MOUNT_FROM_HOST" ]
-    then
-      HOST_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $3 }')
-      CONTAINER_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $4 }')
-      if [ -n "$CONTAINER_PATH" ]
+      ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
+      if [ -n "$ADD_NAME" ]
       then
-        MOUNT_PATH="$HOST_PATH:$CONTAINER_PATH"
-      else
-        MOUNT_PATH="$HOST_PATH:$HOST_PATH"
+        RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
       fi
-      RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
-    fi
-    done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
 
+      VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" $DOCKERFILE)
+      if [ -n "$VOLUMES_FROM" ]
+      then
+        VOLUME_NAME="${BASE}_data"
+        RUN_OPTIONS="$RUN_OPTIONS -volumes-from $VOLUME_NAME"
+      fi
 
-    while read -r PORTS_FROM_HOST ; do
-    if [ -n "$PORTS_FROM_HOST" ]
-    then
-      HOST_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $3 }')
-      CONTAINER_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $4 }')
-      NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
-      PORT_OPTIONS=" -p $NEW_PORT $PORT_OPTIONS"
-    fi
-    done < <(grep -i '^# PORTS_FROM_HOST' $DOCKERFILE )
-    if [ -n "$PORT_OPTIONS" ]
-    then
-      RUN_OPTIONS=" $PORT_OPTIONS $RUN_OPTIONS"
-    else
-      RUN_OPTIONS=" -P $RUN_OPTIONS"
-    fi
-
-
-    FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
-    if [ -n "$FOUND_LINKS" ]; then
-      while read LINK_LINE
-      do
-        SOURCE=$(echo $LINK_LINE | awk '{ print $3 }')
-        LINK_NAME=$(echo $LINK_LINE | awk '{ print $4 }')
-        if [ -n "$LINK_NAME" ]
+      while read -r MOUNT_FROM_HOST ; do
+      if [ -n "$MOUNT_FROM_HOST" ]
+      then
+        HOST_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $3 }')
+        CONTAINER_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $4 }')
+        if [ -n "$CONTAINER_PATH" ]
         then
-          LINK_NAME="$LINK_NAME:$SOURCE"
+          MOUNT_PATH="$HOST_PATH:$CONTAINER_PATH"
         else
-          LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
+          MOUNT_PATH="$HOST_PATH:$HOST_PATH"
         fi
-        RUN_OPTIONS="$RUN_OPTIONS --link $LINK_NAME"
-      done <<<"$FOUND_LINKS"
-    fi
+        RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
+      fi
+      done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
 
-    MEMORY_LIMIT=$(/usr/bin/octo config:get $BASE/MEMORY_LIMIT)
-    if [ -n "$MEMORY_LIMIT" ]
-    then
-      RUN_OPTIONS="$RUN_OPTIONS --memory='$MEMORY_LIMIT'"
-    fi
 
-    ENV_VARS=$(/usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
-    if [ -n "$ENV_VARS" ]
-    then
-      ENV=$(/usr/bin/octo config:env $BASE)
-      RUN_OPTIONS="$RUN_OPTIONS $ENV"
+      while read -r PORTS_FROM_HOST ; do
+      if [ -n "$PORTS_FROM_HOST" ]
+      then
+        HOST_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $3 }')
+        CONTAINER_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $4 }')
+        NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+        PORT_OPTIONS=" -p $NEW_PORT $PORT_OPTIONS"
+      fi
+      done < <(grep -i '^# PORTS_FROM_HOST' $DOCKERFILE )
+      if [ -n "$PORT_OPTIONS" ]
+      then
+        RUN_OPTIONS=" $PORT_OPTIONS $RUN_OPTIONS"
+      else
+        RUN_OPTIONS=" -P $RUN_OPTIONS"
+      fi
+
+
+      FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
+      if [ -n "$FOUND_LINKS" ]; then
+        while read LINK_LINE
+        do
+          SOURCE=$(echo $LINK_LINE | awk '{ print $3 }')
+          LINK_NAME=$(echo $LINK_LINE | awk '{ print $4 }')
+          if [ -n "$LINK_NAME" ]
+          then
+            LINK_NAME="$LINK_NAME:$SOURCE"
+          else
+            LINK_NAME="${BASE}_${SOURCE}:${SOURCE}"
+          fi
+          RUN_OPTIONS="$RUN_OPTIONS --link $LINK_NAME"
+        done <<<"$FOUND_LINKS"
+      fi
+
+      MEMORY_LIMIT=$(/usr/bin/octo config:get $BASE/MEMORY_LIMIT)
+      if [ -n "$MEMORY_LIMIT" ]
+      then
+        RUN_OPTIONS="$RUN_OPTIONS --memory='$MEMORY_LIMIT'"
+      fi
+
+      ENV_VARS=$(/usr/bin/octo config $BASE | grep -v "Error: 100: Key not found")
+      if [ -n "$ENV_VARS" ]
+      then
+        ENV=$(/usr/bin/octo config:env $BASE)
+        RUN_OPTIONS="$RUN_OPTIONS $ENV"
+      fi
+      echo "$RUN_OPTIONS"
+    else
+      echo "Something went wrong."
     fi
-    echo "$RUN_OPTIONS"
-  else
-    echo "Something went wrong."
-  fi
   ;;
 
   service:set)
-  if [[ $2 && $3 ]]; then
-    CONTAINER="$2"
-    PORT="$3"
-    TAGS=${4:-http}
+    if [[ $2 && $3 ]]; then
+      CONTAINER="$2"
+      PORT="$3"
+      TAGS=${4:-http}
 
-    CUSTOM_CHECK=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK)
-    CHECK_COMMAND=${CUSTOM_CHECK:-'curl -s http://$PRIVATE_IP:$PORT'}
+      CUSTOM_CHECK=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK)
+      CHECK_COMMAND=${CUSTOM_CHECK:-curl -s http://$PRIVATE_IP:$PORT}
 
-    CUSTOM_CHECK_INTERVAL=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK_INTERVAL)
-    CHECK_INTERVAL=${CUSTOM_CHECK_INTERVAL:-'15s'}
+      CUSTOM_CHECK_INTERVAL=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK_INTERVAL)
+      CHECK_INTERVAL=${CUSTOM_CHECK_INTERVAL:-15s}
 
-    if echo $TAGS | grep -q 'http'
-    then
-      CHECK=",\"check\": {\"script\": \"$CHECK_COMMAND\",\"interval\": \"$CHECK_INTERVAL\"}"
+      if echo $TAGS | grep -q 'http'
+      then
+        CHECK=",\"check\": {\"script\": \"$CHECK_COMMAND\",\"interval\": \"$CHECK_INTERVAL\"}"
+      else
+        CHECK=""
+      fi
+      PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
+      /usr/bin/consulkv service:set "$PAYLOAD"
     else
-      CHECK=""
+      echo "Usage: octo service:set {container} {port} {tags}"
     fi
-    PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
-    /usr/bin/consulkv service:set "$PAYLOAD"
-  else
-    echo "Usage: octo service:set {container} {port} {tags}"
-  fi
   ;;
 
   service:rm)
-  if [[ $2 && $3 ]]; then
-    CONTAINER="$2"
-    PORT="$3"
-    /usr/bin/consulkv service:del "$CONTAINER-$PORT"
-  else
-    echo "Usage: octo service:rm {container} {port}"
-  fi
+    if [[ $2 && $3 ]]; then
+      CONTAINER="$2"
+      PORT="$3"
+      /usr/bin/consulkv service:del "$CONTAINER-$PORT"
+    else
+      echo "Usage: octo service:rm {container} {port}"
+    fi
   ;;
 
   service:tags)
-  if [ $2 ]; then
-    for tag in $(sudo docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
-      if echo $tag | grep -q "CONSUL_TAGS"
-      then
-        TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
-      fi
-    done
-    echo $TAG
-  fi
+    if [ $2 ]; then
+      for tag in $(sudo docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
+        if echo $tag | grep -q "CONSUL_TAGS"
+        then
+          TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
+        fi
+      done
+      echo $TAG
+    fi
   ;;
 
   services)
-  /usr/bin/consulkv services
+    /usr/bin/consulkv services
   ;;
 
   services:catalog)
-  /usr/bin/consulkv services:catalog
+    /usr/bin/consulkv services:catalog
   ;;
 
   services:register)
-  for container in $(sudo docker ps | grep $BUILD_ORG_NAME | awk '{ print $1 }'); do
-    ID=$container
-    PORT=$(inspect_to_get_external_port)
-    BASE=$(inspect_to_get_container_name)
-    TAGS=$(/usr/bin/octo service:tags $ID)
-    if [[ $BASE && $PORT ]]
-    then
-      /usr/bin/octo service:set $BASE $PORT $TAGS
-    fi
-  done
+    for container in $(sudo docker ps | grep $BUILD_ORG_NAME | awk '{ print $1 }'); do
+      ID=$container
+      PORT=$(inspect_to_get_external_port)
+      BASE=$(inspect_to_get_container_name)
+      TAGS=$(/usr/bin/octo service:tags $ID)
+      if [[ $BASE && $PORT ]]; then
+        /usr/bin/octo service:set $BASE $PORT $TAGS
+      fi
+    done
   ;;
 
   services:clear)
-  for container in $(sudo docker ps -q ); do
-    ID=$container
-    PORT=$(inspect_to_get_external_port)
-    BASE=$(inspect_to_get_container_name)
-    if [[ $BASE && $PORT ]]
-    then
-      /usr/bin/octo service:rm $BASE $PORT
-    fi
-  done
-  # Remove HTTP tagged orphans from crashed containers.
-  for service in $(/usr/bin/octo services); do
-    if echo $service | grep -q 'http'
-    then
-      ID=$(echo $service | jq .ID | cut -d '"' -f 2)
-      PORT=$(echo $ID | grep -o [0-9]*$)
-      BASE=${ID%-$PORT}
-      /usr/bin/octo service:rm $BASE $PORT
-    fi
-  done
+    for container in $(sudo docker ps -q ); do
+      ID=$container
+      PORT=$(inspect_to_get_external_port)
+      BASE=$(inspect_to_get_container_name)
+      if [[ $BASE && $PORT ]]; then
+        /usr/bin/octo service:rm $BASE $PORT
+      fi
+    done
+    # Remove HTTP tagged orphans from crashed containers.
+    for service in $(/usr/bin/octo services); do
+      if echo $service | grep -q 'http'
+      then
+        ID=$(echo $service | jq .ID | cut -d '"' -f 2)
+        PORT=$(echo $ID | grep -o [0-9]*$)
+        BASE=${ID%-$PORT}
+        /usr/bin/octo service:rm $BASE $PORT
+      fi
+    done
   ;;
 
   domains:set)
-  if [[ $2 && $3 ]]; then
-    DOMAINS=$(get_unique_domains $3)
-    /usr/bin/consulkv set $CONSUL_PREFIX/$2/DOMAINS "$DOMAINS"
-  else
-    echo "Usage: octo domains:set {container} {domains}"
-    echo "Domains are space separated."
-  fi
+    if [[ $2 && $3 ]]; then
+      DOMAINS=$(get_unique_domains $3)
+      /usr/bin/consulkv set $CONSUL_PREFIX/$2/DOMAINS "$DOMAINS"
+    else
+      echo "Usage: octo domains:set {container} {domains}"
+      echo "Domains are space separated."
+    fi
   ;;
 
   domains:get)
-  if [ $2 ]; then
-    /usr/bin/consulkv get $CONSUL_PREFIX/$2/DOMAINS
-  else
-    echo "Usage: octo domains:get {container}"
-  fi
+    if [ $2 ]; then
+      /usr/bin/consulkv get $CONSUL_PREFIX/$2/DOMAINS
+    else
+      echo "Usage: octo domains:get {container}"
+    fi
   ;;
 
   config:consul_template)
     BASE="$2"
     # If there isn't a template already, copy the template and set the name.
     NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
-    if [ ! -f $NGINX_TEMPLATE ]
-      then
+    if [ ! -f $NGINX_TEMPLATE ]; then
       sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
       sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
     fi
     # If there isn't a Consul template config already, copy and update.
     CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
-    if [ ! -f $CONSUL_CONFIG ]
-      then
+    if [ ! -f $CONSUL_CONFIG ]; then
       sudo cp /etc/nginx/template.cfg $CONSUL_CONFIG
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_CONFIG
     fi
     # If there isn't a Consul service watch, copy, update and reload consul.
     CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
-    if [ ! -f $CONSUL_WATCH_JSON ]
-      then
+    if [ ! -f $CONSUL_WATCH_JSON ]; then
       sudo cp /etc/nginx/template.watch $CONSUL_WATCH_JSON
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_JSON
       sudo service consul reload
     fi
     # If there isn't a Consul KV watch, copy, update and reload consul.
     CONSUL_WATCH_KV_JSON="/etc/consul.d/watch-kv-$BASE.json"
-    if [ ! -f $CONSUL_WATCH_KV_JSON ]
-      then
+    if [ ! -f $CONSUL_WATCH_KV_JSON ]; then
       sudo cp /etc/nginx/template.kv.watch $CONSUL_WATCH_KV_JSON
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_KV_JSON
       sudo service consul reload
@@ -490,196 +483,196 @@ case "$1" in
   ;;
 
   status)
-  cd $SRC_DIR
-  for i in *.git; do
-    site=`basename $i .git`
-    echo -n "$site: "
-    if (/usr/bin/consulkv service:health $site | grep -q "passing"); then
-      echo -e "\e[32mOK\e[0m"
-    else
-      echo -e "\e[31mDOWN\e[0m"
-    fi
-  done
+    cd $SRC_DIR
+    for i in *.git; do
+      site=`basename $i .git`
+      echo -n "$site: "
+      if (/usr/bin/consulkv service:health $site | grep -q "passing"); then
+        echo -e "\e[32mOK\e[0m"
+      else
+        echo -e "\e[31mDOWN\e[0m"
+      fi
+    done
   ;;
 
   clean)
-  echo "Cleaning old exited containers."
-  # TODO: Errors if there's no containers - annoying.
-  sudo docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker rm
-  echo "Showing all remaining containers."
-  sudo docker ps -a
-  echo "Cleaning out all unused images."
-  sudo docker images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker rmi
-  echo "Showing all remaining images."
-  sudo docker images
+    echo "Cleaning old exited containers."
+    # TODO: Errors if there's no containers - annoying.
+    sudo docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker rm
+    echo "Showing all remaining containers."
+    sudo docker ps -a
+    echo "Cleaning out all unused images."
+    sudo docker images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker rmi
+    echo "Showing all remaining images."
+    sudo docker images
   ;;
 
   remove)
-  if [ $2 ]; then
-    BASE="$2"
-    # Remove the Consul watch.
-    /usr/bin/octo remove:consul_watch $BASE
-    if [ -d /home/git/$BASE.git ]; then
-      sudo rm -rf /home/git/$BASE.git
+    if [ $2 ]; then
+      BASE="$2"
+      # Remove the Consul watch.
+      /usr/bin/octo remove:consul_watch $BASE
+      if [ -d /home/git/$BASE.git ]; then
+        sudo rm -rf /home/git/$BASE.git
+      else
+        echo "There is no source with that name."
+        exit
+      fi
+      if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
+      echo "Removed the source for $BASE."
+      /usr/bin/octo stop $BASE
     else
-      echo "There is no source with that name."
-      exit
+      echo "Usage: octo remove {container}"
     fi
-    if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
-    echo "Removed the source for $BASE."
-    /usr/bin/octo stop $BASE
-  else
-    echo "Usage: octo remove {container}"
-  fi
   ;;
 
   remove:config)
-  if [ $2 ]; then
-    BASE="$2"
-    # Remove the nginx config.
-    NGINX_CONFIG="/etc/nginx/containers/$BASE.conf"
-    if [ -f $NGINX_CONFIG ]; then
-      sudo rm -f $NGINX_CONFIG
-      sudo service proxy reload
+    if [ $2 ]; then
+      BASE="$2"
+      # Remove the nginx config.
+      NGINX_CONFIG="/etc/nginx/containers/$BASE.conf"
+      if [ -f $NGINX_CONFIG ]; then
+        sudo rm -f $NGINX_CONFIG
+        sudo service proxy reload
+      fi
+      # Remove the nginx template.
+      NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
+      if [ -f $NGINX_TEMPLATE ]; then
+        sudo rm -f $NGINX_TEMPLATE
+      fi
+      # Remove the Consul template config.
+      CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
+      if [ -f $CONSUL_CONFIG ]; then
+        sudo rm -f $CONSUL_CONFIG
+      fi
+      # Remove the Consul Watches.
+      /usr/bin/octo remove:consul_watch $BASE
+      # Remove the kv data.
+      /usr/bin/octo config:rm $BASE
+    else
+      echo "Usage: octo remove:config {container}"
     fi
-    # Remove the nginx template.
-    NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
-    if [ -f $NGINX_TEMPLATE ]; then
-      sudo rm -f $NGINX_TEMPLATE
-    fi
-    # Remove the Consul template config.
-    CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
-    if [ -f $CONSUL_CONFIG ]; then
-      sudo rm -f $CONSUL_CONFIG
-    fi
-    # Remove the Consul Watches.
-    /usr/bin/octo remove:consul_watch $BASE
-    # Remove the kv data.
-    /usr/bin/octo config:rm $BASE
-  else
-    echo "Usage: octo remove:config {container}"
-  fi
   ;;
 
   remove:consul_watch)
-  if [ $2 ]; then
-    BASE="$2"
-    CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
-    CONSUL_WATCH_KV_JSON="/etc/consul.d/watch-kv-$BASE.json"
-    if [ -f $CONSUL_WATCH_JSON ]; then
-      sudo rm -f $CONSUL_WATCH_JSON
+    if [ $2 ]; then
+      BASE="$2"
+      CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
+      CONSUL_WATCH_KV_JSON="/etc/consul.d/watch-kv-$BASE.json"
+      if [ -f $CONSUL_WATCH_JSON ]; then
+        sudo rm -f $CONSUL_WATCH_JSON
+      fi
+      if [ -f $CONSUL_WATCH_KV_JSON ]; then
+        sudo rm -f $CONSUL_WATCH_KV_JSON
+      fi
+      sudo service consul reload
+      echo "Removed any watches and reloaded Consul."
+    else
+      echo "Usage: octo remove:consul_watch {container}"
     fi
-    if [ -f $CONSUL_WATCH_KV_JSON ]; then
-      sudo rm -f $CONSUL_WATCH_KV_JSON
-    fi
-    sudo service consul reload
-    echo "Removed any watches and reloaded Consul."
-  else
-    echo "Usage: octo remove:consul_watch {container}"
-  fi
   ;;
 
   move:sites)
-  if [ $2 ]; then
-    # Grab all of the sites.
-    sudo /usr/bin/rsync -avz ubuntu@$2:/home/git/*.git /home/git/
-    cd /home/git
-    for i in *.git; do
-      site=`basename $i .git`
-      /usr/bin/octo restart $site
-      # Need a checkout and not a bare repo to build with later.
-      sudo git clone /home/git/$site.git $SRC_DIR/$site.git
-    done
-    sudo chown -R git.git $SRC_DIR
-  else
-    echo "Usage: octo move:sites {ip-address}'"
-  fi
+    if [ $2 ]; then
+      # Grab all of the sites.
+      sudo /usr/bin/rsync -avz ubuntu@$2:/home/git/*.git /home/git/
+      cd /home/git
+      for i in *.git; do
+        site=`basename $i .git`
+        /usr/bin/octo restart $site
+        # Need a checkout and not a bare repo to build with later.
+        sudo git clone /home/git/$site.git $SRC_DIR/$site.git
+      done
+      sudo chown -R git.git $SRC_DIR
+    else
+      echo "Usage: octo move:sites {ip-address}'"
+    fi
   ;;
 
   move:config)
-  if [ $2 ]; then
-    ssh `whoami`@$2 "octo config:export" | bash
-    echo "## Done moving the config from $2. ##"
-    octo config:export
-  else
-    echo "Usage: octo move:config {ip-address}"
-  fi
+    if [ $2 ]; then
+      ssh `whoami`@$2 "octo config:export" | bash
+      echo "## Done moving the config from $2. ##"
+      octo config:export
+    else
+      echo "Usage: octo move:config {ip-address}"
+    fi
   ;;
 
   move:redis)
-  if [[ $2 && $3 ]]; then
-    WHOAMI=`whoami`
-    ssh -f -N -L 9999:127.0.01:$3 $WHOAMI@$2
-    python /usr/local/bin/redis-copy.py -s 127.0.0.1:9999 -t 127.0.0.1:$3 -d 0 --clean
-    python /usr/local/bin/redis-copy.py -s 127.0.0.1:9999 -t 127.0.0.1:$3 -d 0
-    ps auwx | grep "$WHOAMI@$2" | awk '{ print $2 }' | xargs kill
-  else
-    echo "Usage: octo move:redis {ip-address} {port}"
-  fi
+    if [[ $2 && $3 ]]; then
+      WHOAMI=`whoami`
+      ssh -f -N -L 9999:127.0.01:$3 $WHOAMI@$2
+      python /usr/local/bin/redis-copy.py -s 127.0.0.1:9999 -t 127.0.0.1:$3 -d 0 --clean
+      python /usr/local/bin/redis-copy.py -s 127.0.0.1:9999 -t 127.0.0.1:$3 -d 0
+      ps auwx | grep "$WHOAMI@$2" | awk '{ print $2 }' | xargs kill
+    else
+      echo "Usage: octo move:redis {ip-address} {port}"
+    fi
   ;;
 
   restart)
-  if [ $2 ]; then
-    show_break
-    echo "Restarting $2."
-    newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
-    branch=`cd /home/git/$2.git; git branch | grep "*" | cut -d ' ' -f 2`
-    cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
-    sudo rm -rf $SRC_DIR/$2
-  else
-    echo "Usage: octo restart {container}"
-  fi
+    if [ $2 ]; then
+      show_break
+      echo "Restarting $2."
+      newrev=`cd /home/git/$2.git; git log . | head -1 | cut -d ' ' -f 2`
+      branch=`cd /home/git/$2.git; git branch | grep "*" | cut -d ' ' -f 2`
+      cd /home/git/$2.git; sudo git archive $newrev | /home/git/receiver "$2" "$newrev" "git" "NOTHING HERE" "$branch"
+      sudo rm -rf $SRC_DIR/$2
+    else
+      echo "Usage: octo restart {container}"
+    fi
   ;;
 
   reload)
-  if [ $2 ]; then
-    BASE="$2"
-    NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
-    NUM_CONTAINERS=${NUM_CONTAINERS:-1}
+    if [ $2 ]; then
+      BASE="$2"
+      NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
+      NUM_CONTAINERS=${NUM_CONTAINERS:-1}
 
-    /usr/bin/octo stop $BASE
-    /usr/bin/octo start $BASE $NUM_CONTAINERS
-  else
-    echo "Usage: octo reload {container}"
-  fi
+      /usr/bin/octo stop $BASE
+      /usr/bin/octo start $BASE $NUM_CONTAINERS
+    else
+      echo "Usage: octo reload {container}"
+    fi
   ;;
 
   push)
-  if [ $2 ]; then
-    BASE="$2"
-    if [ -n "$PRIVATE_REGISTRY" ]; then
-      sudo docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
-      sudo docker push $PRIVATE_REGISTRY/$BASE
+    if [ $2 ]; then
+      BASE="$2"
+      if [ -n "$PRIVATE_REGISTRY" ]; then
+        sudo docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
+        sudo docker push $PRIVATE_REGISTRY/$BASE
+      else
+        echo "This feature requires a private registry."
+      fi
     else
-      echo "This feature requires a private registry."
+      echo "Usage: octo push {container}"
     fi
-  else
-    echo "Usage: octo push {container}"
-  fi
   ;;
 
   pull)
-  if [ $2 ]; then
-    BASE="$2"
-    if [ -n "$PRIVATE_REGISTRY" ]; then
-      sudo docker pull $PRIVATE_REGISTRY/$BASE
-      sudo docker tag $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
+    if [ $2 ]; then
+      BASE="$2"
+      if [ -n "$PRIVATE_REGISTRY" ]; then
+        sudo docker pull $PRIVATE_REGISTRY/$BASE
+        sudo docker tag $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
+      else
+        echo "This feature requires a private registry."
+      fi
     else
-      echo "This feature requires a private registry."
+      echo "Usage: octo pull {container}"
     fi
-  else
-    echo "Usage: octo pull {container}"
-  fi
   ;;
 
   update)
-  echo "Updating your /usr/bin/octo from $OCTO_BIN"
-  cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
+    echo "Updating your /usr/bin/octo from $OCTO_BIN"
+    cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
   ;;
 
   help|-h|--help)
-  echo "Usage: octo status|clean|restart|reload|remove|move|config|logspout|logs|update"
-  cat<<EOF
+    echo "Usage: octo status|clean|restart|reload|remove|move|config|logspout|logs|update"
+    cat<<EOF
 
   octo status                              Show basic app status: OK or DOWN.
   octo clean                               Remove unused and stopped containers.
@@ -722,14 +715,14 @@ case "$1" in
 
   octo update                              Update octo command from $OCTO_BIN.
 EOF
-  for script in $(ls -d /usr/local/octohost/plugins/*/commands); do
-    $script "$@"
-  done
+    for script in $(ls -d /usr/local/octohost/plugins/*/commands); do
+      $script "$@"
+    done
   ;;
 
   *)
-  for script in $(ls -d /usr/local/octohost/plugins/*/commands); do
-    $script "$@"
-  done
+    for script in $(ls -d /usr/local/octohost/plugins/*/commands); do
+      $script "$@"
+    done
   ;;
 esac
