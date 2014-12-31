@@ -4,22 +4,6 @@ if [ -f /etc/default/octohost ]; then
   . /etc/default/octohost
 fi
 
-get_short_container_id ()
-{
-  sudo docker ps | grep "$BUILD_ORG_NAME/$1:latest" | cut -d ' ' -f 1
-}
-
-get_long_container_id ()
-{
-  sudo docker inspect $1 | jq '.[0].ID' | cut -d '"' -f 2
-}
-
-reformat_bytes ()
-{
-  (( size = $1/1024/1024 ))
-  echo "$size"
-}
-
 show_break ()
 {
   echo ""
@@ -76,18 +60,6 @@ check_syslog_port ()
     echo "Need to define REMOTE_SYSLOG_PORT in /etc/default/octohost"
     exit 1
   fi
-}
-
-get_exposed_port ()
-{
-  INTERNAL_PORT=$(grep -i "^EXPOSE" $DOCKERFILE | cut -d ' ' -f 2)
-  echo $INTERNAL_PORT
-}
-
-get_external_port()
-{
-  PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
-  echo $PORT
 }
 
 inspect_to_get_external_port()
