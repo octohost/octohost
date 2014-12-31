@@ -132,7 +132,7 @@ fi
 /usr/bin/octo domains:set $BASE $DOMAINS
 
 NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
-if [ -z "$NUM_CONTAINERS" ]; then NUM_CONTAINERS="1"; fi
+NUM_CONTAINERS=${NUM_CONTAINERS:-1}
 
 # Launch more containers based on the KV set.
 if [ "$NUM_CONTAINERS" -gt "1" ]

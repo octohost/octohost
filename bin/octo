@@ -163,8 +163,6 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       TAGS=$(/usr/bin/octo service:tags $ID)
       /usr/bin/octo service:set $BASE $PORT $TAGS
-      # Removing this for now - depending on the watch.
-      # /usr/bin/octo config:consul_template $BASE
     done
   else
     echo "Usage: octo start {container}"
@@ -186,8 +184,6 @@ case "$1" in
       PORT=$(inspect_to_get_external_port)
       sudo docker kill "$ID" > /dev/null
       octo service:rm "$BASE" "$PORT"
-      # Removing this for now - depending on the watch.
-      # /usr/bin/octo config:consul_template $BASE
     done
   else
     echo "Usage: octo stop {container}"
@@ -349,20 +345,10 @@ case "$1" in
     TAGS=${4:-http}
 
     CUSTOM_CHECK=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK)
-    if [ -z "$CUSTOM_CHECK" ]
-    then
-      CHECK_COMMAND="curl -s http://$PRIVATE_IP:$PORT"
-    else
-      CHECK_COMMAND="$CUSTOM_CHECK"
-    fi
+    CHECK_COMMAND=${CUSTOM_CHECK:-'curl -s http://$PRIVATE_IP:$PORT'}
 
     CUSTOM_CHECK_INTERVAL=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK_INTERVAL)
-    if [ -z "$CUSTOM_CHECK_INTERVAL" ]
-    then
-      CHECK_INTERVAL="15s"
-    else
-      CHECK_INTERVAL="$CUSTOM_CHECK_INTERVAL"
-    fi
+    CHECK_INTERVAL=${CUSTOM_CHECK_INTERVAL:-'15s'}
 
     if echo $TAGS | grep -q 'http'
     then
@@ -649,7 +635,7 @@ case "$1" in
   if [ $2 ]; then
     BASE="$2"
     NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
-    if [ -z "$NUM_CONTAINERS" ]; then NUM_CONTAINERS="1"; fi
+    NUM_CONTAINERS=${NUM_CONTAINERS:-1}
 
     /usr/bin/octo stop $BASE
     /usr/bin/octo start $BASE $NUM_CONTAINERS
