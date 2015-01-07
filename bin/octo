@@ -110,7 +110,8 @@ get_unique_domains ()
 
   rm -f $SCRATCH
 
-  echo "$FINAL_DOMAINS"
+  # Trim the first space.
+  echo "${FINAL_DOMAINS/ /}"
 }
 
 case "$1" in
@@ -522,6 +523,7 @@ case "$1" in
       if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
       echo "Removed the source for $BASE."
       /usr/bin/octo stop $BASE
+      /usr/bin/octo remove:nginx_config $BASE
     else
       echo "Usage: octo remove {container}"
     fi
@@ -531,11 +533,7 @@ case "$1" in
     if [ $2 ]; then
       BASE="$2"
       # Remove the nginx config.
-      NGINX_CONFIG="/etc/nginx/containers/$BASE.conf"
-      if [ -f $NGINX_CONFIG ]; then
-        sudo rm -f $NGINX_CONFIG
-        sudo service proxy reload
-      fi
+      /usr/bin/octo remove:nginx_config $BASE
       # Remove the nginx template.
       NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
       if [ -f $NGINX_TEMPLATE ]; then
@@ -570,6 +568,18 @@ case "$1" in
       echo "Removed any watches and reloaded Consul."
     else
       echo "Usage: octo remove:consul_watch {container}"
+    fi
+  ;;
+
+  remove:nginx_config)
+    if [ $2 ]; then
+      BASE="$2"
+      # Remove the nginx config.
+      NGINX_CONFIG="/etc/nginx/containers/$BASE.conf"
+      if [ -f $NGINX_CONFIG ]; then
+        sudo rm -f $NGINX_CONFIG
+        sudo service proxy reload
+      fi
     fi
   ;;
 
