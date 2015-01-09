@@ -434,7 +434,7 @@ case "$1" in
 
   services:remove)
     if [ $2 ]; then
-      for service in $(/usr/bin/octo services | grep "$2"); do
+      for service in $(/usr/bin/octo services | grep "\"Service\":\"$2\""); do
         if echo $service | grep -q 'http'
           then
           ID=$(echo $service | jq .ID | cut -d '"' -f 2)
