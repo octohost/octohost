@@ -186,6 +186,7 @@ case "$1" in
         sudo docker kill "$ID" > /dev/null
         octo service:rm "$BASE" "$PORT"
       done
+      /usr/bin/octo services:remove "$BASE"
     else
       echo "Usage: octo stop {container}"
     fi
@@ -415,15 +416,36 @@ case "$1" in
       fi
     done
     # Remove HTTP tagged orphans from crashed containers.
+    /usr/bin/octo services:remove_all
+  ;;
+
+  services:remove_all)
+    # Remove HTTP tagged orphans from crashed containers.
     for service in $(/usr/bin/octo services); do
       if echo $service | grep -q 'http'
-      then
+        then
         ID=$(echo $service | jq .ID | cut -d '"' -f 2)
         PORT=$(echo $ID | grep -o [0-9]*$)
         BASE=${ID%-$PORT}
         /usr/bin/octo service:rm $BASE $PORT
       fi
     done
+  ;;
+
+  services:remove)
+    if [ $2 ]; then
+      for service in $(/usr/bin/octo services | grep "$2"); do
+        if echo $service | grep -q 'http'
+          then
+          ID=$(echo $service | jq .ID | cut -d '"' -f 2)
+          PORT=$(echo $ID | grep -o [0-9]*$)
+          BASE=${ID%-$PORT}
+          /usr/bin/octo service:rm $BASE $PORT
+        fi
+      done
+    else
+      echo "Usage: octo services:remove {container}"
+    fi
   ;;
 
   domains:set)
