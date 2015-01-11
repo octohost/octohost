@@ -313,6 +313,7 @@ case "$1" in
       RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
     done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
 
+
     while read -r PORTS_FROM_HOST ; do
     if [ -n "$PORTS_FROM_HOST" ]
     then
@@ -329,6 +330,23 @@ case "$1" in
       RUN_OPTIONS=" -P $RUN_OPTIONS"
     fi 
 
+    # Support a CNAME file in repo src
+    # and if there supply the -h option to docker run
+    CNAME=/home/git/src/$REPOSITORY/CNAME
+    if [ -f $CNAME ]
+    then
+      # Add a new line at end if it does not exist to ensure the loop gets last line
+      sed -i -e '$a\' $CNAME
+      while read DOMAIN
+      do
+        echo "Adding $LINK_PREFIX://$DOMAIN"
+        HOSTNAME="$DOMAIN"
+      done < $CNAME
+    fi
+    if [ -n "$HOSTNAME" ]
+    then
+      RUN_OPTIONS=" -h $HOSTNAME $RUN_OPTIONS"
+    fi 
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
     if [ -n "$FOUND_LINKS" ]; then
