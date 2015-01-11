@@ -302,8 +302,6 @@ case "$1" in
     fi
 
     while read -r MOUNT_FROM_HOST ; do
-    if [ -n "$MOUNT_FROM_HOST" ]
-    then
       HOST_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $3 }')
       CONTAINER_PATH=$(echo $MOUNT_FROM_HOST | awk '{ print $4 }')
       if [ -n "$CONTAINER_PATH" ]
@@ -313,9 +311,7 @@ case "$1" in
         MOUNT_PATH="$HOST_PATH:$HOST_PATH"
       fi
       RUN_OPTIONS=" -v $MOUNT_PATH $RUN_OPTIONS"
-    fi
     done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
-
 
     while read -r PORTS_FROM_HOST ; do
     if [ -n "$PORTS_FROM_HOST" ]
