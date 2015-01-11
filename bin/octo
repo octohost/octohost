@@ -309,7 +309,7 @@ case "$1" in
 
     # Support a CNAME file in repo src
     # and if there supply the -h option to docker run
-    CNAME=$REPO_PATH/CNAME
+    CNAME="/home/git/src/${BASE}.git/CNAME"
     if [ -f $CNAME ]
     then
       # Add a new line at end if it does not exist to ensure the loop gets last line
