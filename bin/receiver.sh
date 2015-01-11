@@ -5,7 +5,7 @@ BRANCH="$5"
 if [ "$REPOSITORY" == "" ] ; then
   echo "Something is wrong. Your Repository name is blank!"
   exit 1
-fi 
+fi
 
 if [ -f /etc/default/octohost ]; then
   . /etc/default/octohost
@@ -132,7 +132,7 @@ fi
 /usr/bin/octo domains:set $BASE $DOMAINS
 
 NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
-if [ -z "$NUM_CONTAINERS" ]; then NUM_CONTAINERS="1"; fi
+NUM_CONTAINERS=${NUM_CONTAINERS:-1}
 
 # Launch more containers based on the KV set.
 if [ "$NUM_CONTAINERS" -gt "1" ]
@@ -149,7 +149,7 @@ else
   echo "Not killing any containers."
 fi
 
-/usr/bin/octo config:proxy
+/usr/bin/octo config:consul_template $BASE
 
 if [ -n "$XIP_IO" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$XIP_IO";fi
 if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX";fi
