@@ -69,26 +69,6 @@ then
     exit
   fi
 
-  if [ -z "$PORT" ]
-  then
-    echo "#################################################"
-    echo "Something went wrong, trying again."
-    echo "Killing the container we just launched."
-    sudo docker kill $ID > /dev/null
-    echo "Launching a new one"
-    ID=$(echo "$RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | xargs sudo docker run)
-    PORT=$(sudo docker port $ID $INTERNAL_PORT | sed 's/0.0.0.0://')
-    if [ -z "$PORT" ]
-    then
-      echo "docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | mail -s "$BASE failed to launch on $PUBLIC_IP" $EMAIL_NOTIFICATION
-    else
-      echo "docker run $RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | mail -s "$BASE launched on the second try on $PUBLIC_IP" $EMAIL_NOTIFICATION
-    fi
-    echo "#################################################"
-  else
-    echo "Everything looks good."
-  fi
-
 else
   echo "There is no Dockerfile present."
   exit
