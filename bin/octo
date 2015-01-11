@@ -316,7 +316,6 @@ case "$1" in
       # sed -i -e '$a\' $CNAME
       while read DOMAIN
       do
-        echo "Adding $LINK_PREFIX://$DOMAIN"
         CONTAINER_HOSTNAME="$DOMAIN"
       done < $CNAME
     fi
