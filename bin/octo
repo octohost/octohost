@@ -340,12 +340,12 @@ case "$1" in
       while read DOMAIN
       do
         echo "Adding $LINK_PREFIX://$DOMAIN"
-        HOSTNAME="$DOMAIN"
+        CONTAINER_HOSTNAME="$DOMAIN"
       done < $CNAME
     fi
-    if [ -n "$HOSTNAME" ]
+    if [ -n "$CONTAINER_HOSTNAME" ]
     then
-      RUN_OPTIONS=" -h $HOSTNAME $RUN_OPTIONS"
+      RUN_OPTIONS=" -h $CONTAINER_HOSTNAME $RUN_OPTIONS"
     fi 
 
     FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
