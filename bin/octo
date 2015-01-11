@@ -319,7 +319,13 @@ case "$1" in
     then
       HOST_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $3 }')
       CONTAINER_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $4 }')
-      NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+      CONTAINER_ADDRESS=$(echo $PORTS_FROM_HOST | awk '{ print $5 }')
+      if [ -n "$CONTAINER_ADDRESS" ]
+      then
+        NEW_PORT="$CONTAINER_ADDRESS:$HOST_PORT:$CONTAINER_PORT"
+      else
+        NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+      fi
       PORT_OPTIONS=" -p $NEW_PORT $PORT_OPTIONS"
     fi
     done < <(grep -i '^# PORTS_FROM_HOST' $DOCKERFILE )
