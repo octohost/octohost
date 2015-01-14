@@ -357,7 +357,7 @@ case "$1" in
       else
         CHECK=""
       fi
-      PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
+      PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}}"
       /usr/bin/consulkv service:set "$PAYLOAD"
     else
       echo "Usage: octo service:set {container} {port} {tags}"
