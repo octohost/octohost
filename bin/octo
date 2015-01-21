@@ -264,7 +264,7 @@ case "$1" in
       ADD_NAME=$(grep -i "^# ADD_NAME" $DOCKERFILE)
       if [ -n "$ADD_NAME" ]
       then
-        RUN_OPTIONS="$RUN_OPTIONS -name $BASE"
+        RUN_OPTIONS="$RUN_OPTIONS --name $BASE"
       fi
 
       VOLUMES_FROM=$(grep -i "^# VOLUMES_FROM" $DOCKERFILE)
