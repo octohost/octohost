@@ -186,7 +186,9 @@ case "$1" in
         sudo docker kill "$ID" > /dev/null
         octo service:rm "$BASE" "$PORT"
       done
-      /usr/bin/octo services:remove "$BASE"
+      if [ -z $IMAGE_ID ]; then
+        /usr/bin/octo services:remove "$BASE"
+      fi
     else
       echo "Usage: octo stop {container}"
     fi
