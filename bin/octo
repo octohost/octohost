@@ -295,7 +295,13 @@ case "$1" in
       then
         HOST_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $3 }')
         CONTAINER_PORT=$(echo $PORTS_FROM_HOST | awk '{ print $4 }')
+      CONTAINER_ADDRESS=$(echo $PORTS_FROM_HOST | awk '{ print $5 }')
+      if [ -n "$CONTAINER_ADDRESS" ]
+      then
+        NEW_PORT="$CONTAINER_ADDRESS:$HOST_PORT:$CONTAINER_PORT"
+      else
         NEW_PORT="0.0.0.0:$HOST_PORT:$CONTAINER_PORT"
+      fi
         PORT_OPTIONS=" -p $NEW_PORT $PORT_OPTIONS"
       fi
       done < <(grep -i '^# PORTS_FROM_HOST' $DOCKERFILE )
@@ -306,6 +312,22 @@ case "$1" in
         RUN_OPTIONS=" -P $RUN_OPTIONS"
       fi
 
+    # Support a CNAME file in repo src
+    # and if there supply the -h option to docker run
+    CNAME="/home/git/src/${BASE}.git/CNAME"
+    if [ -f $CNAME ]
+    then
+      # Add a new line at end if it does not exist to ensure the loop gets last line
+      # sed -i -e '$a\' $CNAME
+      while read DOMAIN
+      do
+        CONTAINER_HOSTNAME="$DOMAIN"
+      done < $CNAME
+    fi
+    if [ -n "$CONTAINER_HOSTNAME" ]
+    then
+      RUN_OPTIONS=" -h $CONTAINER_HOSTNAME $RUN_OPTIONS"
+    fi 
 
       FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
       if [ -n "$FOUND_LINKS" ]; then
