@@ -364,6 +364,14 @@ case "$1" in
   ;;
 
   service:set)
+    if [[ $2 ]]; then
+      set_src_variables "$2"
+      NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" $DOCKERFILE)
+      if [ -n "$NO_HTTP_PROXY" ]
+      then
+        exit 0
+      fi
+    fi
     if [[ $2 && $3 ]]; then
       CONTAINER="$2"
       PORT="$3"
