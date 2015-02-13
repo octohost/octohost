@@ -521,6 +521,12 @@ case "$1" in
 
   config:consul_template)
     BASE="$2"
+    if [[ $BASE ]]; then
+      NO_HTTP_PROXY=$(/usr/bin/octo config:check "$BASE" "NO_HTTP_PROXY")
+      if [ -n "$NO_HTTP_PROXY" ]; then
+        exit 0
+      fi
+    fi
     # If there isn't a template already, copy the template and set the name.
     NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
     if [ ! -f $NGINX_TEMPLATE ]; then
