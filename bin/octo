@@ -762,6 +762,16 @@ case "$1" in
     cd /usr/bin/ && rm -f octo && wget -q $OCTO_BIN && chmod 755 octo
   ;;
 
+  version)
+    echo "==== octohost version ===="
+    sudo cat /var/archive/version
+    echo "==== Docker Version ===="
+    sudo docker version
+    echo "==== Consul Version ===="
+    sudo consul version
+    echo "All source code for this installation is in /var/archive/"
+  ;;
+
   help|-h|--help)
     echo "Usage: octo status|clean|restart|reload|remove|move|config|logspout|logs|update"
     cat<<EOF
