@@ -763,13 +763,17 @@ case "$1" in
   ;;
 
   version)
-    echo "==== octohost version ===="
-    sudo cat /var/archive/version
+    if [ -f '/var/archive/version' ]; then
+      echo "==== octohost version ===="
+      sudo cat /var/archive/version
+    fi
     echo "==== Docker Version ===="
     sudo docker version
     echo "==== Consul Version ===="
     sudo consul version
-    echo "All source code for this installation is in /var/archive/"
+    if [ -d '/var/archive' ]; then
+      echo "All source code for this installation is in /var/archive/"
+    fi
   ;;
 
   help|-h|--help)
