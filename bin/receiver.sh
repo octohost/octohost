@@ -43,37 +43,42 @@ else
   exit
 fi
 
-if [ -n "$XIP_IO" ]
-then
-  echo "Adding $LINK_PREFIX://$BASE.$XIP_IO"
-  DOMAINS="$BASE.$XIP_IO"
-fi
+NO_HTTP_PROXY=$(/usr/bin/octo config:check "$BASE" "NO_HTTP_PROXY")
+if [ -z "$NO_HTTP_PROXY" ]; then
 
-if [ -n "$DOMAIN_SUFFIX" ]
-then
-  echo "Adding $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX"
   if [ -n "$XIP_IO" ]
   then
-    DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
-  else
-    DOMAINS="$BASE.$DOMAIN_SUFFIX"
+    echo "Adding $LINK_PREFIX://$BASE.$XIP_IO"
+    DOMAINS="$BASE.$XIP_IO"
   fi
-fi
 
-# Support a CNAME file in repo src
-CNAME=/home/git/src/$REPOSITORY/CNAME
-if [ -f $CNAME ]
-then
-  # Add a new line at end if it does not exist to ensure the loop gets last line
-  sed -i -e '$a\' $CNAME
-  while read DOMAIN
-  do
-    echo "Adding $LINK_PREFIX://$DOMAIN"
-    DOMAINS="$DOMAINS,$DOMAIN"
-  done < $CNAME
-fi
+  if [ -n "$DOMAIN_SUFFIX" ]
+  then
+    echo "Adding $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX"
+    if [ -n "$XIP_IO" ]
+    then
+      DOMAINS="$DOMAINS,$BASE.$DOMAIN_SUFFIX"
+    else
+      DOMAINS="$BASE.$DOMAIN_SUFFIX"
+    fi
+  fi
 
-/usr/bin/octo domains:set "$BASE" "$DOMAINS"
+  # Support a CNAME file in repo src
+  CNAME=/home/git/src/$REPOSITORY/CNAME
+  if [ -f $CNAME ]
+  then
+    # Add a new line at end if it does not exist to ensure the loop gets last line
+    sed -i -e '$a\' $CNAME
+    while read DOMAIN
+    do
+      echo "Adding $LINK_PREFIX://$DOMAIN"
+      DOMAINS="$DOMAINS,$DOMAIN"
+    done < $CNAME
+  fi
+
+  /usr/bin/octo domains:set "$BASE" "$DOMAINS"
+
+fi
 
 NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
 NUM_CONTAINERS=${NUM_CONTAINERS:-1}
@@ -90,8 +95,15 @@ fi
 
 /usr/bin/octo config:consul_template "$BASE"
 
-if [ -n "$XIP_IO" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$XIP_IO";fi
-if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX";fi
+NO_HTTP_PROXY=$(/usr/bin/octo config:check "$BASE" "NO_HTTP_PROXY")
+if [ -z "$NO_HTTP_PROXY" ]; then
+
+  if [ -n "$XIP_IO" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$XIP_IO";fi
+  if [ -n "$DOMAIN_SUFFIX" ]; then echo "Your site is available at: $LINK_PREFIX://$BASE.$DOMAIN_SUFFIX";fi
+
+else
+  echo "Your container isn't available from the web because you set NO_HTTP_PROXY."
+fi
 
 if [ -n "$PRIVATE_REGISTRY" ]; then
   echo "Pushing $BASE to a private registry."
