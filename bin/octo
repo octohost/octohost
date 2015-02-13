@@ -409,6 +409,12 @@ case "$1" in
   ;;
 
   service:rm)
+    if [[ $2 ]]; then
+      NO_HTTP_PROXY=$(/usr/bin/octo config:check "$2" "NO_HTTP_PROXY")
+      if [ -n "$NO_HTTP_PROXY" ]; then
+        exit 0
+      fi
+    fi
     if [[ $2 && $3 ]]; then
       CONTAINER="$2"
       PORT="$3"
