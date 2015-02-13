@@ -605,6 +605,7 @@ case "$1" in
       echo "Removed the source for $BASE."
       /usr/bin/octo stop $BASE
       /usr/bin/octo remove:nginx_config $BASE
+      /usr/bin/octo remove:consul_watch $BASE
     else
       echo "Usage: octo remove {container}"
     fi
