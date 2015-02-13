@@ -595,6 +595,7 @@ case "$1" in
       BASE="$2"
       # Remove the Consul watch.
       /usr/bin/octo remove:consul_watch $BASE
+      /usr/bin/octo stop $BASE
       if [ -d /home/git/$BASE.git ]; then
         sudo rm -rf /home/git/$BASE.git
       else
@@ -603,9 +604,7 @@ case "$1" in
       fi
       if [ -d $SRC_DIR/$BASE.git ]; then sudo rm -rf $SRC_DIR/$BASE.git; fi
       echo "Removed the source for $BASE."
-      /usr/bin/octo stop $BASE
       /usr/bin/octo remove:nginx_config $BASE
-      /usr/bin/octo remove:consul_watch $BASE
     else
       echo "Usage: octo remove {container}"
     fi
