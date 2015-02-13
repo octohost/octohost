@@ -327,7 +327,7 @@ case "$1" in
     if [ -n "$CONTAINER_HOSTNAME" ]
     then
       RUN_OPTIONS=" -h $CONTAINER_HOSTNAME $RUN_OPTIONS"
-    fi 
+    fi
 
       FOUND_LINKS=$(grep -i "^# LINK_SERVICE" $DOCKERFILE)
       if [ -n "$FOUND_LINKS" ]; then
@@ -363,12 +363,24 @@ case "$1" in
     fi
   ;;
 
+  config:check)
+    if [[ $2 && $3 ]]; then
+      set_src_variables "$2"
+      CONFIG_TO_CHECK="$3"
+      VALUE=$(grep -i "^# $CONFIG_TO_CHECK" $DOCKERFILE)
+      if [ -z "$VALUE" ]; then
+        VALUE=$(/usr/bin/consulkv get $CONSUL_PREFIX/$2/$CONFIG_TO_CHECK)
+      fi
+      echo $VALUE
+    else
+      echo "octo config:check {container} {var_to_check}"
+    fi
+  ;;
+
   service:set)
     if [[ $2 ]]; then
-      set_src_variables "$2"
-      NO_HTTP_PROXY=$(grep -i "^# NO_HTTP_PROXY" $DOCKERFILE)
-      if [ -n "$NO_HTTP_PROXY" ]
-      then
+      NO_HTTP_PROXY=$(/usr/bin/octo config:check "$2" "NO_HTTP_PROXY")
+      if [ -n "$NO_HTTP_PROXY" ]; then
         exit 0
       fi
     fi
