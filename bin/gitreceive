@@ -40,7 +40,7 @@ EOF
     ;;
 
 # Internal commands
-  run) 
+  run)
     export RECEIVE_USER=$2
     export RECEIVE_FINGERPRINT=$3
     # ssh provides the original requested command in $SSH_ORIGINAL_COMMAND
@@ -65,11 +65,12 @@ EOF
     while read oldrev newrev refname
     do
       if [[ $refname != "refs/heads/master" ]] ; then
-        BRANCH=$(echo $refname | cut -d '/' -f 3)
+        BRANCH=$(echo $refname | cut -d '/' -f 3-10)
+        BRANCH=${BRANCH//\//-}
       else
         BRANCH="master"
       fi
-      
+
       git archive $newrev | $GITHOME/receiver "$RECEIVE_REPO" "$newrev" "$RECEIVE_USER" "$RECEIVE_FINGERPRINT" "$BRANCH"
 
       rc=$?
