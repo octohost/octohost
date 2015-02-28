@@ -1,6 +1,19 @@
 #!/bin/bash
 REPOSITORY="$1"
 BRANCH="$5"
+BASE=`basename $REPOSITORY .git`
+
+log () {
+  local message="$1"
+  logger -p local4.info -t octohost "$message"
+}
+
+if [ "$BRANCH" != "master" ]
+then
+  BASE="$BASE-$BRANCH"
+  REPOSITORY="$BASE.git"
+fi
+echo "Base: $BASE"
 
 if [ "$REPOSITORY" == "" ] ; then
   echo "Something is wrong. Your Repository name is blank!"
@@ -15,13 +28,6 @@ if [ -d "$REPO_PATH" ]; then rm -rf "$REPO_PATH"; fi
 echo "Put repo in src format somewhere."
 mkdir -p "$REPO_PATH" && cat | tar -x -C "$REPO_PATH"
 echo "Building Docker image."
-BASE=`basename $REPOSITORY .git`
-
-if [ "$BRANCH" != "master" ]
-then
-  BASE="$BASE-$BRANCH"
-fi
-echo "Base: $BASE"
 
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
@@ -31,6 +37,7 @@ IMAGE_ID=$(sudo docker images | grep "$BUILD_ORG_NAME\/$BASE " | awk '{ print $3
 if [ -e "$DOCKERFILE" ]
 then
   sudo docker build -t $BUILD_ORG_NAME/$BASE $REPO_PATH
+  log "Build 'docker build -t $BUILD_ORG_NAME/$BASE $REPO_PATH'"
 
   if [ $? -ne 0 ]
   then

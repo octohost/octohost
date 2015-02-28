@@ -4,6 +4,14 @@ if [ -f /etc/default/octohost ]; then
   . /etc/default/octohost
 fi
 
+log () {
+  local message="$1"
+  #local level="${2:-info}"
+  logger -p local4.info -t octohost "$message"
+}
+
+log "Command='$0 $*'"
+
 show_break ()
 {
   echo ""
@@ -91,6 +99,7 @@ set_src_variables ()
   REPOSITORY="$BASE.git"
   REPO_PATH="$SRC_DIR/$REPOSITORY"
   DOCKERFILE="$REPO_PATH/Dockerfile"
+  log "Base: $BASE, Repo: $REPOSITORY, Path: $REPO_PATH, Dockerfile: $DOCKERFILE"
 }
 
 get_unique_domains ()
@@ -358,6 +367,7 @@ case "$1" in
         RUN_OPTIONS="$RUN_OPTIONS $ENV"
       fi
       echo "$RUN_OPTIONS"
+      log "Run Options: $RUN_OPTIONS"
     else
       echo "Something went wrong."
     fi
@@ -372,6 +382,7 @@ case "$1" in
         VALUE=$(/usr/bin/consulkv get $CONSUL_PREFIX/$2/$CONFIG_TO_CHECK)
       fi
       echo $VALUE
+      log "config:check '$CONFIG_TO_CHECK=$VALUE'"
     else
       echo "octo config:check {container} {var_to_check}"
     fi
@@ -403,6 +414,7 @@ case "$1" in
       fi
       PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
       /usr/bin/consulkv service:set "$PAYLOAD"
+      log "service:set '$PAYLOAD'"
     else
       echo "Usage: octo service:set {container} {port} {tags}"
     fi
@@ -433,6 +445,7 @@ case "$1" in
         fi
       done
       echo $TAG
+      log "service:tags '$TAGS'"
     fi
   ;;
 
@@ -505,6 +518,7 @@ case "$1" in
     if [[ $2 && $3 ]]; then
       DOMAINS=$(get_unique_domains $3)
       /usr/bin/consulkv set $CONSUL_PREFIX/$2/DOMAINS "$DOMAINS"
+      log "domains:set '$DOMAINS'"
     else
       echo "Usage: octo domains:set {container} {domains}"
       echo "Domains are space separated."
