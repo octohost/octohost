@@ -401,14 +401,14 @@ case "$1" in
       TAGS=${4:-http}
 
       CUSTOM_CHECK=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK)
-      CHECK_COMMAND=${CUSTOM_CHECK:-curl -s http://$PRIVATE_IP:$PORT}
+      CHECK_COMMAND=${CUSTOM_CHECK:-http://$PRIVATE_IP:$PORT}
 
       CUSTOM_CHECK_INTERVAL=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK_INTERVAL)
       CHECK_INTERVAL=${CUSTOM_CHECK_INTERVAL:-15s}
 
       if echo $TAGS | grep -q 'http'
       then
-        CHECK=",\"check\": {\"script\": \"$CHECK_COMMAND\",\"interval\": \"$CHECK_INTERVAL\"}"
+        CHECK=",\"check\": {\"http\": \"$CHECK_COMMAND\",\"interval\": \"$CHECK_INTERVAL\"}"
       else
         CHECK=""
       fi
