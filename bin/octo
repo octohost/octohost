@@ -547,9 +547,17 @@ case "$1" in
     fi
     # If there isn't a template already, copy the template and set the name.
     NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
-    if [ ! -f $NGINX_TEMPLATE ]; then
-      sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
-      sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
+    FORCE_SSL=$(/usr/bin/octo config:get $BASE/SSL_FORCED)
+    if [ -z "$FORCE_SSL" ]; then
+      if [ ! -f $NGINX_TEMPLATE ]; then
+        sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
+        sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
+      fi
+    else
+      if [ ! -f $NGINX_TEMPLATE ]; then
+        sudo cp /etc/nginx/templateSSL.ctmpl $NGINX_TEMPLATE
+        sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
+      fi
     fi
     # If there isn't a Consul template config already, copy and update.
     CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
