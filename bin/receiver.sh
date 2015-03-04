@@ -32,7 +32,13 @@ echo "Building Docker image."
 # Find out the old container ID.
 OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
 
-IMAGE_ID=$(sudo docker images | grep "$BUILD_ORG_NAME\/$BASE " | awk '{ print $3 }')
+if [ -n "$PRIVATE_REGISTRY" ]; then
+  IMAGE_NAME="$PRIVATE_REGISTRY\/$BASE"
+else
+  IMAGE_NAME="$BUILD_ORG_NAME\/$BASE"
+fi
+
+IMAGE_ID=$(sudo docker images | grep "$IMAGE_NAME " | awk '{ print $3 }')
 
 if [ -e "$DOCKERFILE" ]
 then

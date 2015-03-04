@@ -183,7 +183,11 @@ case "$1" in
     if [ $2 ]; then
       BASE="$2"
       if [ $3 ]; then
-        IMAGE_ID="$3"
+        if [ -n $PRIVATE_REGISTRY ]; then
+          IMAGE_ID="$PRIVATE_REGISTRY/$BASE"
+        else
+          IMAGE_ID="$3"
+        fi
         CONTAINERS=$(sudo docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
       else
         CONTAINERS=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
