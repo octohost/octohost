@@ -747,7 +747,7 @@ case "$1" in
     if [ $2 ]; then
       BASE="$2"
       if [ -n "$PRIVATE_REGISTRY" ]; then
-        sudo docker tag $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
+        sudo docker tag -f $BUILD_ORG_NAME/$BASE $PRIVATE_REGISTRY/$BASE
         sudo docker push $PRIVATE_REGISTRY/$BASE
       else
         echo "This feature requires a private registry."
