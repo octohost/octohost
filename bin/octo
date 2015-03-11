@@ -173,6 +173,7 @@ case "$1" in
         PORT=$(inspect_to_get_external_port)
         TAGS=$(/usr/bin/octo service:tags $ID)
         /usr/bin/octo service:set $BASE $PORT $TAGS
+        /usr/bin/octo add:upstart $BASE
       done
     else
       echo "Usage: octo start {container}"
@@ -591,6 +592,31 @@ case "$1" in
     sudo consul-template -config $CONSUL_CONFIG -once
   ;;
 
+  add:upstart)
+    if [ $2 ]; then
+      BASE="$2"
+      UPSTART_CONFIG="/etc/init/octohost-$BASE.conf"
+      if [ ! -f $UPSTART_CONFIG ]; then
+        sudo cp /etc/octohost/templates/upstart.conf $UPSTART_CONFIG
+        sudo sed -i "s/REPLACEME/$BASE/" $UPSTART_CONFIG
+      fi
+    else
+      echo "Usage: octo add:upstart {container}"
+    fi
+  ;;
+
+  remove:upstart)
+    if [ $2 ]; then
+      BASE="$2"
+      UPSTART_CONFIG="/etc/init/octohost-$BASE.conf"
+      if [ -f $UPSTART_CONFIG ]; then
+        sudo rm -f $UPSTART_CONFIG
+      fi
+    else
+      echo "Usage: octo remove:upstart {container}"
+    fi
+  ;;
+
   status)
     cd $SRC_DIR
     for i in *.git; do
@@ -621,6 +647,7 @@ case "$1" in
       BASE="$2"
       # Remove the Consul watch.
       /usr/bin/octo remove:consul_watch $BASE
+      /usr/bin/octo remove:upstart $BASE
       /usr/bin/octo stop $BASE
       if [ -d /home/git/$BASE.git ]; then
         sudo rm -rf /home/git/$BASE.git
@@ -655,6 +682,8 @@ case "$1" in
       /usr/bin/octo remove:consul_watch $BASE
       # Remove the kv data.
       /usr/bin/octo config:rm $BASE
+      # Remove the Upstart config.
+      /usr/bin/octo remove:upstart $BASE
     else
       echo "Usage: octo remove:config {container}"
     fi
