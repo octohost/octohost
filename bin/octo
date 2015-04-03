@@ -551,19 +551,19 @@ case "$1" in
     ALT_NGINX=$(/usr/bin/octo config:get $BASE/NGINX_ALT)
     FORCE_SSL=$(/usr/bin/octo config:get $BASE/SSL_FORCED)
 
-    if [ -z "$ALT_NGINX" ]; then
-      if [ ! -f $ALT_NGINX ]; then
-        sudo cp $ALT_NGINX $NGINX_TEMPLATE
+    if [ ! -z "$FORCE_SSL" ]; then
+      if [ ! -f $NGINX_TEMPLATE ]; then
+        sudo cp /etc/nginx/templateSSL.ctmpl $NGINX_TEMPLATE
         sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
       fi
-    elif [ -z "$FORCE_SSL" ]; then
+    elif [ ! -z "$ALT_NGINX" ]; then
       if [ ! -f $NGINX_TEMPLATE ]; then
-        sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
+        sudo cp $ALT_NGINX $NGINX_TEMPLATE
         sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
       fi
     else
       if [ ! -f $NGINX_TEMPLATE ]; then
-        sudo cp /etc/nginx/templateSSL.ctmpl $NGINX_TEMPLATE
+        sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
         sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
       fi
     fi
