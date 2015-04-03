@@ -548,8 +548,15 @@ case "$1" in
     fi
     # If there isn't a template already, copy the template and set the name.
     NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
+    ALT_NGINX=$(/usr/bin/octo config:get $BASE/NGINX_ALT)
     FORCE_SSL=$(/usr/bin/octo config:get $BASE/SSL_FORCED)
-    if [ -z "$FORCE_SSL" ]; then
+    if [ -z "$ALT_NGINX" ]; then
+      NGINX_TEMPLATE="$ALT_NGINX"
+      if [ ! -f $NGINX_TEMPLATE ]; then
+        sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
+        sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
+      fi
+    elif [ -z "$FORCE_SSL" ]; then
       if [ ! -f $NGINX_TEMPLATE ]; then
         sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
         sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
