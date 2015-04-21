@@ -72,13 +72,19 @@ check_syslog_port ()
 
 inspect_to_get_external_port()
 {
-  PORT=$(sudo docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $ID)
+  PORT=$(sudo docker -H $DOCKER_HOST inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostPort}} {{end}}' $ID)
   echo $PORT
+}
+
+inspect_to_get_ip_address()
+{
+  IP_ADDRESS=$(sudo docker -H $DOCKER_HOST inspect --format='{{range $p, $conf := .NetworkSettings.Ports}}{{(index $conf 0).HostIp}} {{end}}' $ID)
+  echo $IP_ADDRESS
 }
 
 inspect_to_get_container_name()
 {
-  for tag in $(sudo docker inspect -f '{{json .Config.Env}}' $ID | jq '.[]' ); do
+  for tag in $(sudo docker -H $DOCKER_HOST inspect -f '{{json .Config.Env}}' $ID | jq '.[]' ); do
   if echo $tag | grep -q "CONTAINER_NAME"
   then
     CONTAINER_NAME=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
@@ -89,7 +95,11 @@ inspect_to_get_container_name()
 
 launch_container_return_id ()
 {
-  ID=$(echo "$RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | xargs sudo docker run)
+  if [ -n "$PRIVATE_REGISTRY" ]; then
+    ID=$(echo "$RUN_OPTIONS $PRIVATE_REGISTRY/$BASE" | xargs sudo docker -H $DOCKER_HOST run)
+  else
+    ID=$(echo "$RUN_OPTIONS $BUILD_ORG_NAME/$BASE" | xargs sudo docker -H $DOCKER_HOST run)
+  fi
   echo $ID
 }
 
@@ -171,8 +181,9 @@ case "$1" in
         fi
         ID=$(launch_container_return_id)
         PORT=$(inspect_to_get_external_port)
+        CONTAINER_IP=$(inspect_to_get_ip_address)
         TAGS=$(/usr/bin/octo service:tags $ID)
-        /usr/bin/octo service:set $BASE $PORT $TAGS
+        /usr/bin/octo service:set $BASE $CONTAINER_IP $PORT $TAGS
         /usr/bin/octo add:upstart $BASE
       done
     else
@@ -189,15 +200,15 @@ case "$1" in
         else
           IMAGE_ID="$3"
         fi
-        CONTAINERS=$(sudo docker ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
+        CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
       else
-        CONTAINERS=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+        CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "$BASE:latest" | cut -d ' ' -f 1)
       fi
       for container in $CONTAINERS
       do
         ID="$container"
         PORT=$(inspect_to_get_external_port)
-        sudo docker kill "$ID" > /dev/null
+        sudo docker -H $DOCKER_HOST kill "$ID" > /dev/null
         octo service:rm "$BASE" "$PORT"
       done
       if [ -z $IMAGE_ID ]; then
@@ -400,13 +411,14 @@ case "$1" in
         exit 0
       fi
     fi
-    if [[ $2 && $3 ]]; then
+    if [[ $2 && $3 && $4 ]]; then
       CONTAINER="$2"
-      PORT="$3"
-      TAGS=${4:-http}
+      CONTAINER_IP="$3"
+      PORT="$4"
+      TAGS=${5:-http}
 
       CUSTOM_CHECK=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK)
-      CHECK_COMMAND=${CUSTOM_CHECK:-http://$PRIVATE_IP:$PORT}
+      CHECK_COMMAND=${CUSTOM_CHECK:-http://$CONTAINER_IP:$PORT}
 
       CUSTOM_CHECK_INTERVAL=$(/usr/bin/octo config:get $CONTAINER/CUSTOM_CHECK_INTERVAL)
       CHECK_INTERVAL=${CUSTOM_CHECK_INTERVAL:-15s}
@@ -417,11 +429,11 @@ case "$1" in
       else
         CHECK=""
       fi
-      PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
+      PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Address\": \"$CONTAINER_IP\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
       /usr/bin/consulkv service:set "$PAYLOAD"
       log "service:set '$PAYLOAD'"
     else
-      echo "Usage: octo service:set {container} {port} {tags}"
+      echo "Usage: octo service:set {container} {ip_address} {port} {tags}"
     fi
   ;;
 
@@ -443,7 +455,7 @@ case "$1" in
 
   service:tags)
     if [ $2 ]; then
-      for tag in $(sudo docker inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
+      for tag in $(sudo docker -H $DOCKER_HOST inspect -f '{{json .Config.Env}}' $2 | jq '.[]' ); do
         if echo $tag | grep -q "CONSUL_TAGS"
         then
           TAG=$(echo $tag | cut -d '"' -f 2 | cut -d '=' -f 2-10)
@@ -463,19 +475,20 @@ case "$1" in
   ;;
 
   services:register)
-    for container in $(sudo docker ps | grep $BUILD_ORG_NAME | awk '{ print $1 }'); do
+    for container in $(sudo docker -H $DOCKER_HOST ps | grep $BUILD_ORG_NAME | awk '{ print $1 }'); do
       ID=$container
       PORT=$(inspect_to_get_external_port)
+      CONTAINER_IP=$(inspect_to_get_ip_address)
       BASE=$(inspect_to_get_container_name)
       TAGS=$(/usr/bin/octo service:tags $ID)
       if [[ $BASE && $PORT ]]; then
-        /usr/bin/octo service:set $BASE $PORT $TAGS
+        /usr/bin/octo service:set $BASE $CONTAINER_IP $PORT $TAGS
       fi
     done
   ;;
 
   services:clear)
-    for container in $(sudo docker ps -q ); do
+    for container in $(sudo docker -H $DOCKER_HOST ps -q ); do
       ID=$container
       PORT=$(inspect_to_get_external_port)
       BASE=$(inspect_to_get_container_name)
@@ -633,13 +646,13 @@ case "$1" in
   clean)
     echo "Cleaning old exited containers."
     # TODO: Errors if there's no containers - annoying.
-    sudo docker ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker rm
+    sudo docker -H $DOCKER_HOST ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker -H $DOCKER_HOST rm
     echo "Showing all remaining containers."
-    sudo docker ps -a
+    sudo docker -H $DOCKER_HOST ps -a
     echo "Cleaning out all unused images."
-    sudo docker images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker rmi
+    sudo docker -H $DOCKER_HOST images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker -H $DOCKER_HOST rmi
     echo "Showing all remaining images."
-    sudo docker images
+    sudo docker -H $DOCKER_HOST images
   ;;
 
   remove)
@@ -802,8 +815,8 @@ case "$1" in
     if [ $2 ]; then
       BASE="$2"
       if [ -n "$PRIVATE_REGISTRY" ]; then
-        sudo docker pull $PRIVATE_REGISTRY/$BASE
-        sudo docker tag -f $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
+        sudo docker -H $DOCKER_HOST pull $PRIVATE_REGISTRY/$BASE
+        sudo docker -H $DOCKER_HOST tag -f $PRIVATE_REGISTRY/$BASE $BUILD_ORG_NAME/$BASE
       else
         echo "This feature requires a private registry."
       fi
@@ -859,7 +872,7 @@ case "$1" in
   octo domains:set {container} {domains}   Put list of comma separated domains into Consul for a {container}
   octo domains:get {container}             Get list of domains from Consul for a {container}
 
-  octo service:set {container} {port}      Add service to Consul.
+  octo service:set {container} {ip} {port} Add service to Consul.
   octo service:rm {container} {port}       Remove a service from Consul.
   octo service:tags {container}            Get service tags from CONSUL_TAGS ENV in a container.
 
