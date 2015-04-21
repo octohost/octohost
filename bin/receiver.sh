@@ -99,6 +99,7 @@ NUM_CONTAINERS=${NUM_CONTAINERS:-1}
 if [ -n "$PRIVATE_REGISTRY" ]; then
   echo "Pushing $BASE to a private registry."
   /usr/bin/octo push $BASE > /dev/null
+  docker -H $DOCKER_HOST pull $PRIVATE_REGISTRY/$BASE
 fi
 
 /usr/bin/octo start "$BASE" "$NUM_CONTAINERS"
