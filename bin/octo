@@ -192,28 +192,29 @@ case "$1" in
   ;;
 
   stop)
-    if [ $2 ]; then
+    if [ "$2" ]; then
       BASE="$2"
-      if [ $3 ]; then
+      if [ "$3" ]; then
+        IMAGE_ID="$3"
         if [ -n $PRIVATE_REGISTRY ]; then
-          IMAGE_ID="$PRIVATE_REGISTRY/$BASE"
+          IMAGE_PREFIX="$PRIVATE_REGISTRY/"
         else
-          IMAGE_ID="$3"
+          IMAGE_PREFIX=""
         fi
-        CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "$IMAGE_ID" | cut -d ' ' -f 1)
       else
-        CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "$BASE:latest" | cut -d ' ' -f 1)
+        CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "${IMAGE_PREFIX}$BASE:latest" | cut -d ' ' -f 1)
       fi
       for container in $CONTAINERS
       do
         ID="$container"
         PORT=$(inspect_to_get_external_port)
+        CONTAINER_IP=$(inspect_to_get_ip_address)
         sudo docker -H $DOCKER_HOST kill "$ID" > /dev/null
-        octo service:rm "$BASE" "$PORT"
+        octo service:rm "$BASE" "$CONTAINER_IP" "$PORT"
       done
-      if [ -z $IMAGE_ID ]; then
-        /usr/bin/octo services:remove "$BASE"
-      fi
+      # if [ -z $IMAGE_ID ]; then
+      #   /usr/bin/octo services:remove "$BASE"
+      # fi
     else
       echo "Usage: octo stop {container}"
     fi
@@ -429,7 +430,7 @@ case "$1" in
       else
         CHECK=""
       fi
-      PAYLOAD="{\"ID\": \"$CONTAINER-$PORT\",\"Name\": \"$CONTAINER\",\"Address\": \"$CONTAINER_IP\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
+      PAYLOAD="{\"ID\": \"$CONTAINER-$CONTAINER_IP-$PORT\",\"Name\": \"$CONTAINER\",\"Address\": \"$CONTAINER_IP\",\"Port\": $PORT,\"Tags\": [\"$TAGS\"]$CHECK}"
       /usr/bin/consulkv service:set "$PAYLOAD"
       log "service:set '$PAYLOAD'"
     else
@@ -444,12 +445,13 @@ case "$1" in
         exit 0
       fi
     fi
-    if [[ $2 && $3 ]]; then
+    if [[ "$2" && "$3" && "$4" ]]; then
       CONTAINER="$2"
-      PORT="$3"
-      /usr/bin/consulkv service:del "$CONTAINER-$PORT"
+      CONTAINER_IP="$3"
+      PORT="$4"
+      /usr/bin/consulkv service:del "$CONTAINER-$CONTAINER_IP-$PORT"
     else
-      echo "Usage: octo service:rm {container} {port}"
+      echo "Usage: octo service:rm {container} {ip} {port}"
     fi
   ;;
 
@@ -491,9 +493,10 @@ case "$1" in
     for container in $(sudo docker -H $DOCKER_HOST ps -q ); do
       ID=$container
       PORT=$(inspect_to_get_external_port)
+      CONTAINER_IP=$(inspect_to_get_ip_address)
       BASE=$(inspect_to_get_container_name)
-      if [[ $BASE && $PORT ]]; then
-        /usr/bin/octo service:rm $BASE $PORT
+      if [[ "$BASE" && "$CONTAINER_IP" && "$PORT" ]]; then
+        /usr/bin/octo service:rm "$BASE" "$CONTAINER_IP" "$PORT"
       fi
     done
     # Remove HTTP tagged orphans from crashed containers.

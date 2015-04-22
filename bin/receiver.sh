@@ -29,16 +29,18 @@ echo "Put repo in src format somewhere."
 mkdir -p "$REPO_PATH" && cat | tar -x -C "$REPO_PATH"
 echo "Building Docker image."
 
-# Find out the old container ID.
-OLD_ID=$(sudo docker -H $DOCKER_HOST ps | grep "$BASE:latest" | cut -d ' ' -f 1)
-
 if [ -n "$PRIVATE_REGISTRY" ]; then
   IMAGE_NAME="$PRIVATE_REGISTRY\/$BASE"
 else
   IMAGE_NAME="$BUILD_ORG_NAME\/$BASE"
 fi
 
-IMAGE_ID=$(sudo docker -H $DOCKER_HOST images | grep "$IMAGE_NAME " | awk '{ print $3 }')
+# Find out the old container ID.
+OLD_ID=$(sudo docker -H $DOCKER_HOST ps | grep "$IMAGE_NAME" | cut -d ' ' -f 1)
+log "Old ID: '$OLD_ID'"
+
+IMAGE_ID=$(sudo docker -H $DOCKER_HOST images | grep "$IMAGE_NAME " | awk '{ print $3 }' | sort | uniq)
+log "IMAGE ID: '$IMAGE_ID'"
 
 if [ -e "$DOCKERFILE" ]
 then
