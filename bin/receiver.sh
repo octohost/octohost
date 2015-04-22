@@ -39,9 +39,6 @@ fi
 OLD_ID=$(sudo docker -H $DOCKER_HOST ps | grep "$IMAGE_NAME" | cut -d ' ' -f 1)
 log "Old ID: '$OLD_ID'"
 
-IMAGE_ID=$(sudo docker -H $DOCKER_HOST images | grep "$IMAGE_NAME " | awk '{ print $3 }' | sort | uniq)
-log "IMAGE ID: '$IMAGE_ID'"
-
 if [ -e "$DOCKERFILE" ]
 then
   sudo docker build -t $BUILD_ORG_NAME/$BASE $REPO_PATH
@@ -109,7 +106,10 @@ fi
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
 then
-  /usr/bin/octo stop "$BASE" "$IMAGE_ID"
+  for old_container in $OLD_ID
+  do
+    /usr/bin/octo kill "$BASE" "$old_container"
+  done
 else
   echo "Not killing any containers."
 fi

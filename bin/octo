@@ -194,29 +194,31 @@ case "$1" in
   stop)
     if [ "$2" ]; then
       BASE="$2"
-      if [ "$3" ]; then
-        IMAGE_ID="$3"
-        if [ -n $PRIVATE_REGISTRY ]; then
-          IMAGE_PREFIX="$PRIVATE_REGISTRY/"
-        else
-          IMAGE_PREFIX=""
-        fi
+      if [ -n $PRIVATE_REGISTRY ]; then
+        IMAGE_PREFIX="$PRIVATE_REGISTRY/"
       else
-        CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "${IMAGE_PREFIX}$BASE:latest" | cut -d ' ' -f 1)
+        IMAGE_PREFIX=""
       fi
+      CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "${IMAGE_PREFIX}$BASE:latest" | cut -d ' ' -f 1)
       for container in $CONTAINERS
       do
-        ID="$container"
-        PORT=$(inspect_to_get_external_port)
-        CONTAINER_IP=$(inspect_to_get_ip_address)
-        sudo docker -H $DOCKER_HOST kill "$ID" > /dev/null
-        octo service:rm "$BASE" "$CONTAINER_IP" "$PORT"
+        octo kill "$BASE" "$container"
       done
-      # if [ -z $IMAGE_ID ]; then
-      #   /usr/bin/octo services:remove "$BASE"
-      # fi
     else
-      echo "Usage: octo stop {container}"
+      echo "Usage: octo stop {container_name}"
+    fi
+  ;;
+
+  kill)
+    if [[ "$2" && "$3" ]]; then
+      BASE="$2"
+      ID="$3"
+      PORT=$(inspect_to_get_external_port)
+      CONTAINER_IP=$(inspect_to_get_ip_address)
+      sudo docker -H $DOCKER_HOST kill "$ID" > /dev/null
+      octo service:rm "$BASE" "$CONTAINER_IP" "$PORT"
+    else
+      echo "Usage: octo kill {container} {container_id}"
     fi
   ;;
 
