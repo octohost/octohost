@@ -53,4 +53,4 @@ LINK_PREFIX="http"
 
 CONSUL_PREFIX="octohost"
 
-DOCKER_HOST="tcp://0.0.0.0:4343"
+DOCKER_HOST="tcp://0.0.0.0:4243"
