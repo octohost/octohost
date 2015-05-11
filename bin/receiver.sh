@@ -29,16 +29,15 @@ echo "Put repo in src format somewhere."
 mkdir -p "$REPO_PATH" && cat | tar -x -C "$REPO_PATH"
 echo "Building Docker image."
 
-# Find out the old container ID.
-OLD_ID=$(sudo docker ps | grep "$BASE:latest" | cut -d ' ' -f 1)
-
 if [ -n "$PRIVATE_REGISTRY" ]; then
   IMAGE_NAME="$PRIVATE_REGISTRY\/$BASE"
 else
   IMAGE_NAME="$BUILD_ORG_NAME\/$BASE"
 fi
 
-IMAGE_ID=$(sudo docker images | grep "$IMAGE_NAME " | awk '{ print $3 }')
+# Find out the old container ID.
+OLD_ID=$(sudo docker -H $DOCKER_HOST ps | grep "$IMAGE_NAME" | cut -d ' ' -f 1)
+log "Old ID: '$OLD_ID'"
 
 if [ -e "$DOCKERFILE" ]
 then
@@ -96,12 +95,21 @@ fi
 NUM_CONTAINERS=$(/usr/bin/octo config:get $BASE/CONTAINERS)
 NUM_CONTAINERS=${NUM_CONTAINERS:-1}
 
+if [ -n "$PRIVATE_REGISTRY" ]; then
+  echo "Pushing $BASE to a private registry."
+  /usr/bin/octo push $BASE > /dev/null
+  docker -H $DOCKER_HOST pull $PRIVATE_REGISTRY/$BASE
+fi
+
 /usr/bin/octo start "$BASE" "$NUM_CONTAINERS"
 
 # Kill the old container by ID.
 if [ -n "$OLD_ID" ]
 then
-  /usr/bin/octo stop "$BASE" "$IMAGE_ID"
+  for old_container in $OLD_ID
+  do
+    /usr/bin/octo kill "$BASE" "$old_container"
+  done
 else
   echo "Not killing any containers."
 fi
@@ -116,9 +124,4 @@ if [ -z "$NO_HTTP_PROXY" ]; then
 
 else
   echo "Your container isn't available from the web because you set NO_HTTP_PROXY."
-fi
-
-if [ -n "$PRIVATE_REGISTRY" ]; then
-  echo "Pushing $BASE to a private registry."
-  /usr/bin/octo push $BASE > /dev/null
 fi
