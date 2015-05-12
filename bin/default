@@ -33,8 +33,8 @@ EMAIL_NOTIFICATION="sysadmin@example.com"
 OCTO_BIN="https://raw.githubusercontent.com/octohost/octohost/master/bin/octo"
 
 LOGSPOUT_IMAGE="gliderlabs/logspout"
-#LOGSPOUT_TARGET=""
-LOGSPOUT="docker run -p 8000:8000 -d -v=/var/run/docker.sock:/tmp/docker.sock $LOGSPOUT_IMAGE $LOGSPOUT_TARGET"
+#LOGSPOUT_TARGET="syslog://"
+LOGSPOUT="docker run -p 8000:8000 --name="logspout" -d -v=/var/run/docker.sock:/tmp/docker.sock $LOGSPOUT_IMAGE $LOGSPOUT_TARGET"
 
 REMOTE_SYSLOG_IMAGE="octohost/remote_syslog"
 #REMOTE_SYSLOG_PORT=""
