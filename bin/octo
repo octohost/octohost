@@ -878,7 +878,7 @@ case "$1" in
   octo domains:get {container}             Get list of domains from Consul for a {container}
 
   octo service:set {container} {ip} {port} Add service to Consul.
-  octo service:rm {container} {port}       Remove a service from Consul.
+  octo service:rm {container} {ip} {port}       Remove a service from Consul.
   octo service:tags {container}            Get service tags from CONSUL_TAGS ENV in a container.
 
   octo services                            List all services that the local Consul agent knows about.
