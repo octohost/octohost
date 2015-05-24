@@ -566,25 +566,20 @@ case "$1" in
     fi
     # If there isn't a template already, copy the template and set the name.
     NGINX_TEMPLATE="/etc/nginx/templates/$BASE.ctmpl"
-    ALT_NGINX=$(/usr/bin/octo config:get $BASE/NGINX_ALT)
-    FORCE_SSL=$(/usr/bin/octo config:get $BASE/SSL_FORCED)
+    NGINX_TEMPLATE_ALT=$(/usr/bin/octo config:get $BASE/NGINX_ALT)
+    NGINX_TEMPLATE_SSL=$(/usr/bin/octo config:get $BASE/SSL_FORCED)
 
-    if [ ! -z "$ALT_NGINX" ]; then
-      if [ ! -f $NGINX_TEMPLATE ]; then
-        sudo cp $ALT_NGINX $NGINX_TEMPLATE
-        sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
+    if [ ! -f $NGINX_TEMPLATE ]; then
+      if [ ! -z "$NGINX_TEMPLATE_ALT" ]; then
+        sudo cp $NGINX_TEMPLATE_ALT $NGINX_TEMPLATE
+      elif [ ! -z "$NGINX_TEMPLATE_SSL" ]; then
+        sudo cp /etc/octohost/templates/nginx-ssl.ctmpl $NGINX_TEMPLATE
+      else
+        sudo cp /etc/octohost/templates/nginx.ctmpl $NGINX_TEMPLATE
       fi
-    elif [ ! -z "$FORCE_SSL" ]; then
-      if [ ! -f $NGINX_TEMPLATE ]; then
-        sudo cp /etc/nginx/templateSSL.ctmpl $NGINX_TEMPLATE
-        sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
-      fi
-    else
-      if [ ! -f $NGINX_TEMPLATE ]; then
-        sudo cp /etc/nginx/template.ctmpl $NGINX_TEMPLATE
-        sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
-      fi
+      sudo sed -i "s/REPLACEME/$BASE/" $NGINX_TEMPLATE
     fi
+
     # If there isn't a Consul template config already, copy and update.
     CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
     if [ ! -f $CONSUL_CONFIG ]; then
