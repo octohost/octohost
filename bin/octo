@@ -583,24 +583,16 @@ case "$1" in
     # If there isn't a Consul template config already, copy and update.
     CONSUL_CONFIG="/etc/nginx/templates/$BASE.cfg"
     if [ ! -f $CONSUL_CONFIG ]; then
-      sudo cp /etc/nginx/template.cfg $CONSUL_CONFIG
+      sudo cp /etc/octohost/templates/consul-template.cfg $CONSUL_CONFIG
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_CONFIG
     fi
     # If there isn't a Consul service watch, copy, update and reload consul.
     CONSUL_WATCH_JSON="/etc/consul.d/watch-$BASE.json"
     if [ ! -f $CONSUL_WATCH_JSON ]; then
-      sudo cp /etc/nginx/template.watch $CONSUL_WATCH_JSON
+      sudo cp /etc/octohost/templates/consul-service-watch.json $CONSUL_WATCH_JSON
       sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_JSON
       sudo service consul reload
     fi
-    # Disabled due to: https://github.com/hashicorp/consul/issues/571
-    # # If there isn't a Consul KV watch, copy, update and reload consul.
-    # CONSUL_WATCH_KV_JSON="/etc/consul.d/watch-kv-$BASE.json"
-    # if [ ! -f $CONSUL_WATCH_KV_JSON ]; then
-    #   sudo cp /etc/nginx/template.kv.watch $CONSUL_WATCH_KV_JSON
-    #   sudo sed -i "s/REPLACEME/$BASE/" $CONSUL_WATCH_KV_JSON
-    #   sudo service consul reload
-    # fi
 
     # Render the proper template and restart the proxy service.
     /usr/bin/octo config:consul_template_render $BASE
