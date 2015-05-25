@@ -1,8 +1,0 @@
-/var/log/serf.log {
-  daily
-  rotate 7
-  delaycompress
-  compress
-  notifempty
-  missingok
-}
