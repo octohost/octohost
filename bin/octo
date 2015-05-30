@@ -317,6 +317,11 @@ case "$1" in
       fi
       done < <(grep -i '^# MOUNT_FROM_HOST' $DOCKERFILE )
 
+      PRIVILEGED=$(grep -i "^# PRIVILEGED" $DOCKERFILE)
+      if [ -n "$PRIVILEGED" ]
+      then
+        RUN_OPTIONS="$RUN_OPTIONS --privileged "
+      fi
 
       while read -r PORTS_FROM_HOST ; do
       if [ -n "$PORTS_FROM_HOST" ]
