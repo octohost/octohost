@@ -48,7 +48,7 @@ start_logs ()
 {
   check_syslog_port
   if [ -e "/var/run/docker.sock" ]; then
-    LOG_COMMAND="sudo docker run -d -v=$1:$2 $REMOTE_SYSLOG_COMMAND $2"
+    LOG_COMMAND="sudo docker run -d --restart always -v=$1:$2 $REMOTE_SYSLOG_COMMAND $2"
     $LOG_COMMAND
   else
     sudo service docker start

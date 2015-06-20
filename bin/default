@@ -34,7 +34,7 @@ OCTO_BIN="https://raw.githubusercontent.com/octohost/octohost/master/bin/octo"
 
 LOGSPOUT_IMAGE="gliderlabs/logspout"
 #LOGSPOUT_TARGET="syslog://"
-LOGSPOUT="docker run -p 8000:8000 --name="logspout" -d -v=/var/run/docker.sock:/tmp/docker.sock $LOGSPOUT_IMAGE $LOGSPOUT_TARGET"
+LOGSPOUT="docker run -p 8000:8000 --restart always --name="logspout" -d -v=/var/run/docker.sock:/tmp/docker.sock $LOGSPOUT_IMAGE $LOGSPOUT_TARGET"
 
 REMOTE_SYSLOG_IMAGE="octohost/remote_syslog"
 #REMOTE_SYSLOG_PORT=""
@@ -43,7 +43,7 @@ REMOTE_SYSLOG_COMMAND="$REMOTE_SYSLOG_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SY
 
 OCTOLOGS_IMAGE="octohost/octologs"
 OCTOLOGS_FILES="-v=/etc/log_files.yml:/log_files.yml -v=/var/log/nginx/access.log:/access.log -v=/var/log/nginx/error.log:/error.log -v=/var/log/upstart/docker.log:/docker.log"
-OCTOLOGS="docker run -d $OCTOLOGS_FILES $OCTOLOGS_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION -c /log_files.yml"
+OCTOLOGS="docker run --restart always -d $OCTOLOGS_FILES $OCTOLOGS_IMAGE -p $REMOTE_SYSLOG_PORT -d $REMOTE_SYSLOG_DESTINATION -c /log_files.yml"
 
 CONSUL_SERVER="0.0.0.0:8500"
 
