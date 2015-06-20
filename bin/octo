@@ -643,14 +643,23 @@ case "$1" in
   ;;
 
   clean)
-    echo "Cleaning old exited containers."
-    # TODO: Errors if there's no containers - annoying.
-    sudo docker -H $DOCKER_HOST ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1 | xargs sudo docker -H $DOCKER_HOST rm
-    echo "Showing all remaining containers."
+    CONTAINERS_TO_DELETE=$(sudo docker -H $DOCKER_HOST ps -a | grep -v "$BUILD_ORG_NAME\/.*\_data*" | grep "Exit" | cut -d ' ' -f 1)
+    if [ "$CONTAINERS_TO_DELETE" != '' ] ; then
+      echo "Cleaning old exited containers."
+      echo $CONTAINERS_TO_DELETE | xargs sudo docker -H $DOCKER_HOST rm
+    else
+      echo "No exited containers to delete."
+    fi
+    echo "Showing remaining containers."
     sudo docker -H $DOCKER_HOST ps -a
-    echo "Cleaning out all unused images."
-    sudo docker -H $DOCKER_HOST images | grep "\<none\>" | awk '{ print $3 }' | xargs sudo docker -H $DOCKER_HOST rmi
-    echo "Showing all remaining images."
+    IMAGES_TO_DELETE=$(sudo docker -H $DOCKER_HOST images | grep "\<none\>" | awk '{ print $3 }')
+    if [ "$IMAGES_TO_DELETE" != '' ] ; then
+      echo "Cleaning out all unused images."
+      echo $IMAGES_TO_DELETE | xargs sudo docker -H $DOCKER_HOST rmi
+    else
+      echo "No unused images to delete."
+    fi
+    echo "Showing remaining images."
     sudo docker -H $DOCKER_HOST images
   ;;
 
