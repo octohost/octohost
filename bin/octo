@@ -858,6 +858,12 @@ case "$1" in
     sudo service consul start
   ;;
 
+  docker:reset_key)
+    sudo service docker stop
+    rm -f /etc/docker/key.json
+    sudo service docker start
+  ;;
+
   help|-h|--help)
     echo "Usage: octo status|clean|restart|reload|remove|move|config|logspout|logs|update"
     cat<<EOF
