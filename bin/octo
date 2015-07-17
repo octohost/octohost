@@ -260,8 +260,8 @@ case "$1" in
     if [ $2 ]; then
       for conf in `/usr/bin/consulkv ls $CONSUL_PREFIX/$2`;
       do
-        echo -n "/$2/$conf:";
-        /usr/bin/octo config:get $2/$conf
+        CONF_VALUE=$(/usr/bin/octo config:get $2/$conf)
+        echo "/$2/$conf:$CONF_VALUE";
       done
     else
       echo "Usage: octo config {container}"
