@@ -743,13 +743,14 @@ case "$1" in
   move:sites)
     if [ $2 ]; then
       # Grab all of the sites.
-      sudo /usr/bin/rsync -avz ubuntu@$2:/home/git/*.git /home/git/
+      RSYNC_USERNAME=${3:-ubuntu}
+      sudo /usr/bin/rsync -avz $RSYNC_USERNAME@$2:/home/git/*.git /home/git/
       cd /home/git
       for i in *.git; do
         site=`basename $i .git`
-        /usr/bin/octo restart $site
         # Need a checkout and not a bare repo to build with later.
         sudo git clone /home/git/$site.git $SRC_DIR/$site.git
+        /usr/bin/octo restart $site
       done
       sudo chown -R git.git $SRC_DIR
     else
