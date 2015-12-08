@@ -199,7 +199,7 @@ case "$1" in
       else
         IMAGE_PREFIX=""
       fi
-      CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "${IMAGE_PREFIX}$BASE:latest" | cut -d ' ' -f 1)
+      CONTAINERS=$(sudo docker -H $DOCKER_HOST ps | grep "${IMAGE_PREFIX}$BASE" | cut -d ' ' -f 1)
       for container in $CONTAINERS
       do
         octo kill "$BASE" "$container"
