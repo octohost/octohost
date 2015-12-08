@@ -760,7 +760,8 @@ case "$1" in
 
   move:config)
     if [ $2 ]; then
-      ssh `whoami`@$2 "octo config:export" | bash
+      SSH_USERNAME=${3:-ubuntu}
+      ssh $SSH_USERNAME@$2 "octo config:export" | bash
       echo "## Done moving the config from $2. ##"
       octo config:export
     else
