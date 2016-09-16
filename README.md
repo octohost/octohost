@@ -3,6 +3,10 @@
 Purpose
 --------
 
+## DEPRECATED
+
+**NOTE:** This project is no longer actively maintained. Use [Dokku](https://github.com/dokku/dokku), [Deis Workflow](https://deis.com/) or [Kubernetes](https://github.com/kubernetes/kubernetes).
+
 To host any web code possible by adding a Dockerfile to your app's source repository.
 
 All documentation has been moved to the main site at [http://www.octohost.io](http://www.octohost.io).
